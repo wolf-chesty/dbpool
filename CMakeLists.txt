@@ -69,8 +69,8 @@ if (DBPOOL_USE_SQLITE3)
 endif ()
 
 
-option(DBPOOL_TESTS "Build database tests" ON)
+option(DBPOOL_BUILD_TESTS "Build database tests" ON)
 
-if (DBPOOL_TESTS)
+if (DBPOOL_BUILD_TESTS)
 	add_subdirectory(tests)
 endif ()

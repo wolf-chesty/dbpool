@@ -3,6 +3,11 @@
 #include "db_conn_guard.h"
 #include "db_conn_pool.h"
 
+//!
+//! \brief Takes ownership of the members from \c connGuard.
+//!
+//! \param connGuard Connection guard to take ownership of.
+//!
 db_conn_guard::db_conn_guard(db_conn_guard&& connGuard)
 {
 	assert(connGuard.mConn);
@@ -13,6 +18,12 @@ db_conn_guard::db_conn_guard(db_conn_guard&& connGuard)
 	mConnPool = std::move(connGuard.mConnPool);
 }
 
+//!
+//! \brief Construct a connection guard with \c conn database connection and \c connPool database connection pool,
+//!
+//! \param conn Database connection.
+//! \param connPool Connection pool that owns the database connection \c conn.
+//!
 db_conn_guard::db_conn_guard(db_conn* conn, std::shared_ptr<db_conn_pool> connPool)
 		:mConn(conn), mConnPool(connPool)
 {
@@ -24,12 +35,16 @@ db_conn_guard::~db_conn_guard()
 {
 	if (mConn) {
 		mConnPool->push_conn(mConn);
-		mConn = nullptr;
 	}
 }
 
 db_conn_guard& db_conn_guard::operator=(db_conn_guard&& connGuard)
 {
+    // make sure old connection pool doesn't "leak" connections
+    if (mConn && mConnPool) {
+        mConnPool->push_conn(mConn);
+    }
+
 	assert(connGuard.mConn);
 	mConn = connGuard.mConn;
 	connGuard.mConn = nullptr;

@@ -8,10 +8,16 @@ class db_conn_pool;
 
 //!
 //! \class db_conn_guard
+//!
 //! \brief Database connection guard.
 //!
-//! This class maintains the lifetime of the \c db_conn class and is responsible for adding the connection back to the
-//! connection pool whenever the object goes out of scope.
+//! This class maintains the lifetime of a \c db_conn object and is responsible for placing the connection back into its
+//! connection pool whenever this object goes out of scope.
+//!
+//! Concurrent threads should NOT share a \c db_conn_guard class as that can potentially cause crashes and/or invalid
+//! indices when multiple threads of execution are returning query results. Each thread should have their own
+//! \c db_conn_guard and destroy it when the thread has completed its operation. By persisting this object, other
+//! threads can be starved of database connections .
 //!
 class db_conn_guard {
 public:
@@ -27,6 +33,6 @@ public:
 	std::unique_ptr<db_stmt> get_stmt(const std::string& sql);
 
 private:
-	db_conn* mConn;
+	db_conn* mConn{};
 	std::shared_ptr<db_conn_pool> mConnPool;
 };

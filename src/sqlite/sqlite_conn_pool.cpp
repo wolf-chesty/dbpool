@@ -56,8 +56,12 @@ sqlite_conn_pool::sqlite_conn_pool(std::string_view filename, const size_t poolS
 
 sqlite_conn_pool::~sqlite_conn_pool()
 {
-	stop_optimization_thread();
-	commit();
+    if (mDb) {
+        stop_optimization_thread();
+        commit();
+
+        sqlite3_close(mDb);
+    }
 }
 
 void sqlite_conn_pool::initialize()
@@ -65,9 +69,8 @@ void sqlite_conn_pool::initialize()
 	sqlite3_enable_shared_cache(1);
 
 	// open handle to database for connection pool stuff
-	if (sqlite3_open(mFilename.c_str(), &mDb)) {
-		const auto err = fmt::format("Unable to open file '{}'", mFilename);
-		throw std::runtime_error(err);
+	if (SQLITE_OK != sqlite3_open(mFilename.c_str(), &mDb)) {
+		throw std::runtime_error(fmt::format("Unable to open file '{}'", mFilename));
 	}
 }
 
@@ -117,8 +120,7 @@ void sqlite_conn_pool::set_schema(const int64_t schema)
 	assert(mDb);
 	const auto sqlStmt = fmt::format("PRAGMA user_version = {}", schema);
 	if (sqlite3_exec(mDb, sqlStmt.data(), nullptr, nullptr, nullptr)) {
-		const auto err = fmt::format("sqlite_conn_pool::set_schema: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(err);
+		throw std::runtime_error(fmt::format("sqlite_conn_pool::set_schema: {}", sqlite3_errmsg(mDb)));
 	}
 }
 
@@ -126,8 +128,7 @@ db_conn* sqlite_conn_pool::new_conn()
 {
 	sqlite3* db{};
 	if (sqlite3_open(mFilename.data(), &db)) {
-		const auto err = fmt::format("sqlite_conn_pool::new_conn: Unable to open file '{}'", mFilename);
-		throw std::runtime_error(err);
+		throw std::runtime_error(fmt::format("sqlite_conn_pool::new_conn: Unable to open file '{}'", mFilename));
 	}
 	return new sqlite_conn(db);
 }
@@ -162,7 +163,7 @@ void sqlite_conn_pool::start_optimization_thread(const size_t timeout, const siz
 	if (timeout > 0) {
 		mRunOptimizationThread = true;
 		mOptimizationThread = std::make_unique<std::thread>(&sqlite_conn_pool::optimization_thread, this, timeout,
-				threshold);
+                threshold);
 		mOptimizationCondition.notify_one();
 	}
 }
@@ -182,8 +183,7 @@ void sqlite_conn_pool::commit()
 {
 	assert(mDb);
 	if (sqlite3_exec(mDb, "VACUUM", nullptr, nullptr, nullptr)) {
-		const auto err = fmt::format("sqlite_conn_pool::commit: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(err);
+		throw std::runtime_error(fmt::format("sqlite_conn_pool::commit: {}", sqlite3_errmsg(mDb)));
 	}
 }
 

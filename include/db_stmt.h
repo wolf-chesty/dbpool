@@ -3,6 +3,15 @@
 #include <string>
 //#include "uuid.h"
 
+//!
+//! \class db_stmt
+//!
+//! \brief Interface for a database prepared statement.
+//!
+//! The purpose of this class is to provide a layer of abstraction for the different database API methods for statement
+//! construction. By coding the rest of the application to this interface the developer can potentially replace the
+//! backing database without having to rewrite code.
+//!
 class db_stmt {
 public:
 	enum class return_code {
@@ -20,6 +29,11 @@ public:
 	db_stmt(const db_stmt&) = delete;
 	db_stmt& operator=(const db_stmt&) = delete;
 
+    //!
+    //! \brief Executes the prepared statement.
+    //!
+    //! \return \c return_code for the statement execution.
+    //!
 	virtual return_code execute() = 0;
 
 	virtual void bind_blob(const int32_t index, const void* data, const size_t nbytes) = 0;

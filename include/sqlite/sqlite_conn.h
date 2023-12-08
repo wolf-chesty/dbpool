@@ -9,7 +9,7 @@
 //!
 //! \class sqlite_conn
 //!
-//! \brief Class that implements the connection to an SQLite3 database.
+//! \brief Class that implements a connection to an SQLite3 database.
 //!
 class sqlite_conn
 		: public db_conn {

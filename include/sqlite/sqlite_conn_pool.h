@@ -5,6 +5,18 @@
 #include "db_conn_pool.h"
 #include "db_file.h"
 
+//!
+//! \class sqlite_conn_pool
+//!
+//! \brief Implements the \c db_conn_pool interface for an SQLite database connection pool.
+//!
+//! This class implements the factory functions needed by the \c db_conn_pool class to construct SQLite database
+//! connections that will be managed by the \c db_conn_pool class.
+//!
+//! This object also performs some housekeeping on the underlying database object such as: vacuuming (change
+//! committal) and database optimization. This object will perform a database vacuum operation upon closing the database
+//! connection. Periodically, this object will also perform a optimization operation on the database.
+//!
 class sqlite_conn_pool
 		: public db_conn_pool, public db_file, public std::enable_shared_from_this<sqlite_conn_pool> {
 private:

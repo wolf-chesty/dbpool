@@ -31,12 +31,12 @@ sqlite_stmt::~sqlite_stmt()
 
 sqlite_stmt& sqlite_stmt::operator=(sqlite_stmt&& stmt)
 {
-    // reset the previous statement before relinquishing control of it
-    if (mStmt) {
-        if (sqlite3_bind_parameter_count(mStmt))
-            sqlite3_clear_bindings(mStmt);
-        sqlite3_reset(mStmt);
-    }
+	// reset the previous statement before relinquishing control of it
+	if (mStmt) {
+		if (sqlite3_bind_parameter_count(mStmt))
+			sqlite3_clear_bindings(mStmt);
+		sqlite3_reset(mStmt);
+	}
 
 	mDb = stmt.mDb;
 	stmt.mDb = nullptr;
@@ -167,8 +167,8 @@ void sqlite_stmt::bind_uuid(const int32_t index, uuids::uuid&& value)
 void sqlite_stmt::bind_text(const int32_t index, std::string_view value)
 {
 	const int ret = value.empty()
-			? sqlite3_bind_null(mStmt, index)
-			: sqlite3_bind_text(mStmt, index, value.data(), static_cast<int>(value.length()), SQLITE_TRANSIENT);
+					? sqlite3_bind_null(mStmt, index)
+					: sqlite3_bind_text(mStmt, index, value.data(), static_cast<int>(value.length()), SQLITE_TRANSIENT);
 
 	if (ret) {
 		const auto e = fmt::format("sqlite::bind_text: {}", sqlite3_errmsg(mDb));
@@ -178,7 +178,7 @@ void sqlite_stmt::bind_text(const int32_t index, std::string_view value)
 
 bool sqlite_stmt::get_bool(const int32_t index)
 {
-	return sqlite3_column_int(mStmt, index)!=0;
+	return sqlite3_column_int(mStmt, index) != 0;
 }
 
 std::string sqlite_stmt::get_date(const int32_t index)

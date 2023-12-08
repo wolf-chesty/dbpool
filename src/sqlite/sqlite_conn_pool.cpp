@@ -56,18 +56,18 @@ sqlite_conn_pool::sqlite_conn_pool(std::string_view filename, const size_t poolS
 
 sqlite_conn_pool::~sqlite_conn_pool()
 {
-    if (mDb) {
-        stop_optimization_thread();
-        commit();
+	if (mDb) {
+		stop_optimization_thread();
+		commit();
 
-        sqlite3_close(mDb);
-    }
+		sqlite3_close(mDb);
+	}
 }
 
 void sqlite_conn_pool::initialize()
 {
-    // set SQLite3 to multi-threaded mode
-    sqlite3_config(SQLITE_CONFIG_MULTITHREAD, nullptr);
+	// set SQLite3 to multi-threaded mode
+	sqlite3_config(SQLITE_CONFIG_MULTITHREAD, nullptr);
 
 	// open handle to database for connection pool stuff
 	if (SQLITE_OK != sqlite3_open(mFilename.c_str(), &mDb)) {
@@ -104,9 +104,9 @@ int64_t sqlite_conn_pool::get_schema()
 		throw std::runtime_error(err);
 	}
 
-		// execute the prepared statement
+	// execute the prepared statement
 #ifdef NDEBUG
-		sqlite3_step(stmt);
+	sqlite3_step(stmt);
 #else
 	assert(SQLITE_ROW == sqlite3_step(stmt));
 #endif
@@ -164,7 +164,7 @@ void sqlite_conn_pool::start_optimization_thread(const size_t timeout, const siz
 	if (timeout > 0) {
 		mRunOptimizationThread = true;
 		mOptimizationThread = std::make_unique<std::thread>(&sqlite_conn_pool::optimization_thread, this, timeout,
-                threshold);
+				threshold);
 		mOptimizationCondition.notify_one();
 	}
 }

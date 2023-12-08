@@ -5,7 +5,7 @@
 
 //!
 //! \class db_conn
-//! \brief Database connection class
+//! \brief Database connection class.
 //!
 //! This class provides an interface for a connection to a database.
 //!

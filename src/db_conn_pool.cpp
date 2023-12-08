@@ -5,7 +5,7 @@
 #include "db_stmt.h"
 
 //!
-//! \brief Creates a connection pull with \c poolSize database connections.
+//! \brief Creates a connection pool with \c poolSize database connections.
 //!
 //! \param poolSize Size of the connection pool.
 //!
@@ -76,7 +76,7 @@ void db_conn_pool::push_conn(db_conn* conn)
     std::unique_lock<std::mutex> lk(mConnectionMutex);
 	mAvailableConnections.push_front(conn);
 	lk.unlock();
-
+pull
     // notify threads waiting in pop_conn for a connection that a connection has been returned to the pool
 	mConnectionCondition.notify_all();
 }

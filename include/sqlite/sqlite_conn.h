@@ -6,6 +6,11 @@
 #include <unordered_map>
 #include "db_conn.h"
 
+//!
+//! \class sqlite_conn
+//!
+//! \brief Class that implements the connection to an SQLite3 database.
+//!
 class sqlite_conn
 		: public db_conn {
 public:

@@ -66,7 +66,8 @@ sqlite_conn_pool::~sqlite_conn_pool()
 
 void sqlite_conn_pool::initialize()
 {
-	sqlite3_enable_shared_cache(1);
+    // set SQLite3 to multi-threaded mode
+    sqlite3_config(SQLITE_CONFIG_MULTITHREAD, nullptr);
 
 	// open handle to database for connection pool stuff
 	if (SQLITE_OK != sqlite3_open(mFilename.c_str(), &mDb)) {

@@ -31,6 +31,13 @@ sqlite_stmt::~sqlite_stmt()
 
 sqlite_stmt& sqlite_stmt::operator=(sqlite_stmt&& stmt)
 {
+    // reset the previous statement before relinquishing control of it
+    if (mStmt) {
+        if (sqlite3_bind_parameter_count(mStmt))
+            sqlite3_clear_bindings(mStmt);
+        sqlite3_reset(mStmt);
+    }
+
 	mDb = stmt.mDb;
 	stmt.mDb = nullptr;
 

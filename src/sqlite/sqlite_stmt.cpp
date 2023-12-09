@@ -78,13 +78,12 @@ void sqlite_stmt::bind_date(const int32_t index, std::string_view value)
 		const std::string v(value);
 		std::istringstream ss{v};
 		date::sys_time<std::chrono::milliseconds> t;
-		ss >> date::parse("%FT%TZ", t);            // timestamp without TZ offset
+		ss >> date::parse("%FT%TZ", t);				// timestamp without TZ offset
 		if (ss.fail()) {
-			// failed to parse the date; perhaps Flowroute sent a timestampe
-			// with TZ offset, try again
+			// failed to parse the date; perhaps timestamp has a TZ offset, try again
 			ss.clear();
 			ss.str(v);
-			ss >> date::parse("%FT%T%Ez", t);    // timestamp with TZ offset
+			ss >> date::parse("%FT%T%Ez", t);		// timestamp with TZ offset
 		}
 
 		// place number of milliseconds since epoch into database

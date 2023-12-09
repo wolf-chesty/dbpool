@@ -18,7 +18,7 @@ sqlite_conn::sqlite_conn(sqlite3* db)
 //!
 sqlite_conn::~sqlite_conn()
 {
-    close();
+	close();
 }
 
 //!
@@ -26,14 +26,14 @@ sqlite_conn::~sqlite_conn()
 //!
 void sqlite_conn::close()
 {
-    // make sure to clean up memory for cached prepared statements
-    for (auto& stmt : mStmtCache) {
-        sqlite3_finalize(stmt.second);
-    }
+	// make sure to clean up memory for cached prepared statements
+	for (auto& stmt : mStmtCache) {
+		sqlite3_finalize(stmt.second);
+	}
 
-    // close database handle
-    assert(mDb);
-    sqlite3_close(mDb);
+	// close database handle
+	assert(mDb);
+	sqlite3_close(mDb);
 }
 
 //!

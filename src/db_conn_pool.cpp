@@ -73,11 +73,11 @@ db_conn* db_conn_pool::pop_conn()
 void db_conn_pool::push_conn(db_conn* conn)
 {
 	// add database connection back to pool
-    std::unique_lock<std::mutex> lk(mConnectionMutex);
+	std::unique_lock<std::mutex> lk(mConnectionMutex);
 	mAvailableConnections.push_front(conn);
 	lk.unlock();
 
-    // notify threads that a connection has been returned to the pool
+	// notify threads that a connection has been returned to the pool
 	mConnectionCondition.notify_all();
 }
 

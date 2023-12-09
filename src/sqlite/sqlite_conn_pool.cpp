@@ -136,9 +136,9 @@ int64_t sqlite_conn_pool::get_schema()
 		throw std::runtime_error(err);
 	}
 
-	// execute the prepared statement
+		// execute the prepared statement
 #ifdef NDEBUG
-	sqlite3_step(stmt);
+		sqlite3_step(stmt);
 #else
 	assert(SQLITE_ROW == sqlite3_step(stmt));
 #endif

@@ -21,10 +21,10 @@ db_conn_guard::db_conn_guard(db_conn* conn, std::shared_ptr<db_conn_pool> connPo
 //!
 db_conn_guard::~db_conn_guard()
 {
-    assert(mConnPool);
-    assert(mConn);
+	assert(mConnPool);
+	assert(mConn);
 
-    if (mConn)
+	if (mConn)
 		mConnPool->push_conn(mConn);
 }
 

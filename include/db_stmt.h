@@ -34,11 +34,11 @@ public:
 	db_stmt& operator=(const db_stmt&) = delete;
 	db_stmt& operator=(db_stmt&&) = delete;
 
-    //!
-    //! \brief Executes the prepared statement.
-    //!
-    //! \return \c return_code for the statement execution.
-    //!
+	//!
+	//! \brief Executes the prepared statement.
+	//!
+	//! \return \c return_code for the statement execution.
+	//!
 	virtual return_code execute() = 0;
 
 	virtual void bind_blob(const int32_t index, const void* data, const size_t nbytes) = 0;

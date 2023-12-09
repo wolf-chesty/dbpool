@@ -11,22 +11,22 @@ class db_file {
 public:
 	virtual ~db_file() = default;
 
-    //!
-    //! \brief Flushes database changes from memory to disk.
-    //!
+	//!
+	//! \brief Flushes database changes from memory to disk.
+	//!
 	virtual void commit() = 0;
 
-    //!
-    //! \brief Returns the database filename.
-    //!
-    //! \return Database filename.
-    //!
+	//!
+	//! \brief Returns the database filename.
+	//!
+	//! \return Database filename.
+	//!
 	virtual std::string get_filename() const = 0;
 
-    //!
-    //! Returns true if the database is open.
-    //!
-    //! \return \c true if the database is open.
-    //!
+	//!
+	//! Returns true if the database is open.
+	//!
+	//! \return \c true if the database is open.
+	//!
 	virtual bool is_open() const = 0;
 };

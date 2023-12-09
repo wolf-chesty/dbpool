@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(thread_test)
 
 	auto stmt2 = conn2->get_stmt("SELECT * FROM t2 ORDER BY x");
 	auto thread2 = [&stmt2]() {
-		BOOST_TEST((db_stmt::return_code::row == stmt2->execute()));
+	  BOOST_TEST((db_stmt::return_code::row == stmt2->execute()));
 	};
 
 	// execute stmt2 while stmt1 still has a selection index and wait for stmt2 to complete; both selection indices

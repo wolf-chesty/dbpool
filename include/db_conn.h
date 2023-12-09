@@ -22,31 +22,31 @@ public:
 	db_conn& operator=(const db_conn&) = delete;
 	db_conn& operator=(db_conn&&) = delete;
 
-    //!
-    //! \brief Returns \c true if the database is open.
-    //!
-    //! \return \c true if the database is open.
-    //!
+	//!
+	//! \brief Returns \c true if the database is open.
+	//!
+	//! \return \c true if the database is open.
+	//!
 	virtual bool is_open() = 0;
 
-    //!
-    //! \brief Executes an SQL statements directly on this database connection.
-    //!
-    //! \param sql SQL statement to execute.
-    //! \return \c db_stmt::return_code.
-    //!
-    //! Executes an SQL statement directly on the database connection without creating a prepared statement.
-    //!
+	//!
+	//! \brief Executes an SQL statements directly on this database connection.
+	//!
+	//! \param sql SQL statement to execute.
+	//! \return \c db_stmt::return_code.
+	//!
+	//! Executes an SQL statement directly on the database connection without creating a prepared statement.
+	//!
 	virtual db_stmt::return_code exec(std::string_view sql) = 0;
 
-    //!
-    //! \brief Get a prepared statement for this database connection.
-    //!
-    //! \param sql SQL statement to create the prepared statement from.
-    //! \return Pointer to a prepared statement object.
-    //!
-    //! Implementers of this function should return a handle to the a prepared statement that can be used with this
-    //! database connection.
-    //!
+	//!
+	//! \brief Get a prepared statement for this database connection.
+	//!
+	//! \param sql SQL statement to create the prepared statement from.
+	//! \return Pointer to a prepared statement object.
+	//!
+	//! Implementers of this function should return a handle to the a prepared statement that can be used with this
+	//! database connection.
+	//!
 	virtual std::unique_ptr<db_stmt> get_stmt(std::shared_ptr<db_conn_guard> conn, const std::string& sql) = 0;
 };

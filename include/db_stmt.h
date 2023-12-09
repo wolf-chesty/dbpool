@@ -25,12 +25,14 @@ public:
 	};
 
 public:
-	db_stmt(std::shared_ptr<db_conn_guard> conn);
-	db_stmt(db_stmt&& stmt);
+	db_stmt(const db_stmt&) = delete;
+	db_stmt(db_stmt&&) = delete;
+	explicit db_stmt(std::shared_ptr<db_conn_guard> conn);
+
 	virtual ~db_stmt() = default;
 
-	db_stmt(const db_stmt&) = delete;
 	db_stmt& operator=(const db_stmt&) = delete;
+	db_stmt& operator=(db_stmt&&) = delete;
 
     //!
     //! \brief Executes the prepared statement.

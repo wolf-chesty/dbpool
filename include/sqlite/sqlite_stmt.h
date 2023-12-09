@@ -6,14 +6,14 @@
 class sqlite_stmt
 		: public db_stmt {
 public:
-	sqlite_stmt(sqlite_stmt&& stmt);
+	sqlite_stmt(const sqlite_stmt&) = delete;
+	sqlite_stmt(sqlite_stmt&&) = delete;
 	sqlite_stmt(std::shared_ptr<db_conn_guard> conn, sqlite3* db, sqlite3_stmt* stmt);
+
 	~sqlite_stmt() override;
 
-	sqlite_stmt& operator=(sqlite_stmt&& stmt);
-
-	sqlite_stmt(const sqlite_stmt&) = delete;
 	sqlite_stmt& operator=(const sqlite_stmt&) = delete;
+	sqlite_stmt& operator=(sqlite_stmt&&) = delete;
 
 	return_code execute() override;
 
@@ -39,8 +39,6 @@ public:
 	static return_code to_error_code(int code);
 
 private:
-	void reset();
-
 	sqlite3* mDb{};
 	sqlite3_stmt* mStmt{};
 };

@@ -4,19 +4,6 @@
 #include "sqlite/sqlite_stmt.h"
 
 //!
-//! \brief Creates an SQLite3 database connection using resources from SQLite3 dtabase connection \c conn.
-//!
-//! \param conn Database connection to take resources from.
-//!
-sqlite_conn::sqlite_conn(sqlite_conn&& conn)
-{
-	mDb = conn.mDb;
-	conn.mDb = nullptr;
-
-	mStmtCache = std::move(conn.mStmtCache);
-}
-
-//!
 //! \brief Creates an \c sqlite_conn wrapper around an \c sqlite3 connection pointer.
 //!
 //! \param db SQLite3 API database connection.
@@ -32,25 +19,6 @@ sqlite_conn::sqlite_conn(sqlite3* db)
 sqlite_conn::~sqlite_conn()
 {
     close();
-}
-
-//!
-//! \brief Takes ownership of the \c sqlite3 connection from the \c conn connection.
-//!
-//! \param conn \c sqlite_conn to take ownership from.
-//! \return Reference to this object.
-//!
-sqlite_conn& sqlite_conn::operator=(sqlite_conn&& conn)
-{
-    close();
-
-	mDb = conn.mDb;
-	conn.mDb = nullptr;
-
-    // do we really need to keep the statement cache?
-	mStmtCache = std::move(conn.mStmtCache);
-
-	return *this;
 }
 
 //!

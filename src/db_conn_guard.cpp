@@ -4,21 +4,6 @@
 #include "db_conn_pool.h"
 
 //!
-//! \brief Takes ownership of the members from \c connGuard.
-//!
-//! \param connGuard Connection guard to take ownership from.
-//!
-db_conn_guard::db_conn_guard(db_conn_guard&& connGuard)
-{
-	assert(connGuard.mConn);
-	mConn = connGuard.mConn;
-	connGuard.mConn = nullptr;
-
-	assert(connGuard.mConnPool);
-	mConnPool = std::move(connGuard.mConnPool);
-}
-
-//!
 //! \brief Construct a connection guard with \c conn database connection and \c connPool database connection pool.
 //!
 //! \param conn Database connection.
@@ -44,28 +29,6 @@ db_conn_guard::~db_conn_guard()
 }
 
 //!
-//! \brief Assignment operator that takes ownership of the members of \c connGuard.
-//!
-//! \param connGuard Connection guard to take members from.
-//! \return Reference to this object.
-//!
-db_conn_guard& db_conn_guard::operator=(db_conn_guard&& connGuard)
-{
-    // make sure old connection pool doesn't "leak" connections
-    if (mConn && mConnPool)
-        mConnPool->push_conn(mConn);
-
-	assert(connGuard.mConn);
-	mConn = connGuard.mConn;
-	connGuard.mConn = nullptr;
-
-	assert(connGuard.mConnPool);
-	mConnPool = std::move(connGuard.mConnPool);
-
-	return *this;
-}
-
-//!
 //! \brief Executes an SQL statements on this database connection.
 //!
 //! \param sql SQL statement to execute.
@@ -86,6 +49,5 @@ db_stmt::return_code db_conn_guard::exec(std::string_view sql)
 std::unique_ptr<db_stmt> db_conn_guard::get_stmt(const std::string& sql)
 {
 	assert(mConn);
-	auto p = shared_from_this();
 	return mConn->get_stmt(shared_from_this(), sql);
 }

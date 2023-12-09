@@ -14,10 +14,13 @@
 class db_conn {
 public:
 	db_conn() = default;
+	db_conn(const db_conn&) = delete;
+	db_conn(db_conn&&) = delete;
+
 	virtual ~db_conn() = default;
 
-	db_conn(const db_conn&) = delete;
 	db_conn& operator=(const db_conn&) = delete;
+	db_conn& operator=(db_conn&&) = delete;
 
     //!
     //! \brief Returns \c true if the database is open.

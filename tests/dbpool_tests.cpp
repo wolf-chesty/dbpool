@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(file_name)
 {
 	auto dbPool = sqlite_conn_pool::create(":memory:");
 	auto dbFile = std::dynamic_pointer_cast<db_file>(dbPool);
-	BOOST_TEST(dbFile->get_filename() == ":memory:");
+	BOOST_TEST((dbFile && dbFile->get_filename() == ":memory:"));
 }
 
 BOOST_AUTO_TEST_CASE(table_creation)
@@ -186,6 +186,37 @@ BOOST_AUTO_TEST_CASE(thread_test)
 	// make sure t2 index is still valid
 	BOOST_TEST((stmt2->get_int32(0) == 1));
 	BOOST_TEST((db_stmt::return_code::done == stmt2->execute()));
+}
+
+BOOST_AUTO_TEST_CASE(connection_guard_scope_test)
+{
+	auto conn = sqlite_conn_pool::create(":memory:")->get_conn();
+
+	// make sure that conn is not invalid once the connection pool shared pointer has died
+	BOOST_TEST((db_stmt::return_code::ok == conn->exec("CREATE TABLE t1(x INT)")));
+}
+
+BOOST_AUTO_TEST_CASE(statement_scope_test)
+{
+	std::unique_ptr<db_stmt> stmt;
+	{
+		auto dbPool = sqlite_conn_pool::create(":memory:");
+
+		// create table with values
+		auto conn = dbPool->get_conn();
+		conn->exec("CREATE TABLE t1(x INT)");
+		conn->exec("INSERT INTO t1(x) VALUES(1)");
+		conn->exec("INSERT INTO t1(x) VALUES(5)");
+
+		stmt = conn->get_stmt("SELECT * FROM t1 ORDER BY x");
+	}
+
+	// make sure that conn falling out of scope doesn't cause the prepared statement to crash
+	BOOST_TEST((db_stmt::return_code::row == stmt->execute()));
+	BOOST_TEST((stmt->get_int32(0) == 1));
+	BOOST_TEST((db_stmt::return_code::row == stmt->execute()));
+	BOOST_TEST((stmt->get_int32(0) == 5));
+	BOOST_TEST((db_stmt::return_code::done == stmt->execute()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

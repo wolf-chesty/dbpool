@@ -21,7 +21,7 @@ public:
     //!
     //! \return Database filename.
     //!
-	virtual std::string_view get_filename() const = 0;
+	virtual std::string get_filename() const = 0;
 
     //!
     //! Returns true if the database is open.

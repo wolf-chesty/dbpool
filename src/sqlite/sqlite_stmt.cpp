@@ -8,21 +8,6 @@
 #include "sqlite/sqlite_stmt.h"
 
 //!
-//! \brief Takes ownership of the members from \c stmt.
-//!
-//! \param stmt Statement to take ownership from.
-//!
-sqlite_stmt::sqlite_stmt(sqlite_stmt&& stmt)
-		:db_stmt(std::forward<db_stmt>(stmt))
-{
-	mDb = stmt.mDb;
-	stmt.mDb = nullptr;
-
-	mStmt = stmt.mStmt;
-	stmt.mStmt = nullptr;
-}
-
-//!
 //! \brief Constructs a prepared statement for connection \c db using SQL statement \c stmt.
 //!
 //! \param db Database connection that this prepared statement is bound to.
@@ -36,40 +21,11 @@ sqlite_stmt::sqlite_stmt(std::shared_ptr<db_conn_guard> conn, sqlite3* db, sqlit
 //!
 //! \brief Resets the underlying prepared statement for reuse.
 //!
-sqlite_stmt::~sqlite_stmt()
-{
-	reset();
-}
-
-//!
-//! \brief Takes ownership of the prepared statement \c stmt.
-//!
-//! \param stmt Prepared statement to take ownership from.
-//! \return Reference to this object.
-//!
-sqlite_stmt& sqlite_stmt::operator=(sqlite_stmt&& stmt)
-{
-	// reset the previous statement before relinquishing control of it
-	if (mStmt)
-		reset();
-
-	mDb = stmt.mDb;
-	stmt.mDb = nullptr;
-
-	mStmt = stmt.mStmt;
-	stmt.mStmt = nullptr;
-
-	return *this;
-}
-
-//!
-//! \brief Reset the prepared statement to an empty state.
-//!
 //! Prepared statements are cached for reuse so rather than actually freeing the prepared statement memory this function
 //! will unbind and reset the prepared statement to its initial state for reuse by another process. Prepared statement
 //! deletion will actually be performed by the database connection that created it.
 //!
-void sqlite_stmt::reset()
+sqlite_stmt::~sqlite_stmt()
 {
 	assert(mStmt);
 	if (sqlite3_bind_parameter_count(mStmt))
@@ -94,18 +50,14 @@ sqlite_stmt::return_code sqlite_stmt::execute()
 
 void sqlite_stmt::bind_blob(const int32_t index, const void* data, const size_t nbytes)
 {
-	if (sqlite3_bind_blob(mStmt, index, data, nbytes, SQLITE_TRANSIENT)) {
-		const auto e = fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (sqlite3_bind_blob(mStmt, index, data, nbytes, SQLITE_TRANSIENT))
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(mDb)));
 }
 
 void sqlite_stmt::bind_bool(const int32_t index, const bool value)
 {
-	if (sqlite3_bind_int(mStmt, index, value ? 1 : 0)) {
-		const auto e = fmt::format("sqlite_stmt::bind_bool: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (sqlite3_bind_int(mStmt, index, value ? 1 : 0))
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_bool: {}", sqlite3_errmsg(mDb)));
 }
 
 void sqlite_stmt::bind_date(const int32_t index, std::string_view value)
@@ -148,34 +100,26 @@ void sqlite_stmt::bind_date(const int32_t index, std::string_view value)
 
 void sqlite_stmt::bind_double(const int32_t index, const double value)
 {
-	if (sqlite3_bind_double(mStmt, index, value)) {
-		const auto e = fmt::format("sqlite_stmt::bind_double: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (sqlite3_bind_double(mStmt, index, value))
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_double: {}", sqlite3_errmsg(mDb)));
 }
 
 void sqlite_stmt::bind_int32(const int32_t index, const int32_t value)
 {
-	if (sqlite3_bind_int(mStmt, index, value)) {
-		const auto e = fmt::format("sqlite_stmt::bind_int32: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (sqlite3_bind_int(mStmt, index, value))
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_int32: {}", sqlite3_errmsg(mDb)));
 }
 
 void sqlite_stmt::bind_int64(const int32_t index, const int64_t value)
 {
-	if (sqlite3_bind_int64(mStmt, index, value)) {
-		const auto e = fmt::format("sqlite_stmt::bind_int64: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (sqlite3_bind_int64(mStmt, index, value))
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_int64: {}", sqlite3_errmsg(mDb)));
 }
 
 void sqlite_stmt::bind_null(const int32_t index)
 {
-	if (sqlite3_bind_null(mStmt, index)) {
-		const auto e = fmt::format("sqlite_stmt::bind_null: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (sqlite3_bind_null(mStmt, index))
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_null: {}", sqlite3_errmsg(mDb)));
 }
 
 /*
@@ -200,10 +144,8 @@ void sqlite_stmt::bind_text(const int32_t index, std::string_view value)
 					? sqlite3_bind_null(mStmt, index)
 					: sqlite3_bind_text(mStmt, index, value.data(), static_cast<int>(value.length()), SQLITE_TRANSIENT);
 
-	if (ret) {
-		const auto e = fmt::format("sqlite::bind_text: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (ret)
+		throw std::runtime_error(fmt::format("sqlite::bind_text: {}", sqlite3_errmsg(mDb)));
 }
 
 bool sqlite_stmt::get_bool(const int32_t index)

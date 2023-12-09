@@ -28,8 +28,14 @@ public:
 	using conn_cache_type = std::forward_list<db_conn*>;
 
 public:
-	db_conn_pool(const size_t poolSize = 5);
+	db_conn_pool(const db_conn_pool&) = delete;
+	db_conn_pool(db_conn_pool&&) = delete;
+	explicit db_conn_pool(const size_t poolSize = 5);
+
 	virtual ~db_conn_pool();
+
+	db_conn_pool& operator=(const db_conn_pool&) = delete;
+	db_conn_pool& operator=(db_conn_pool&&) = delete;
 
 	std::shared_ptr<db_conn_guard> get_conn();
 

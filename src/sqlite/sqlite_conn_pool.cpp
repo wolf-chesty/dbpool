@@ -57,7 +57,13 @@ int exec_callback(void *data, int c_num, char **c_vals, char **c_names)
 sqlite_conn_pool::sqlite_conn_pool(std::string_view filename, const size_t poolSize, const size_t optimizationTimeout)
 		:db_conn_pool(poolSize)
 {
-	initialize(filename);
+	// set SQLite3 to multi-threaded mode
+	sqlite3_config(SQLITE_CONFIG_MULTITHREAD, nullptr);
+
+	// open handle to database for connection pool stuff
+	if (SQLITE_OK != sqlite3_open(filename.data(), &mDb))
+		throw std::runtime_error(fmt::format("Unable to open file '{}'", filename));
+
 	start_optimization_thread(optimizationTimeout, 400);
 }
 
@@ -76,21 +82,6 @@ sqlite_conn_pool::~sqlite_conn_pool()
 
 		sqlite3_close(mDb);
 	}
-}
-
-//!
-//! \brief Initializes the SQLite environment and opens the database file.
-//!
-//! \param filename Database filename to initialize.
-//!
-void sqlite_conn_pool::initialize(std::string_view filename)
-{
-	// set SQLite3 to multi-threaded mode
-	sqlite3_config(SQLITE_CONFIG_MULTITHREAD, nullptr);
-
-	// open handle to database for connection pool stuff
-	if (SQLITE_OK != sqlite3_open(filename.data(), &mDb))
-		throw std::runtime_error(fmt::format("Unable to open file '{}'", filename));
 }
 
 //!

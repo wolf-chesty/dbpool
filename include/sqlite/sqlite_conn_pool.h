@@ -40,8 +40,6 @@ public:
 	void set_schema(const int64_t schema) override;
 
 protected:
-	void initialize(std::string_view filename);
-
 	db_conn* new_conn() override;
 	std::shared_ptr<db_conn_pool> shared_base_ptr() override;
 

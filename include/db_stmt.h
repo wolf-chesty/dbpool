@@ -62,7 +62,6 @@ public:
 
 private:
 	// nothing is really done with the mConn member; this is just here to make sure that the mConn object that created
-	// this prepared statement doesn't go out of scope before the prepared statement, causing the database connection
-	// to be returned to the pool for reuse
+	// this prepared statement doesn't go out of scope before the prepared statement
 	std::shared_ptr<db_conn_guard> mConn;
 };

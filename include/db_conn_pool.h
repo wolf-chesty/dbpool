@@ -75,5 +75,5 @@ private:
 	std::mutex mConnectionMutex;
 	conn_cache_type mAvailableConnections;
 
-	std::string_view mPrepSql;
+	std::string mPrepSql;
 };

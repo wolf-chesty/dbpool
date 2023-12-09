@@ -92,10 +92,8 @@ void sqlite_stmt::bind_date(const int32_t index, std::string_view value)
 		ret = sqlite3_bind_int(mStmt, index, millis);
 	}
 
-	if (ret) {
-		const auto e = fmt::format("sqlite_stmt::bind_date: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (ret)
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_date: {}", sqlite3_errmsg(mDb)));
 }
 
 void sqlite_stmt::bind_double(const int32_t index, const double value)

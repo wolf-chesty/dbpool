@@ -49,7 +49,7 @@ protected:
 	void push_conn(db_conn* conn);
 
 	//!
-	//! \brief Factor to create a new \c db_conn object to keep in the connection pool.
+	//! \brief Function to create a new \c db_conn object to keep in the connection pool.
 	//!
 	//! \return A \c db_conn object on the stack.
 	//!

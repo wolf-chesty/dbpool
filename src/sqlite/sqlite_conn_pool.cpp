@@ -89,9 +89,8 @@ void sqlite_conn_pool::initialize(std::string_view filename)
 	sqlite3_config(SQLITE_CONFIG_MULTITHREAD, nullptr);
 
 	// open handle to database for connection pool stuff
-	if (SQLITE_OK != sqlite3_open(filename.data(), &mDb)) {
+	if (SQLITE_OK != sqlite3_open(filename.data(), &mDb))
 		throw std::runtime_error(fmt::format("Unable to open file '{}'", filename));
-	}
 }
 
 //!
@@ -131,14 +130,12 @@ int64_t sqlite_conn_pool::get_schema()
 	// compile prepared statement
 	std::string_view sql{"PRAGMA user_version"};
 	sqlite3_stmt* stmt{};
-	if (sqlite3_prepare_v2(mDb, sql.data(), sql.length() + 1, &stmt, nullptr)) {
-		const auto err = fmt::format("sqlite_conn_pool::get_schema: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(err);
-	}
+	if (sqlite3_prepare_v2(mDb, sql.data(), sql.length() + 1, &stmt, nullptr))
+		throw std::runtime_error(fmt::format("sqlite_conn_pool::get_schema: {}", sqlite3_errmsg(mDb)));
 
-		// execute the prepared statement
+	// execute the prepared statement
 #ifdef NDEBUG
-		sqlite3_step(stmt);
+	sqlite3_step(stmt);
 #else
 	assert(SQLITE_ROW == sqlite3_step(stmt));
 #endif
@@ -156,9 +153,8 @@ void sqlite_conn_pool::set_schema(const int64_t schema)
 {
 	assert(mDb);
 	const auto sqlStmt = fmt::format("PRAGMA user_version = {}", schema);
-	if (sqlite3_exec(mDb, sqlStmt.data(), nullptr, nullptr, nullptr)) {
+	if (sqlite3_exec(mDb, sqlStmt.data(), nullptr, nullptr, nullptr))
 		throw std::runtime_error(fmt::format("sqlite_conn_pool::set_schema: {}", sqlite3_errmsg(mDb)));
-	}
 }
 
 //!
@@ -192,9 +188,8 @@ void sqlite_conn_pool::optimization_thread(const size_t timeout, const size_t th
 
 	sqlite3_stmt* stmt{};
 	const auto sql = fmt::format("PRAGMA analysis_limit = {}; PRAGMA optimize;", threshold);
-	if (sqlite3_prepare_v2(mDb, sql.data(), sql.length() + 1, &stmt, nullptr)) {
+	if (sqlite3_prepare_v2(mDb, sql.data(), sql.length() + 1, &stmt, nullptr))
 		throw std::runtime_error(fmt::format("sqlite_conn_pool::optimization_thread: {}", sqlite3_errmsg(mDb)));
-	}
 
 	auto cond = [this]() -> bool { return !mRunOptimizationThread; };
 
@@ -249,9 +244,8 @@ void sqlite_conn_pool::stop_optimization_thread()
 void sqlite_conn_pool::commit()
 {
 	assert(mDb);
-	if (sqlite3_exec(mDb, "VACUUM", nullptr, nullptr, nullptr)) {
+	if (sqlite3_exec(mDb, "VACUUM", nullptr, nullptr, nullptr))
 		throw std::runtime_error(fmt::format("sqlite_conn_pool::commit: {}", sqlite3_errmsg(mDb)));
-	}
 }
 
 //!

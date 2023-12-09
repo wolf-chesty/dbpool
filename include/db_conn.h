@@ -35,6 +35,7 @@ public:
 	//!
 	//! \brief Get a prepared statement for this database connection.
 	//!
+	//! \param conn \c db_conn_guard that owns the prepared statement.
 	//! \param sql SQL statement to create the prepared statement from.
 	//! \return Pointer to a prepared statement object.
 	//!

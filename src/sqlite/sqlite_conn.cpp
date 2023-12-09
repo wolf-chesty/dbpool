@@ -18,14 +18,6 @@ sqlite_conn::sqlite_conn(sqlite3* db)
 //!
 sqlite_conn::~sqlite_conn()
 {
-	close();
-}
-
-//!
-//! \brief Closes the database connection and frees the memory associated with the connection.
-//!
-void sqlite_conn::close()
-{
 	// make sure to clean up memory for cached prepared statements
 	for (auto& stmt : mStmtCache) {
 		sqlite3_finalize(stmt.second);
@@ -34,16 +26,6 @@ void sqlite_conn::close()
 	// close database handle
 	assert(mDb);
 	sqlite3_close(mDb);
-}
-
-//!
-//! \brief Returns true if the database connection is open.
-//!
-//! \return \c true if the database connection is open.
-//!
-bool sqlite_conn::is_open()
-{
-	return mDb != nullptr;
 }
 
 //!

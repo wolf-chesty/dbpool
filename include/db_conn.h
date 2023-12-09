@@ -23,13 +23,6 @@ public:
 	db_conn& operator=(db_conn&&) = delete;
 
 	//!
-	//! \brief Returns \c true if the database is open.
-	//!
-	//! \return \c true if the database is open.
-	//!
-	virtual bool is_open() = 0;
-
-	//!
 	//! \brief Executes an SQL statements directly on this database connection.
 	//!
 	//! \param sql SQL statement to execute.

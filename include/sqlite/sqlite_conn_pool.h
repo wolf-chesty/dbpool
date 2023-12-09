@@ -13,21 +13,14 @@
 //! This class implements the factory functions needed by the \c db_conn_pool class to construct SQLite database
 //! connections that will be managed by the \c db_conn_pool class.
 //!
-//! This object also performs some housekeeping on the underlying database object such as: vacuuming (change
-//! committal) and database optimization. This object will perform a database vacuum operation upon closing the database
-//! connection. Periodically, this object will also perform a optimization operation on the database.
+//! This object keeps a file handle to the SQLite database file that it manages the connection pool for. This connection
+//! isn't counted in the total number of connections for the pool and is used to performs housekeeping on the underlying
+//! database backend such as: vacuuming (defragmentation) upon database close and periodic database optimization. Keep
+//! this in mind as there will be one more connection than specified for this connection pool.
 //!
 class sqlite_conn_pool
 		: public db_conn_pool, public db_file, public std::enable_shared_from_this<sqlite_conn_pool> {
-private:
-	struct _params {
-	  std::string_view filename;
-	  size_t poolSize;
-	  size_t optimizationTimeout;
-	};
-
 public:
-	sqlite_conn_pool(_params params);
 	~sqlite_conn_pool() override;
 
 	static std::shared_ptr<db_conn_pool> create(std::string_view filename, const size_t poolSize = defaultPoolSize,

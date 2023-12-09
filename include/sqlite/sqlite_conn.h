@@ -28,9 +28,11 @@ public:
 
 	bool is_open() override;
 	db_stmt::return_code exec(std::string_view sql) override;
-	std::unique_ptr<db_stmt> get_stmt(const std::string& sql) override;
+	std::unique_ptr<db_stmt> get_stmt(std::shared_ptr<db_conn_guard> conn, const std::string& sql) override;
 
 private:
+    void close();
+
 	sqlite3* mDb{};
 	stmt_cache_type mStmtCache;
 };

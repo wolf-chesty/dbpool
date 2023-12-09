@@ -31,7 +31,7 @@ public:
 	db_conn_pool(const size_t poolSize = 5);
 	virtual ~db_conn_pool();
 
-	db_conn_guard get_conn();
+	std::shared_ptr<db_conn_guard> get_conn();
 
 	virtual int64_t get_schema() = 0;
 	virtual void set_schema(int64_t schema) = 0;
@@ -42,7 +42,24 @@ protected:
 	db_conn* pop_conn();
 	void push_conn(db_conn* conn);
 
+	//!
+	//! \brief Factor to create a new \c db_conn object to keep in the connection pool.
+	//!
+	//! \return A \c db_conn object on the stack.
+	//!
 	virtual db_conn* new_conn() = 0;
+
+	//!
+	//! \brief Returns an \c std::shared_ptr to this object.
+	//!
+	//! \return \c std::shared_ptr to this object.
+	//!
+	//! Functions in this class will use managed pointers to the base class (this object) of derived classes. Most
+	//! objects in this library are coded against the \c db_conn_pool interface and some objects (such as the
+	//! \c db_conn_guard class) use shared pointers to the connection pool in order to control the lifetime of the
+	//! connection pool. By using managed pointers we can avoid prematurely closing the database connections in the pool
+	//! by having each \c db_conn_guard keep a \c std::shared_ptr to the owning connection pool.
+	//!
 	virtual std::shared_ptr<db_conn_pool> shared_base_ptr() = 0;
 
 	virtual void prep_conn(db_conn*);

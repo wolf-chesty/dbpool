@@ -7,7 +7,7 @@ class sqlite_stmt
 		: public db_stmt {
 public:
 	sqlite_stmt(sqlite_stmt&& stmt);
-	sqlite_stmt(sqlite3* db, sqlite3_stmt* stmt);
+	sqlite_stmt(std::shared_ptr<db_conn_guard> conn, sqlite3* db, sqlite3_stmt* stmt);
 	~sqlite_stmt() override;
 
 	sqlite_stmt& operator=(sqlite_stmt&& stmt);
@@ -39,6 +39,8 @@ public:
 	static return_code to_error_code(int code);
 
 private:
+	void reset();
+
 	sqlite3* mDb{};
 	sqlite3_stmt* mStmt{};
 };

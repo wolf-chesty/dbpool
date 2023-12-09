@@ -34,10 +34,10 @@ db_conn_pool::~db_conn_pool()
 //!
 //! \return A new \c db_conn_guard.
 //!
-db_conn_guard db_conn_pool::get_conn()
+std::shared_ptr<db_conn_guard> db_conn_pool::get_conn()
 {
 	auto conn = pop_conn();
-	return db_conn_guard(conn, shared_base_ptr());
+	return std::make_shared<db_conn_guard>(conn, shared_base_ptr());
 }
 
 //!
@@ -76,8 +76,8 @@ void db_conn_pool::push_conn(db_conn* conn)
     std::unique_lock<std::mutex> lk(mConnectionMutex);
 	mAvailableConnections.push_front(conn);
 	lk.unlock();
-pull
-    // notify threads waiting in pop_conn for a connection that a connection has been returned to the pool
+
+    // notify threads that a connection has been returned to the pool
 	mConnectionCondition.notify_all();
 }
 

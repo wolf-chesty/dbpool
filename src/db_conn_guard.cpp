@@ -86,5 +86,6 @@ db_stmt::return_code db_conn_guard::exec(std::string_view sql)
 std::unique_ptr<db_stmt> db_conn_guard::get_stmt(const std::string& sql)
 {
 	assert(mConn);
-	return mConn->get_stmt(sql);
+	auto p = shared_from_this();
+	return mConn->get_stmt(shared_from_this(), sql);
 }

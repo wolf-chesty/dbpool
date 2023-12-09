@@ -28,6 +28,7 @@ target_sources (dbpool
 	PRIVATE
 		src/db_conn_guard.cpp
 		src/db_conn_pool.cpp
+		src/db_stmt.cpp
 )
 
 if (MSVC)

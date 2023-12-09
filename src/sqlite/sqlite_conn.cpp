@@ -31,44 +31,73 @@ sqlite_conn::sqlite_conn(sqlite3* db)
 //!
 sqlite_conn::~sqlite_conn()
 {
-	assert(mDb);
-
-	// deallocate the SQLite prepared statements
-	for (auto& stmt : mStmtCache) {
-		sqlite3_finalize(stmt.second);
-	}
-	// close the database handle
-	sqlite3_close(mDb);
+    close();
 }
 
+//!
+//! \brief Takes ownership of the \c sqlite3 connection from the \c conn connection.
+//!
+//! \param conn \c sqlite_conn to take ownership from.
+//! \return Reference to this object.
+//!
 sqlite_conn& sqlite_conn::operator=(sqlite_conn&& conn)
 {
-	// make sure to clean up memory from previous connection
-	for (auto& stmt : mStmtCache) {
-		sqlite3_finalize(stmt.second);
-	}
-	sqlite3_close
+    close();
 
 	mDb = conn.mDb;
 	conn.mDb = nullptr;
 
+    // do we really need to keep the statement cache?
 	mStmtCache = std::move(conn.mStmtCache);
 
 	return *this;
 }
 
+//!
+//! \brief Closes the database connection and frees the memory associated with the connection.
+//!
+void sqlite_conn::close()
+{
+    // make sure to clean up memory for cached prepared statements
+    for (auto& stmt : mStmtCache) {
+        sqlite3_finalize(stmt.second);
+    }
+
+    // close database handle
+    assert(mDb);
+    sqlite3_close(mDb);
+}
+
+//!
+//! \brief Returns true if the database connection is open.
+//!
+//! \return \c true if the database connection is open.
+//!
 bool sqlite_conn::is_open()
 {
 	return mDb != nullptr;
 }
 
+//!
+//! \brief Executes statement \c sql on the database connection.
+//!
+//! \param sql SQL statement to execute.
+//! \return Return code for statement executed.
+//!
 db_stmt::return_code sqlite_conn::exec(std::string_view sql)
 {
 	assert(mDb);
 	return sqlite_stmt::to_error_code(sqlite3_exec(mDb, sql.data(), nullptr, nullptr, nullptr));
 }
 
-std::unique_ptr<db_stmt> sqlite_conn::get_stmt(const std::string& sql)
+//!
+//! \brief Returns a prepared statement for this database connection.
+//!
+//! \param conn Connection guard that initiated the construction of the prepared statement.
+//! \param sql SQL statement of the prepared statement.
+//! \return Pointer to a prepared statement.
+//!
+std::unique_ptr<db_stmt> sqlite_conn::get_stmt(std::shared_ptr<db_conn_guard> conn, const std::string& sql)
 {
 	assert(mDb);
 
@@ -77,15 +106,14 @@ std::unique_ptr<db_stmt> sqlite_conn::get_stmt(const std::string& sql)
 	if (it == mStmtCache.end()) {
 		// create new stored procedure for connection
 		sqlite3_stmt* stmt;
-		if (sqlite3_prepare_v2(mDb, sql.data(), sql.length() + 1, &stmt, nullptr)) {
-			const auto err = fmt::format("sqlite_conn::get_stmt: {}", sqlite3_errmsg(mDb));
-			throw std::runtime_error(err);
-		}
+		if (sqlite3_prepare_v2(mDb, sql.data(), sql.length() + 1, &stmt, nullptr))
+			throw std::runtime_error(fmt::format("sqlite_conn::get_stmt: {}", sqlite3_errmsg(mDb)));
+
 		mStmtCache.emplace(std::make_pair(sql, stmt));
-		p.reset(new sqlite_stmt(mDb, stmt));
+		p.reset(new sqlite_stmt(conn, mDb, stmt));
 	}
 	else {
-		p.reset(new sqlite_stmt(mDb, it->second));
+		p.reset(new sqlite_stmt(conn, mDb, it->second));
 	}
 	return p;
 }

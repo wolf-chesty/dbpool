@@ -1,7 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <string>
 //#include "uuid.h"
+
+class db_conn_guard;
 
 //!
 //! \class db_stmt
@@ -22,8 +25,8 @@ public:
 	};
 
 public:
-	db_stmt() = default;
-	db_stmt(db_stmt&& stmt) = default;
+	db_stmt(std::shared_ptr<db_conn_guard> conn);
+	db_stmt(db_stmt&& stmt);
 	virtual ~db_stmt() = default;
 
 	db_stmt(const db_stmt&) = delete;
@@ -54,4 +57,10 @@ public:
 	virtual int64_t get_int64(const int32_t index) = 0;
 	virtual std::string get_text(const int32_t index) = 0;
 //	virtual uuids::uuid get_uuid(const int32_t index) = 0;
+
+private:
+	// nothing is really done with the mConn member; this is just here to make sure that the mConn object that created
+	// this prepared statement doesn't go out of scope before the prepared statement, causing the database connection
+	// to be returned to the pool for reuse
+	std::shared_ptr<db_conn_guard> mConn;
 };

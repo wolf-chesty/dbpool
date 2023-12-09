@@ -7,7 +7,13 @@
 #include <sstream>
 #include "sqlite/sqlite_stmt.h"
 
+//!
+//! \brief Takes ownership of the members from \c stmt.
+//!
+//! \param stmt Statement to take ownership from.
+//!
 sqlite_stmt::sqlite_stmt(sqlite_stmt&& stmt)
+		:db_stmt(std::forward<db_stmt>(stmt))
 {
 	mDb = stmt.mDb;
 	stmt.mDb = nullptr;
@@ -16,27 +22,36 @@ sqlite_stmt::sqlite_stmt(sqlite_stmt&& stmt)
 	stmt.mStmt = nullptr;
 }
 
-sqlite_stmt::sqlite_stmt(sqlite3* db, sqlite3_stmt* stmt)
-		:mDb(db), mStmt(stmt)
+//!
+//! \brief Constructs a prepared statement for connection \c db using SQL statement \c stmt.
+//!
+//! \param db Database connection that this prepared statement is bound to.
+//! \param stmt SQL statement to create prepared statement from.
+//!
+sqlite_stmt::sqlite_stmt(std::shared_ptr<db_conn_guard> conn, sqlite3* db, sqlite3_stmt* stmt)
+		:db_stmt(conn), mDb(db), mStmt(stmt)
 {
 }
 
+//!
+//! \brief Resets the underlying prepared statement for reuse.
+//!
 sqlite_stmt::~sqlite_stmt()
 {
-	assert(mStmt);
-	if (sqlite3_bind_parameter_count(mStmt))
-		sqlite3_clear_bindings(mStmt);
-	sqlite3_reset(mStmt);
+	reset();
 }
 
+//!
+//! \brief Takes ownership of the prepared statement \c stmt.
+//!
+//! \param stmt Prepared statement to take ownership from.
+//! \return Reference to this object.
+//!
 sqlite_stmt& sqlite_stmt::operator=(sqlite_stmt&& stmt)
 {
 	// reset the previous statement before relinquishing control of it
-	if (mStmt) {
-		if (sqlite3_bind_parameter_count(mStmt))
-			sqlite3_clear_bindings(mStmt);
-		sqlite3_reset(mStmt);
-	}
+	if (mStmt)
+		reset();
 
 	mDb = stmt.mDb;
 	stmt.mDb = nullptr;
@@ -45,6 +60,21 @@ sqlite_stmt& sqlite_stmt::operator=(sqlite_stmt&& stmt)
 	stmt.mStmt = nullptr;
 
 	return *this;
+}
+
+//!
+//! \brief Reset the prepared statement to an empty state.
+//!
+//! Prepared statements are cached for reuse so rather than actually freeing the prepared statement memory this function
+//! will unbind and reset the prepared statement to its initial state for reuse by another process. Prepared statement
+//! deletion will actually be performed by the database connection that created it.
+//!
+void sqlite_stmt::reset()
+{
+	assert(mStmt);
+	if (sqlite3_bind_parameter_count(mStmt))
+		sqlite3_clear_bindings(mStmt);
+	sqlite3_reset(mStmt);
 }
 
 sqlite_stmt::return_code sqlite_stmt::to_error_code(int code)

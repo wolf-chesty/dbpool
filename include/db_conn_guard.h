@@ -17,9 +17,10 @@ class db_conn_pool;
 //! Concurrent threads should NOT share a \c db_conn_guard class as that can potentially cause crashes and/or invalid
 //! indices when multiple threads of execution are returning query results. Each thread should have their own
 //! \c db_conn_guard and destroy it when the thread has completed its operation. By persisting this object, other
-//! threads can be starved of database connections .
+//! threads can be starved of database connections.
 //!
-class db_conn_guard {
+class db_conn_guard
+		:std::enable_shared_from_this<db_conn_guard> {
 public:
     db_conn_guard(const db_conn_guard&) = delete;
     db_conn_guard(db_conn_guard&& connGuard);

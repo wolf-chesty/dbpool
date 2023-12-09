@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include "db_conn_guard.h"
 #include "db_stmt.h"
 
 //!
@@ -44,5 +45,5 @@ public:
     //! Implementers of this function should return a handle to the a prepared statement that can be used with this
     //! database connection.
     //!
-	virtual std::unique_ptr<db_stmt> get_stmt(const std::string& sql) = 0;
+	virtual std::unique_ptr<db_stmt> get_stmt(std::shared_ptr<db_conn_guard> conn, const std::string& sql) = 0;
 };

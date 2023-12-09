@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(file_name)
 {
 	auto dbPool = sqlite_conn_pool::create(":memory:");
 	auto dbFile = std::dynamic_pointer_cast<db_file>(dbPool);
-	BOOST_TEST((dbFile && dbFile->get_filename() == ":memory:"));
+	BOOST_TEST(dbFile->get_filename() == ":memory:");
 }
 
 BOOST_AUTO_TEST_CASE(table_creation)

@@ -7,7 +7,6 @@
 
 //!
 //! \class sqlite_conn_pool
-//!
 //! \brief Implements the \c db_conn_pool interface for an SQLite database connection pool.
 //!
 //! This class implements the factory functions needed by the \c db_conn_pool class to construct SQLite database

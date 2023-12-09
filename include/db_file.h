@@ -4,7 +4,6 @@
 
 //!
 //! \class db_file
-//!
 //! \brief Provides an interface for a database that is backed by a file (i.e., SQLite3).
 //!
 class db_file {

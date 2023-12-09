@@ -8,12 +8,10 @@ class db_conn_guard;
 
 //!
 //! \class db_stmt
-//!
 //! \brief Interface for a database prepared statement.
 //!
-//! The purpose of this class is to provide a layer of abstraction for the different database API methods for statement
-//! construction. By coding the rest of the application to this interface the developer can potentially replace the
-//! backing database without having to rewrite code.
+//! The responsibility of this class is to provide a standard interface for inter-oping with prepared statements from
+//! different database APIs.
 //!
 class db_stmt {
 public:
@@ -61,7 +59,8 @@ public:
 //	virtual uuids::uuid get_uuid(const int32_t index) = 0;
 
 private:
-	// nothing is really done with the mConn member; this is just here to make sure that the mConn object that created
-	// this prepared statement doesn't go out of scope before the prepared statement
+	// nothing is really done with this mConn member; this is just here to make sure that the db_conn_guard object that
+	// created this prepared statement isn't destroyed and the database connection isn't returned to the connection pool
+	// before the current thread is done using this prepared statement
 	std::shared_ptr<db_conn_guard> mConn;
 };

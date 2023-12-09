@@ -10,16 +10,14 @@ class db_conn;
 
 //!
 //! \class db_conn_pool
+//! \brief A database connection pool class.
 //!
-//! \brief Provides an interface for a database connection pool class.
+//! The responsibility of this class is to manage (create and destroy) \c db_conn objects that will be used by the
+//! application to communicate with the database. This class will return \c db_conn_guard objects to consumers of this
+//! library.
 //!
-//! Different threads of execution cannot use the same database connection when interacting with the same database
-//! otherwise query results can be stomped on or crashes can occur. Typically concurrent access to database resources
-//! are handled using multiple database connections to the same database resource. The database driver will then
-//! coordinate the threaded access of the database resource. Unfortunately, having an unlimited number of database
-//! connections can be detrimental to the performance of your application so it's considered good practice to limit the
-//! number of concurrent open database connections to a database in order to avoid issues. This class manages a pool of
-//! of database connections that will be shared amongst the threads of a multi-threaded program.
+//! Classes that derive from this will need to implement the API specific code required to return a \c db_conn object
+//! that wraps a API specific database handle.
 //!
 class db_conn_pool {
 	friend db_conn_guard;

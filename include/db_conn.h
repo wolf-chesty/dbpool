@@ -8,8 +8,11 @@
 //! \class db_conn
 //! \brief Database connection class.
 //!
-//! This class provides an interface for a connection to a database. Connections of this type are managed by a
-//! connection pool and are only used through a \c db_conn_guard.
+//! The responsibility of this class is to abstract away the nuances of the various database connection API's so that
+//! this library can use a single interface when executing SQL statements.
+//!
+//! Consumers of this library will never see an object of this type as it's only used by the \c db_conn_guard object
+//! when communicating with the database.
 //!
 class db_conn {
 public:

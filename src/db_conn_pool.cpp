@@ -72,6 +72,8 @@ db_conn* db_conn_pool::pop_conn()
 //!
 void db_conn_pool::push_conn(db_conn* conn)
 {
+	assert(conn);
+
 	// add database connection back to pool
 	std::unique_lock<std::mutex> lk(mConnectionMutex);
 	mAvailableConnections.push_front(conn);

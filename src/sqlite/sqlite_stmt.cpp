@@ -7,37 +7,30 @@
 #include <sstream>
 #include "sqlite/sqlite_stmt.h"
 
-sqlite_stmt::sqlite_stmt(sqlite_stmt&& stmt)
-{
-	mDb = stmt.mDb;
-	stmt.mDb = nullptr;
-
-	mStmt = stmt.mStmt;
-	stmt.mStmt = nullptr;
-}
-
-sqlite_stmt::sqlite_stmt(sqlite3* db, sqlite3_stmt* stmt)
-		:mDb(db), mStmt(stmt)
+//!
+//! \brief Constructs a prepared statement for connection \c db using SQL statement \c stmt.
+//!
+//! \param db Database connection that this prepared statement is bound to.
+//! \param stmt SQL statement to create prepared statement from.
+//!
+sqlite_stmt::sqlite_stmt(std::shared_ptr<db_conn_guard> conn, sqlite3* db, sqlite3_stmt* stmt)
+		:db_stmt(conn), mDb(db), mStmt(stmt)
 {
 }
 
+//!
+//! \brief Resets the underlying prepared statement for reuse.
+//!
+//! Prepared statements are cached for reuse so rather than actually freeing the prepared statement memory this function
+//! will unbind and reset the prepared statement to its initial state for reuse by another process. Prepared statement
+//! deletion will actually be performed by the database connection that created it.
+//!
 sqlite_stmt::~sqlite_stmt()
 {
 	assert(mStmt);
 	if (sqlite3_bind_parameter_count(mStmt))
 		sqlite3_clear_bindings(mStmt);
 	sqlite3_reset(mStmt);
-}
-
-sqlite_stmt& sqlite_stmt::operator=(sqlite_stmt&& stmt)
-{
-	mDb = stmt.mDb;
-	stmt.mDb = nullptr;
-
-	mStmt = stmt.mStmt;
-	stmt.mStmt = nullptr;
-
-	return *this;
 }
 
 sqlite_stmt::return_code sqlite_stmt::to_error_code(int code)
@@ -57,18 +50,14 @@ sqlite_stmt::return_code sqlite_stmt::execute()
 
 void sqlite_stmt::bind_blob(const int32_t index, const void* data, const size_t nbytes)
 {
-	if (sqlite3_bind_blob(mStmt, index, data, nbytes, SQLITE_TRANSIENT)) {
-		const auto e = fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (sqlite3_bind_blob(mStmt, index, data, nbytes, SQLITE_TRANSIENT))
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(mDb)));
 }
 
 void sqlite_stmt::bind_bool(const int32_t index, const bool value)
 {
-	if (sqlite3_bind_int(mStmt, index, value ? 1 : 0)) {
-		const auto e = fmt::format("sqlite_stmt::bind_bool: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (sqlite3_bind_int(mStmt, index, value ? 1 : 0))
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_bool: {}", sqlite3_errmsg(mDb)));
 }
 
 void sqlite_stmt::bind_date(const int32_t index, std::string_view value)
@@ -89,13 +78,12 @@ void sqlite_stmt::bind_date(const int32_t index, std::string_view value)
 		const std::string v(value);
 		std::istringstream ss{v};
 		date::sys_time<std::chrono::milliseconds> t;
-		ss >> date::parse("%FT%TZ", t);            // timestamp without TZ offset
+		ss >> date::parse("%FT%TZ", t);				// timestamp without TZ offset
 		if (ss.fail()) {
-			// failed to parse the date; perhaps Flowroute sent a timestampe
-			// with TZ offset, try again
+			// failed to parse the date; perhaps timestamp has a TZ offset, try again
 			ss.clear();
 			ss.str(v);
-			ss >> date::parse("%FT%T%Ez", t);    // timestamp with TZ offset
+			ss >> date::parse("%FT%T%Ez", t);		// timestamp with TZ offset
 		}
 
 		// place number of milliseconds since epoch into database
@@ -103,42 +91,32 @@ void sqlite_stmt::bind_date(const int32_t index, std::string_view value)
 		ret = sqlite3_bind_int(mStmt, index, millis);
 	}
 
-	if (ret) {
-		const auto e = fmt::format("sqlite_stmt::bind_date: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (ret)
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_date: {}", sqlite3_errmsg(mDb)));
 }
 
 void sqlite_stmt::bind_double(const int32_t index, const double value)
 {
-	if (sqlite3_bind_double(mStmt, index, value)) {
-		const auto e = fmt::format("sqlite_stmt::bind_double: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (sqlite3_bind_double(mStmt, index, value))
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_double: {}", sqlite3_errmsg(mDb)));
 }
 
 void sqlite_stmt::bind_int32(const int32_t index, const int32_t value)
 {
-	if (sqlite3_bind_int(mStmt, index, value)) {
-		const auto e = fmt::format("sqlite_stmt::bind_int32: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (sqlite3_bind_int(mStmt, index, value))
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_int32: {}", sqlite3_errmsg(mDb)));
 }
 
 void sqlite_stmt::bind_int64(const int32_t index, const int64_t value)
 {
-	if (sqlite3_bind_int64(mStmt, index, value)) {
-		const auto e = fmt::format("sqlite_stmt::bind_int64: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (sqlite3_bind_int64(mStmt, index, value))
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_int64: {}", sqlite3_errmsg(mDb)));
 }
 
 void sqlite_stmt::bind_null(const int32_t index)
 {
-	if (sqlite3_bind_null(mStmt, index)) {
-		const auto e = fmt::format("sqlite_stmt::bind_null: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (sqlite3_bind_null(mStmt, index))
+		throw std::runtime_error(fmt::format("sqlite_stmt::bind_null: {}", sqlite3_errmsg(mDb)));
 }
 
 /*
@@ -160,18 +138,16 @@ void sqlite_stmt::bind_uuid(const int32_t index, uuids::uuid&& value)
 void sqlite_stmt::bind_text(const int32_t index, std::string_view value)
 {
 	const int ret = value.empty()
-			? sqlite3_bind_null(mStmt, index)
-			: sqlite3_bind_text(mStmt, index, value.data(), static_cast<int>(value.length()), SQLITE_TRANSIENT);
+					? sqlite3_bind_null(mStmt, index)
+					: sqlite3_bind_text(mStmt, index, value.data(), static_cast<int>(value.length()), SQLITE_TRANSIENT);
 
-	if (ret) {
-		const auto e = fmt::format("sqlite::bind_text: {}", sqlite3_errmsg(mDb));
-		throw std::runtime_error(e);
-	}
+	if (ret)
+		throw std::runtime_error(fmt::format("sqlite::bind_text: {}", sqlite3_errmsg(mDb)));
 }
 
 bool sqlite_stmt::get_bool(const int32_t index)
 {
-	return sqlite3_column_int(mStmt, index)!=0;
+	return sqlite3_column_int(mStmt, index) != 0;
 }
 
 std::string sqlite_stmt::get_date(const int32_t index)

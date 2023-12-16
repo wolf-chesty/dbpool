@@ -3,9 +3,9 @@ cmake_policy (VERSION 3.11)
 
 project (dbpool VERSION 0.0.1.0 LANGUAGES C CXX)
 
-add_library(dbpool STATIC "")
+add_library (dbpool STATIC "")
 
-target_include_directories(dbpool
+target_include_directories (dbpool
 	PUBLIC
 		${CMAKE_CURRENT_LIST_DIR}/include
 )
@@ -14,7 +14,7 @@ include (cmake/date.cmake)
 include (cmake/fmt.cmake)
 #include (cmake/stduuid.cmake)
 
-target_link_libraries(dbpool
+target_link_libraries (dbpool
 	PUBLIC
 		fmt
 		pthread
@@ -24,14 +24,15 @@ target_link_libraries(dbpool
 		date::date
 )
 
-target_sources(dbpool
+target_sources (dbpool
 	PRIVATE
 		src/db_conn_guard.cpp
 		src/db_conn_pool.cpp
+		src/db_stmt.cpp
 )
 
 if (MSVC)
-	target_sources(dbpool
+	target_sources (dbpool
 		PRIVATE
 			src/db_conn.h
 			src/db_conn_guard.h
@@ -41,17 +42,17 @@ if (MSVC)
 	)
 endif ()
 
-option(DBPOOL_USE_SQLITE3 "Build SQLite3 code" ON)
+option (USE_SQLITE3 "Build SQLite3 code" ON)
 
-if (DBPOOL_USE_SQLITE3)
-	find_package(SQLite3 REQUIRED)
+if (USE_SQLITE3)
+	find_package (SQLite3 REQUIRED)
 
-	target_link_libraries(dbpool
+	target_link_libraries (dbpool
 		PRIVATE
 			${SQLite3_LIBRARIES}
 	)
 
-	target_sources(dbpool
+	target_sources (dbpool
 		PRIVATE
 			src/sqlite/sqlite_conn.cpp
 			src/sqlite/sqlite_conn_pool.cpp
@@ -59,7 +60,7 @@ if (DBPOOL_USE_SQLITE3)
 	)
 
 	if (MSVC)
-		target_sources(dbpool
+		target_sources (dbpool
 			PRIVATE
 				src/sqlite/sqlite_conn.h
 				src/sqlite/sqlite_conn_pool.h
@@ -69,8 +70,8 @@ if (DBPOOL_USE_SQLITE3)
 endif ()
 
 
-option(DBPOOL_BUILD_TESTS "Build database tests" ON)
+option (BUILD_TESTS "Build database tests" ON)
 
-if (DBPOOL_BUILD_TESTS)
-	add_subdirectory(tests)
+if (BUILD_TESTS)
+	add_subdirectory (tests)
 endif ()

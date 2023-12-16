@@ -8,6 +8,17 @@
 
 class db_conn;
 
+//!
+//! \class db_conn_pool
+//! \brief A database connection pool class.
+//!
+//! The responsibility of this class is to manage (create and destroy) \c db_conn objects that will be used by the
+//! application to communicate with the database. This class will return \c db_conn_guard objects to consumers of this
+//! library.
+//!
+//! Classes that derive from this will need to implement the API specific code required to return a \c db_conn object
+//! that wraps a API specific database handle.
+//!
 class db_conn_pool {
 	friend db_conn_guard;
 
@@ -15,10 +26,16 @@ public:
 	using conn_cache_type = std::forward_list<db_conn*>;
 
 public:
-	db_conn_pool(const size_t poolSize = 5);
+	db_conn_pool(const db_conn_pool&) = delete;
+	db_conn_pool(db_conn_pool&&) = delete;
+	explicit db_conn_pool(const size_t poolSize = 5);
+
 	virtual ~db_conn_pool();
 
-	db_conn_guard get_conn();
+	db_conn_pool& operator=(const db_conn_pool&) = delete;
+	db_conn_pool& operator=(db_conn_pool&&) = delete;
+
+	std::shared_ptr<db_conn_guard> get_conn();
 
 	virtual int64_t get_schema() = 0;
 	virtual void set_schema(int64_t schema) = 0;
@@ -29,7 +46,24 @@ protected:
 	db_conn* pop_conn();
 	void push_conn(db_conn* conn);
 
+	//!
+	//! \brief Function to create a new \c db_conn object to keep in the connection pool.
+	//!
+	//! \return A \c db_conn object on the stack.
+	//!
 	virtual db_conn* new_conn() = 0;
+
+	//!
+	//! \brief Returns an \c std::shared_ptr to this object.
+	//!
+	//! \return \c std::shared_ptr to this object.
+	//!
+	//! Functions in this class will use managed pointers to the base class (this object) of derived classes. Most
+	//! objects in this library are coded against the \c db_conn_pool interface and some objects (such as the
+	//! \c db_conn_guard class) use shared pointers to the connection pool in order to control the lifetime of the
+	//! connection pool. By using managed pointers we can avoid prematurely closing the database connections in the pool
+	//! by having each \c db_conn_guard keep a \c std::shared_ptr to the owning connection pool.
+	//!
 	virtual std::shared_ptr<db_conn_pool> shared_base_ptr() = 0;
 
 	virtual void prep_conn(db_conn*);
@@ -37,8 +71,7 @@ protected:
 private:
 	std::condition_variable mConnectionCondition;
 	std::mutex mConnectionMutex;
-	conn_cache_type mInUseConnections;
 	conn_cache_type mAvailableConnections;
 
-	std::string_view mPrepSql;
+	std::string mPrepSql;
 };

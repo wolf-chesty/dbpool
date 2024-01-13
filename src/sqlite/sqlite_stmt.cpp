@@ -48,19 +48,19 @@ sqlite_stmt::return_code sqlite_stmt::execute()
 	return to_error_code(sqlite3_step(mStmt));
 }
 
-void sqlite_stmt::bind_blob(const int32_t index, const void* data, const size_t nbytes)
+void sqlite_stmt::bind_blob(int32_t const index, void const* data, size_t const nbytes)
 {
 	if (sqlite3_bind_blob(mStmt, index, data, nbytes, SQLITE_TRANSIENT))
 		throw std::runtime_error(fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(mDb)));
 }
 
-void sqlite_stmt::bind_bool(const int32_t index, const bool value)
+void sqlite_stmt::bind_bool(int32_t const index, bool const value)
 {
 	if (sqlite3_bind_int(mStmt, index, value ? 1 : 0))
 		throw std::runtime_error(fmt::format("sqlite_stmt::bind_bool: {}", sqlite3_errmsg(mDb)));
 }
 
-void sqlite_stmt::bind_date(const int32_t index, std::string_view value)
+void sqlite_stmt::bind_date(int32_t const index, std::string_view value)
 {
 	int ret{};
 	if (value.empty()) {
@@ -75,7 +75,7 @@ void sqlite_stmt::bind_date(const int32_t index, std::string_view value)
 		// 	parsing to complete.
 
 		// parse ISO 8601 date
-		const std::string v(value);
+		std::string const v(value);
 		std::istringstream ss{v};
 		date::sys_time<std::chrono::milliseconds> t;
 		ss >> date::parse("%FT%TZ", t);				// timestamp without TZ offset
@@ -87,7 +87,7 @@ void sqlite_stmt::bind_date(const int32_t index, std::string_view value)
 		}
 
 		// place number of milliseconds since epoch into database
-		const int64_t millis = t.time_since_epoch().count();
+		int64_t const millis = t.time_since_epoch().count();
 		ret = sqlite3_bind_int(mStmt, index, millis);
 	}
 
@@ -95,32 +95,32 @@ void sqlite_stmt::bind_date(const int32_t index, std::string_view value)
 		throw std::runtime_error(fmt::format("sqlite_stmt::bind_date: {}", sqlite3_errmsg(mDb)));
 }
 
-void sqlite_stmt::bind_double(const int32_t index, const double value)
+void sqlite_stmt::bind_double(int32_t const index, double const value)
 {
 	if (sqlite3_bind_double(mStmt, index, value))
 		throw std::runtime_error(fmt::format("sqlite_stmt::bind_double: {}", sqlite3_errmsg(mDb)));
 }
 
-void sqlite_stmt::bind_int32(const int32_t index, const int32_t value)
+void sqlite_stmt::bind_int32(int32_t const index, int32_t const value)
 {
 	if (sqlite3_bind_int(mStmt, index, value))
 		throw std::runtime_error(fmt::format("sqlite_stmt::bind_int32: {}", sqlite3_errmsg(mDb)));
 }
 
-void sqlite_stmt::bind_int64(const int32_t index, const int64_t value)
+void sqlite_stmt::bind_int64(int32_t const index, int64_t const value)
 {
 	if (sqlite3_bind_int64(mStmt, index, value))
 		throw std::runtime_error(fmt::format("sqlite_stmt::bind_int64: {}", sqlite3_errmsg(mDb)));
 }
 
-void sqlite_stmt::bind_null(const int32_t index)
+void sqlite_stmt::bind_null(int32_t const index)
 {
 	if (sqlite3_bind_null(mStmt, index))
 		throw std::runtime_error(fmt::format("sqlite_stmt::bind_null: {}", sqlite3_errmsg(mDb)));
 }
 
 /*
-void sqlite_stmt::bind_uuid(const int32_t index, const uuids::uuid& value)
+void sqlite_stmt::bind_uuid(int32_t const index, uuids::uuid const& value)
 {
 	auto d = value.as_bytes();
 	if (sqlite3_bind_blob(mStmt, index, &d[0], d.size(), SQLITE_TRANSIENT)) {
@@ -129,15 +129,15 @@ void sqlite_stmt::bind_uuid(const int32_t index, const uuids::uuid& value)
 	}
 }
 
-void sqlite_stmt::bind_uuid(const int32_t index, uuids::uuid&& value)
+void sqlite_stmt::bind_uuid(int32_t const index, uuids::uuid&& value)
 {
 	bind_uuid(index, value);
 }
 */
 
-void sqlite_stmt::bind_text(const int32_t index, std::string_view value)
+void sqlite_stmt::bind_text(int32_t const index, std::string_view value)
 {
-	const int ret = value.empty()
+	int const ret = value.empty()
 					? sqlite3_bind_null(mStmt, index)
 					: sqlite3_bind_text(mStmt, index, value.data(), static_cast<int>(value.length()), SQLITE_TRANSIENT);
 
@@ -145,12 +145,12 @@ void sqlite_stmt::bind_text(const int32_t index, std::string_view value)
 		throw std::runtime_error(fmt::format("sqlite::bind_text: {}", sqlite3_errmsg(mDb)));
 }
 
-bool sqlite_stmt::get_bool(const int32_t index)
+bool sqlite_stmt::get_bool(int32_t const index)
 {
 	return sqlite3_column_int(mStmt, index) != 0;
 }
 
-std::string sqlite_stmt::get_date(const int32_t index)
+std::string sqlite_stmt::get_date(int32_t const index)
 {
 	// sqlite doesn't have a native date field; keep number of milliseconds since epoch in database
 	auto millis = sqlite3_column_int64(mStmt, index);
@@ -160,28 +160,28 @@ std::string sqlite_stmt::get_date(const int32_t index)
 	return date::format("%FT%TZ", date::floor<std::chrono::milliseconds>(tp));
 }
 
-double sqlite_stmt::get_double(const int32_t index)
+double sqlite_stmt::get_double(int32_t const index)
 {
 	return sqlite3_column_double(mStmt, index);
 }
 
-int32_t sqlite_stmt::get_int32(const int32_t index)
+int32_t sqlite_stmt::get_int32(int32_t const index)
 {
 	return sqlite3_column_int(mStmt, index);
 }
 
-int64_t sqlite_stmt::get_int64(const int32_t index)
+int64_t sqlite_stmt::get_int64(int32_t const index)
 {
 	return sqlite3_column_int64(mStmt, index);
 }
 
-std::string sqlite_stmt::get_text(const int32_t index)
+std::string sqlite_stmt::get_text(int32_t const index)
 {
 	return reinterpret_cast<const char*>(sqlite3_column_text(mStmt, index));
 }
 
 /*
-uuids::uuid sqlite_stmt::get_uuid(const int32_t index)
+uuids::uuid sqlite_stmt::get_uuid(int32_t const index)
 {
 	uuids::uuid id;
 

@@ -23,13 +23,13 @@ public:
 	};
 
 public:
-	db_stmt(const db_stmt&) = delete;
+	db_stmt(db_stmt const&) = delete;
 	db_stmt(db_stmt&&) = delete;
 	explicit db_stmt(std::shared_ptr<db_conn_guard> conn);
 
 	virtual ~db_stmt() = default;
 
-	db_stmt& operator=(const db_stmt&) = delete;
+	db_stmt& operator=(db_stmt const&) = delete;
 	db_stmt& operator=(db_stmt&&) = delete;
 
 	//!
@@ -39,24 +39,24 @@ public:
 	//!
 	virtual return_code execute() = 0;
 
-	virtual void bind_blob(const int32_t index, const void* data, const size_t nbytes) = 0;
-	virtual void bind_bool(const int32_t index, const bool value) = 0;
-	virtual void bind_date(const int32_t index, std::string_view date) = 0;
-	virtual void bind_double(const int32_t index, const double value) = 0;
-	virtual void bind_int32(const int32_t index, const int32_t value) = 0;
-	virtual void bind_int64(const int32_t index, const int64_t value) = 0;
-	virtual void bind_null(const int32_t index) = 0;
-//	virtual void bind_uuid(const int32_t index, const uuids::uuid& id) = 0;
-//	virtual void bind_uuid(const int32_t index, uuids::uuid&& id) = 0;
-	virtual void bind_text(const int32_t index, std::string_view text) = 0;
+	virtual void bind_blob(int32_t const index, void const* data, size_t const nbytes) = 0;
+	virtual void bind_bool(int32_t const index, bool const value) = 0;
+	virtual void bind_date(int32_t const index, std::string_view date) = 0;
+	virtual void bind_double(int32_t const index, double const value) = 0;
+	virtual void bind_int32(int32_t const index, int32_t const value) = 0;
+	virtual void bind_int64(int32_t const index, int64_t const value) = 0;
+	virtual void bind_null(int32_t const index) = 0;
+//	virtual void bind_uuid(int32_t const index, uuids::uuid& const id) = 0;
+//	virtual void bind_uuid(int32_t const index, uuids::uuid&& id) = 0;
+	virtual void bind_text(int32_t const index, std::string_view text) = 0;
 
-	virtual bool get_bool(const int32_t index) = 0;
-	virtual std::string get_date(const int32_t index) = 0;
-	virtual double get_double(const int32_t index) = 0;
-	virtual int32_t get_int32(const int32_t index) = 0;
-	virtual int64_t get_int64(const int32_t index) = 0;
-	virtual std::string get_text(const int32_t index) = 0;
-//	virtual uuids::uuid get_uuid(const int32_t index) = 0;
+	virtual bool get_bool(int32_t const index) = 0;
+	virtual std::string get_date(int32_t const index) = 0;
+	virtual double get_double(int32_t const index) = 0;
+	virtual int32_t get_int32(int32_t const index) = 0;
+	virtual int64_t get_int64(int32_t const index) = 0;
+	virtual std::string get_text(int32_t const index) = 0;
+//	virtual uuids::uuid get_uuid(int32_t const index) = 0;
 
 private:
 	// nothing is really done with this mConn member; this is just here to make sure that the db_conn_guard object that

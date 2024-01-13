@@ -4,8 +4,8 @@
 #include "sqlite/sqlite_conn.h"
 #include "sqlite/sqlite_conn_pool.h"
 
-const size_t sqlite_conn_pool::defaultPoolSize = 15;
-const size_t sqlite_conn_pool::defaultOptimizationTimeout = 10;
+size_t const sqlite_conn_pool::defaultPoolSize = 15;
+size_t const sqlite_conn_pool::defaultOptimizationTimeout = 10;
 
 //static
 //void sqlite3_hook(void * /*object*/, int op, const char * /*database*/, const char * /*table*/, sqlite_int64 /*key*/)
@@ -54,7 +54,7 @@ int exec_callback(void *data, int c_num, char **c_vals, char **c_names)
 //! An \c optimizationTimeout value <= 0 will cause this class to not start the optimization thread and optimization
 //! will not be performed.
 //!
-sqlite_conn_pool::sqlite_conn_pool(std::string_view filename, const size_t poolSize, const size_t optimizationTimeout)
+sqlite_conn_pool::sqlite_conn_pool(std::string_view filename, size_t const poolSize, size_t const optimizationTimeout)
 		:db_conn_pool(poolSize)
 {
 	// set SQLite3 to multi-threaded mode
@@ -92,8 +92,8 @@ sqlite_conn_pool::~sqlite_conn_pool()
 //! \param optimizationTimeout Number of minutes to wait between optimization calls.
 //! \return Pointer to the connection pool.
 //!
-std::shared_ptr<db_conn_pool> sqlite_conn_pool::create(std::string_view filename, const size_t poolSize,
-		const size_t optimizationTimeout)
+std::shared_ptr<db_conn_pool> sqlite_conn_pool::create(std::string_view filename, size_t const poolSize,
+		size_t const optimizationTimeout)
 {
 	std::shared_ptr<sqlite_conn_pool> pool(new sqlite_conn_pool(filename, poolSize, optimizationTimeout));
 	return std::dynamic_pointer_cast<db_conn_pool>(pool);
@@ -130,7 +130,7 @@ int64_t sqlite_conn_pool::get_schema()
 #else
 	assert(SQLITE_ROW == sqlite3_step(stmt));
 #endif
-	const auto schema = sqlite3_column_int64(stmt, 0);
+	auto const schema = sqlite3_column_int64(stmt, 0);
 	sqlite3_finalize(stmt);
 
 	return schema;
@@ -140,10 +140,10 @@ int64_t sqlite_conn_pool::get_schema()
 //!
 //! \param schema Schema number of the database.
 //!
-void sqlite_conn_pool::set_schema(const int64_t schema)
+void sqlite_conn_pool::set_schema(int64_t const schema)
 {
 	assert(mDb);
-	const auto sqlStmt = fmt::format("PRAGMA user_version = {}", schema);
+	auto const sqlStmt = fmt::format("PRAGMA user_version = {}", schema);
 	if (sqlite3_exec(mDb, sqlStmt.data(), nullptr, nullptr, nullptr))
 		throw std::runtime_error(fmt::format("sqlite_conn_pool::set_schema: {}", sqlite3_errmsg(mDb)));
 }
@@ -173,12 +173,12 @@ db_conn* sqlite_conn_pool::new_conn()
 //!
 //! Time taken to optimize the database does not count towards the timeout length.
 //!
-void sqlite_conn_pool::optimization_thread(const size_t timeout, const size_t threshold)
+void sqlite_conn_pool::optimization_thread(size_t const timeout, size_t const threshold)
 {
 	assert(timeout > 0);
 
 	sqlite3_stmt* stmt{};
-	const auto sql = fmt::format("PRAGMA analysis_limit = {}; PRAGMA optimize;", threshold);
+	auto const sql = fmt::format("PRAGMA analysis_limit = {}; PRAGMA optimize;", threshold);
 	if (sqlite3_prepare_v2(mDb, sql.data(), sql.length() + 1, &stmt, nullptr))
 		throw std::runtime_error(fmt::format("sqlite_conn_pool::optimization_thread: {}", sqlite3_errmsg(mDb)));
 
@@ -201,7 +201,7 @@ void sqlite_conn_pool::optimization_thread(const size_t timeout, const size_t th
 //! \param timeout Number of minutes to wait between calls to the optimization thread.
 //! \param threshold Number of records to optimize at once.
 //!
-void sqlite_conn_pool::start_optimization_thread(const size_t timeout, const size_t threshold)
+void sqlite_conn_pool::start_optimization_thread(size_t const timeout, size_t const threshold)
 {
 	assert(!mOptimizationThread);
 	if (timeout > 0) {

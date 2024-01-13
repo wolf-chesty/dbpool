@@ -43,7 +43,7 @@ db_stmt::return_code db_conn_guard::exec(std::string_view sql)
 //! \param sql SQL statement to create the prepared statement from.
 //! \return Pointer to a prepared statement object.
 //!
-std::unique_ptr<db_stmt> db_conn_guard::get_stmt(const std::string& sql)
+std::unique_ptr<db_stmt> db_conn_guard::get_stmt(std::string const& sql)
 {
 	assert(mConn);
 	return mConn->get_stmt(shared_from_this(), sql);

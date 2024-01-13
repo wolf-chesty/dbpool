@@ -47,7 +47,7 @@ db_stmt::return_code sqlite_conn::exec(std::string_view sql)
 //! \param sql SQL statement of the prepared statement.
 //! \return Pointer to a prepared statement.
 //!
-std::unique_ptr<db_stmt> sqlite_conn::get_stmt(std::shared_ptr<db_conn_guard> conn, const std::string& sql)
+std::unique_ptr<db_stmt> sqlite_conn::get_stmt(std::shared_ptr<db_conn_guard> conn, std::string const& sql)
 {
 	assert(mDb);
 

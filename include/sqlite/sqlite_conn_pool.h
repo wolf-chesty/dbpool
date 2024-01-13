@@ -20,42 +20,42 @@
 class sqlite_conn_pool
 		: public db_conn_pool, public db_file, public std::enable_shared_from_this<sqlite_conn_pool> {
 public:
-	sqlite_conn_pool(const sqlite_conn_pool&) = delete;
+	sqlite_conn_pool(sqlite_conn_pool const&) = delete;
 	sqlite_conn_pool(sqlite_conn_pool&&) = delete;
 
 	~sqlite_conn_pool() override;
 
-	sqlite_conn_pool& operator=(const sqlite_conn_pool&) = delete;
+	sqlite_conn_pool& operator=(sqlite_conn_pool const&) = delete;
 	sqlite_conn_pool& operator=(sqlite_conn_pool&&) = delete;
 
-	static std::shared_ptr<db_conn_pool> create(std::string_view filename, const size_t poolSize = defaultPoolSize,
-			const size_t optimizationTimeout = defaultOptimizationTimeout);
+	static std::shared_ptr<db_conn_pool> create(std::string_view filename, size_t const poolSize = defaultPoolSize,
+			size_t const optimizationTimeout = defaultOptimizationTimeout);
 
 	void commit() override;
 	std::string get_filename() const override;
 	bool is_open() const override;
 
 	int64_t get_schema() override;
-	void set_schema(const int64_t schema) override;
+	void set_schema(int64_t const schema) override;
 
 protected:
 	db_conn* new_conn() override;
 	std::shared_ptr<db_conn_pool> shared_base_ptr() override;
 
 private:
-	sqlite_conn_pool(std::string_view filename, const size_t poolSize, const size_t optimizationTimeout);
+	sqlite_conn_pool(std::string_view filename, size_t const poolSize, size_t const optimizationTimeout);
 
-	void start_optimization_thread(const size_t timeout, const size_t threshold);
+	void start_optimization_thread(size_t const timeout, size_t const threshold);
 	void stop_optimization_thread();
-	void optimization_thread(const size_t timeout, const size_t threshold);
+	void optimization_thread(size_t const timeout, size_t const threshold);
 
 	std::unique_ptr<std::thread> mOptimizationThread;
 	std::mutex mOptimizationMutex;
 	std::condition_variable mOptimizationCondition;
 	bool mRunOptimizationThread{true};
 
-	static const size_t defaultPoolSize;
-	static const size_t defaultOptimizationTimeout;
+	static size_t const defaultPoolSize;
+	static size_t const defaultOptimizationTimeout;
 
 	sqlite3* mDb{};
 };

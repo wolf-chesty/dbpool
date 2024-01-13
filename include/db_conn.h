@@ -17,12 +17,12 @@
 class db_conn {
 public:
 	db_conn() = default;
-	db_conn(const db_conn&) = delete;
+	db_conn(db_conn const&) = delete;
 	db_conn(db_conn&&) = delete;
 
 	virtual ~db_conn() = default;
 
-	db_conn& operator=(const db_conn&) = delete;
+	db_conn& operator=(db_conn const&) = delete;
 	db_conn& operator=(db_conn&&) = delete;
 
 	//!
@@ -45,5 +45,5 @@ public:
 	//! Implementers of this function should return a handle to the a prepared statement that can be used with this
 	//! database connection.
 	//!
-	virtual std::unique_ptr<db_stmt> get_stmt(std::shared_ptr<db_conn_guard> conn, const std::string& sql) = 0;
+	virtual std::unique_ptr<db_stmt> get_stmt(std::shared_ptr<db_conn_guard> conn, std::string const& sql) = 0;
 };

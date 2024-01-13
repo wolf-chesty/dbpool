@@ -9,7 +9,7 @@
 //!
 //! \param poolSize Size of the connection pool.
 //!
-db_conn_pool::db_conn_pool(const size_t poolSize)
+db_conn_pool::db_conn_pool(size_t const poolSize)
 {
 	mAvailableConnections.resize(poolSize, nullptr);
 }

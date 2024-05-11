@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cassert>
-#include "db_conn.h"
+
+#include "db_conn_impl.h"
 #include "db_conn_pool.h"
 #include "db_stmt.h"
 
@@ -10,34 +11,18 @@
 //! \param poolSize Size of the connection pool.
 //!
 db_conn_pool::db_conn_pool(size_t const poolSize)
+    : mAvailableConnections(poolSize)
 {
-	mAvailableConnections.resize(poolSize, nullptr);
 }
 
 //!
-//! \brief Closes the connection pool.
+//! Returns a new \c db_conn object that can be used to execute statements against the database.
 //!
-//! The \c db_conn_pool destructor will iterate through all of the open database connections and delete them.
+//! \return A new \c db_conn.
 //!
-db_conn_pool::~db_conn_pool()
+std::shared_ptr<db_conn> db_conn_pool::get_conn()
 {
-	// delete db connections
-	std::unique_lock<std::mutex> lk(mConnectionMutex);
-	std::for_each(mAvailableConnections.begin(), mAvailableConnections.end(), [](db_conn* conn) { delete conn; });
-	lk.unlock();
-
-	mConnectionCondition.notify_all();
-}
-
-//!
-//! Returns a new \c db_conn_guard object that can be used to execute statements against the database.
-//!
-//! \return A new \c db_conn_guard.
-//!
-std::shared_ptr<db_conn_guard> db_conn_pool::get_conn()
-{
-	auto conn = pop_conn();
-	return std::make_shared<db_conn_guard>(conn, shared_base_ptr());
+    return std::make_shared<db_conn>(pop_conn(), shared_base_ptr());
 }
 
 //!
@@ -45,24 +30,24 @@ std::shared_ptr<db_conn_guard> db_conn_pool::get_conn()
 //!
 //! \return An open \c db_conn.
 //!
-db_conn* db_conn_pool::pop_conn()
+std::unique_ptr<db_conn_impl> db_conn_pool::pop_conn()
 {
-	// if there are available connections then remove the connection from the pool and return it; otherwise wait for a
-	// connection to become available
-	std::unique_lock<std::mutex> lk(mConnectionMutex);
-	mConnectionCondition.wait(lk, [this]() -> bool { return !mAvailableConnections.empty(); });
+    // If there are available connections then remove the connection from the pool and return it; otherwise wait for a
+    // connection to become available
+    std::unique_lock<std::mutex> lk(mConnectionMutex);
+    mConnectionCondition.wait(lk, [this]() -> bool { return !mAvailableConnections.empty(); });
 
-	// grab connection from available pool
-	auto conn = mAvailableConnections.front();
-	mAvailableConnections.pop_front();
+    // Grab connection from available pool
+    auto conn = std::move(mAvailableConnections.front());
+    mAvailableConnections.pop_front();
 
-	// open new database connection if it's not already open
-	if (!conn) {
-		conn = new_conn();
-		prep_conn(conn);
-	}
+    // Open new database connection
+    if (!conn) {
+        conn = new_conn();
+        prep_conn(*conn);
+    }
 
-	return conn;
+    return conn;
 }
 
 //!
@@ -70,17 +55,17 @@ db_conn* db_conn_pool::pop_conn()
 //!
 //! \param conn Database connection to return to the connection pool.
 //!
-void db_conn_pool::push_conn(db_conn* conn)
+void db_conn_pool::push_conn(std::unique_ptr<db_conn_impl> conn)
 {
-	assert(conn);
+    assert(conn);
 
-	// add database connection back to pool
-	std::unique_lock<std::mutex> lk(mConnectionMutex);
-	mAvailableConnections.push_front(conn);
-	lk.unlock();
+    // add database connection back to pool
+    std::unique_lock<std::mutex> lk(mConnectionMutex);
+    mAvailableConnections.emplace_front(std::move(conn));
+    lk.unlock();
 
-	// notify threads that a connection has been returned to the pool
-	mConnectionCondition.notify_all();
+    // notify threads that a connection has been returned to the pool
+    mConnectionCondition.notify_all();
 }
 
 //!
@@ -95,7 +80,7 @@ void db_conn_pool::push_conn(db_conn* conn)
 //!
 void db_conn_pool::set_prep_sql(std::string_view sql)
 {
-	mPrepSql = sql;
+    mPrepSql = sql;
 }
 
 //!
@@ -103,11 +88,10 @@ void db_conn_pool::set_prep_sql(std::string_view sql)
 //!
 //! \param conn Database connection to execute the preparation statement against.
 //!
-//! This function executes the preparatory statement against the \c conn database connection. For more information
-//! about this see \c db_conn_pool::set_prep_sql.
+//! This function executes the preparatory statement against the \c conn database connection.
 //!
-void db_conn_pool::prep_conn(db_conn* conn)
+void db_conn_pool::prep_conn(db_conn_impl &conn)
 {
-	if (!mPrepSql.empty())
-		conn->exec(mPrepSql);
+    if (!mPrepSql.empty())
+        conn.exec(mPrepSql);
 }

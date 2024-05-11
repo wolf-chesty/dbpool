@@ -1,49 +1,36 @@
 #pragma once
 
 #include <memory>
-#include "db_conn_guard.h"
+
 #include "db_stmt.h"
+
+class db_conn_impl;
+class db_conn_pool;
 
 //!
 //! \class db_conn
-//! \brief Database connection class.
+//! \brief Database connection guard.
 //!
-//! The responsibility of this class is to abstract away the nuances of the various database connection API's so that
-//! this library can use a single interface when executing SQL statements.
+//! The responsibility of this class is to return the \c db_conn_impl class back to its parent \c db_conn_pool object.
+//! This class provides a thin wrapper around the \c db_conn_impl object and will delegate most of its function calls to
+//! its //! \c db_conn_impl member. Upon destruction, objects of this type will return their \c db_conn_impl database
+//! handle to the connection pool for reuse.
 //!
-//! Consumers of this library will never see an object of this type as it's only used by the \c db_conn_guard object
-//! when communicating with the database.
-//!
-class db_conn {
+class db_conn : public std::enable_shared_from_this<db_conn> {
 public:
-	db_conn() = default;
-	db_conn(db_conn const&) = delete;
-	db_conn(db_conn&&) = delete;
+    db_conn(db_conn const &) = delete;
+    db_conn(db_conn &&) = delete;
+    db_conn(std::unique_ptr<db_conn_impl> conn, std::shared_ptr<db_conn_pool> connPool);
 
-	virtual ~db_conn() = default;
+    virtual ~db_conn();
 
-	db_conn& operator=(db_conn const&) = delete;
-	db_conn& operator=(db_conn&&) = delete;
+    db_conn &operator=(db_conn const &) = delete;
+    db_conn &operator=(db_conn &&) = delete;
 
-	//!
-	//! \brief Executes an SQL statements directly on this database connection.
-	//!
-	//! \param sql SQL statement to execute.
-	//! \return \c db_stmt::return_code.
-	//!
-	//! Executes an SQL statement directly on the database connection without creating a prepared statement.
-	//!
-	virtual db_stmt::return_code exec(std::string_view sql) = 0;
+    db_stmt::return_code exec(std::string_view sql);
+    std::unique_ptr<db_stmt> get_stmt(std::string const &sql);
 
-	//!
-	//! \brief Get a prepared statement for this database connection.
-	//!
-	//! \param conn \c db_conn_guard that owns the prepared statement.
-	//! \param sql SQL statement to create the prepared statement from.
-	//! \return Pointer to a prepared statement object.
-	//!
-	//! Implementers of this function should return a handle to the a prepared statement that can be used with this
-	//! database connection.
-	//!
-	virtual std::unique_ptr<db_stmt> get_stmt(std::shared_ptr<db_conn_guard> conn, std::string const& sql) = 0;
+private:
+    std::unique_ptr<db_conn_impl> mConn;
+    std::shared_ptr<db_conn_pool> mConnPool;
 };

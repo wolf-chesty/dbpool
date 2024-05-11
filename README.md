@@ -58,7 +58,7 @@ int main() {
 }
 ```
 
-In order to avoid invalidating the returned statements from contending threads you can try the following.
+In order to avoid invalidating the returned record from contending threads you can try the following.
 
 ```
 #include <thread>

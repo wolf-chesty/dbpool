@@ -5,6 +5,8 @@
 #include "db_conn.h"
 #include "db_stmt.h"
 
+namespace dbpool {
+
 //!
 //! \class db_conn_impl
 //! \brief Database connection class.
@@ -45,3 +47,5 @@ public:
     //!
     virtual std::unique_ptr<db_stmt> get_stmt(std::shared_ptr<db_conn> conn, std::string const &sql) = 0;
 };
+
+} // namespace dbpool

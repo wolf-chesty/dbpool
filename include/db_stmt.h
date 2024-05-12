@@ -4,6 +4,8 @@
 #include <span>
 #include <string>
 
+namespace dbpool {
+
 class db_conn;
 
 //!
@@ -26,6 +28,8 @@ public:
 
     db_stmt &operator=(db_stmt const &) = delete;
     db_stmt &operator=(db_stmt &&) = delete;
+
+    std::shared_ptr<db_conn> get_conn();
 
     //!
     //! \brief Executes the prepared statement.
@@ -58,3 +62,5 @@ private:
     // connection pool before the current thread is done using this prepared statement
     std::shared_ptr<db_conn> mConn;
 };
+
+} // namespace dbpool

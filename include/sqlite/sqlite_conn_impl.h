@@ -7,6 +7,8 @@
 
 #include "db_conn_impl.h"
 
+namespace dbpool {
+
 //!
 //! \class sqlite_conn_impl
 //! \brief Class that implements a connection to an SQLite3 database.
@@ -32,3 +34,5 @@ private:
     sqlite3 *mDb{};
     stmt_cache_type mStmtCache;
 };
+
+} // namespace dbpool

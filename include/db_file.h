@@ -2,6 +2,8 @@
 
 #include <string_view>
 
+namespace dbpool {
+
 //!
 //! \class db_file
 //! \brief Provides an interface for databases that are file backed (i.e., SQLite3).
@@ -29,3 +31,5 @@ public:
     //!
     virtual bool is_open() const = 0;
 };
+
+} // namespace dbpool

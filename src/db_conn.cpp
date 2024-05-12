@@ -1,8 +1,11 @@
+#include "db_conn.h"
+
 #include <cassert>
 
-#include "db_conn.h"
 #include "db_conn_impl.h"
 #include "db_conn_pool.h"
+
+using namespace dbpool;
 
 //!
 //! \brief Construct a connection guard with \c conn database connection and \c connPool database

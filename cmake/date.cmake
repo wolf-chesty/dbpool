@@ -1,10 +1,10 @@
-include(FetchContent)
+INCLUDE (FetchContent)
 
-FetchContent_Declare(date
-		GIT_REPOSITORY https://github.com/HowardHinnant/date.git
-		GIT_TAG tags/v3.0.1
-		GIT_SHALLOW TRUE
-		GIT_PROGRESS TRUE
+FETCHCONTENT_DECLARE (date
+        GIT_REPOSITORY https://github.com/HowardHinnant/date.git
+        GIT_TAG tags/v3.0.1
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
 )
 
-FetchContent_MakeAvailable(date)
+FETCHCONTENT_MAKEAVAILABLE (date)

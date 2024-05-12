@@ -1,9 +1,12 @@
+#include "sqlite/sqlite_conn_pool.h"
+
 #include <cassert>
 #include <fmt/core.h>
 #include <sqlite3.h>
 
 #include "sqlite/sqlite_conn_impl.h"
-#include "sqlite/sqlite_conn_pool.h"
+
+using namespace dbpool;
 
 size_t const sqlite_conn_pool::defaultPoolSize = 15;
 size_t const sqlite_conn_pool::defaultOptimizationTimeout = 10;

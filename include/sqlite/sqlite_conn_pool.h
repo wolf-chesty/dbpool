@@ -7,6 +7,8 @@
 #include "db_conn_pool.h"
 #include "db_file.h"
 
+namespace dbpool {
+
 //!
 //! \class sqlite_conn_pool
 //! \brief Implements the \c db_conn_pool interface for an SQLite database connection pool.
@@ -65,3 +67,5 @@ private:
 
     sqlite3 *mDb{};
 };
+
+} // namespace dbpool

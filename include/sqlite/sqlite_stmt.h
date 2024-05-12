@@ -5,6 +5,8 @@
 
 #include "db_stmt.h"
 
+namespace dbpool {
+
 class sqlite_stmt : public db_stmt {
 public:
     sqlite_stmt(sqlite_stmt const &) = delete;
@@ -42,3 +44,5 @@ private:
     sqlite3 *mDb{};
     sqlite3_stmt *mStmt{};
 };
+
+} // namespace dbpool

@@ -1,9 +1,12 @@
+#include "db_conn_pool.h"
+
 #include <algorithm>
 #include <cassert>
 
 #include "db_conn_impl.h"
-#include "db_conn_pool.h"
 #include "db_stmt.h"
+
+using namespace dbpool;
 
 //!
 //! \brief Creates a connection pool with \c poolSize database connections.

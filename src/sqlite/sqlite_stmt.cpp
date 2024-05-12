@@ -1,3 +1,5 @@
+#include "sqlite/sqlite_stmt.h"
+
 #include <cassert>
 #include <chrono>
 #include <cstring>
@@ -6,7 +8,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "sqlite/sqlite_stmt.h"
+using namespace dbpool;
 
 //!
 //! \brief Constructs a prepared statement for connection \c db using SQL statement \c stmt.

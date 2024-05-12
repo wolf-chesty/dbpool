@@ -4,6 +4,8 @@
 
 #include "db_stmt.h"
 
+namespace dbpool {
+
 class db_conn_impl;
 class db_conn_pool;
 
@@ -34,3 +36,5 @@ private:
     std::unique_ptr<db_conn_impl> mConn;
     std::shared_ptr<db_conn_pool> mConnPool;
 };
+
+} // namespace dbpool

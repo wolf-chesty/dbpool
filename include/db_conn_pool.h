@@ -8,6 +8,8 @@
 
 #include "db_conn.h"
 
+namespace dbpool {
+
 class db_conn_impl;
 
 //!
@@ -77,3 +79,5 @@ private:
 
     std::string mPrepSql;
 };
+
+} // namespace dbpool

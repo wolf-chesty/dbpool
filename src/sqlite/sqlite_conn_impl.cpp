@@ -1,8 +1,11 @@
+#include "sqlite/sqlite_conn_impl.h"
+
 #include <cassert>
 #include <fmt/core.h>
 
-#include "sqlite/sqlite_conn_impl.h"
 #include "sqlite/sqlite_stmt.h"
+
+using namespace dbpool;
 
 //!
 //! \brief Creates an \c sqlite_conn_impl wrapper around an \c sqlite3 connection pointer.

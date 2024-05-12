@@ -22,4 +22,4 @@ SpaceAfterTemplateKeyword: false
 SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: ControlStatements
 SortIncludes: CaseInsensitive
-Standard: c++17
+Standard: c++20

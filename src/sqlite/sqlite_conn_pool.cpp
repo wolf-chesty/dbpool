@@ -180,7 +180,8 @@ std::unique_ptr<db_conn_impl> sqlite_conn_pool::new_conn()
 //!
 //! Time taken to optimize the database does not count towards the timeout length.
 //!
-void sqlite_conn_pool::optimization_thread(sqlite3_stmt *stmt, size_t const timeout, size_t const threshold)
+void sqlite_conn_pool::optimization_thread(sqlite3_stmt *stmt, size_t const timeout,
+                                           [[maybe_unused]] size_t const threshold)
 {
     assert(timeout > 0);
 

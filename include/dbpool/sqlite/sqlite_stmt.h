@@ -3,7 +3,7 @@
 #include <span>
 #include <sqlite3.h>
 
-#include "db_stmt.h"
+#include "dbpool/db_stmt.h"
 
 namespace dbpool {
 

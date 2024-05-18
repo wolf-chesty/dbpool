@@ -1,10 +1,10 @@
-#include "db_conn_pool.h"
+#include "dbpool/db_conn_pool.h"
 
 #include <algorithm>
 #include <cassert>
 
-#include "db_conn_impl.h"
-#include "db_stmt.h"
+#include "dbpool/db_conn_impl.h"
+#include "dbpool/db_stmt.h"
 
 using namespace dbpool;
 

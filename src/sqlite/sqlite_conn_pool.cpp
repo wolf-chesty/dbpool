@@ -1,10 +1,10 @@
-#include "sqlite/sqlite_conn_pool.h"
+#include "dbpool/sqlite/sqlite_conn_pool.h"
 
 #include <cassert>
 #include <fmt/core.h>
 #include <sqlite3.h>
 
-#include "sqlite/sqlite_conn_impl.h"
+#include "dbpool/sqlite/sqlite_conn_impl.h"
 
 using namespace dbpool;
 

@@ -1,9 +1,9 @@
-#include "db_conn.h"
+#include "dbpool/db_conn.h"
 
 #include <cassert>
 
-#include "db_conn_impl.h"
-#include "db_conn_pool.h"
+#include "dbpool/db_conn_impl.h"
+#include "dbpool/db_conn_pool.h"
 
 using namespace dbpool;
 

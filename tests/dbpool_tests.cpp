@@ -1,8 +1,8 @@
 #include <boost/test/unit_test.hpp>
 
-#include "db_conn_impl.h"
-#include "db_stmt.h"
-#include "sqlite/sqlite_conn_pool.h"
+#include "dbpool/db_conn_impl.h"
+#include "dbpool/db_stmt.h"
+#include "dbpool/sqlite/sqlite_conn_pool.h"
 
 BOOST_AUTO_TEST_SUITE(dbpool)
 

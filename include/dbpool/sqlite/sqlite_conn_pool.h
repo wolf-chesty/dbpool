@@ -4,8 +4,8 @@
 #include <sqlite3.h>
 #include <thread>
 
-#include "db_conn_pool.h"
-#include "db_file.h"
+#include "dbpool/db_conn_pool.h"
+#include "dbpool/db_file.h"
 
 namespace dbpool {
 

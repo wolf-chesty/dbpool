@@ -1,9 +1,9 @@
-#include "sqlite/sqlite_conn_impl.h"
+#include "dbpool/sqlite/sqlite_conn_impl.h"
 
 #include <cassert>
 #include <fmt/core.h>
 
-#include "sqlite/sqlite_stmt.h"
+#include "dbpool/sqlite/sqlite_stmt.h"
 
 using namespace dbpool;
 

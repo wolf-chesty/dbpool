@@ -5,7 +5,7 @@
 #include <sqlite3.h>
 #include <string>
 
-#include "db_conn_impl.h"
+#include "dbpool/db_conn_impl.h"
 
 namespace dbpool {
 

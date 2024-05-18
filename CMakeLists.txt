@@ -31,17 +31,6 @@ target_sources (dbpool
     src/db_stmt.cpp
 )
 
-if (MSVC)
-    target_sources (dbpool
-        PRIVATE
-        src/db_conn.h
-        src/db_conn_impl.h
-        src/db_conn_pool.h
-        src/db_file.h
-        src/db_stmt.h
-    )
-endif ()
-
 option (USE_SQLITE3 "Build SQLite3 code" ON)
 if (USE_SQLITE3)
     find_package (SQLite3 REQUIRED)
@@ -57,15 +46,6 @@ if (USE_SQLITE3)
         src/sqlite/sqlite_conn_pool.cpp
         src/sqlite/sqlite_stmt.cpp
     )
-
-    if (MSVC)
-        target_sources (dbpool
-            PRIVATE
-            src/sqlite/sqlite_conn_impl.h
-            src/sqlite/sqlite_conn_pool.h
-            src/sqlite/sqlite_stmt.h
-        )
-    endif ()
 endif ()
 
 option (BUILD_TESTS "Build database tests" ON)

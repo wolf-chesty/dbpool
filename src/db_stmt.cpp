@@ -1,5 +1,5 @@
-#include "db_stmt.h"
-#include "db_conn.h"
+#include "dbpool/db_stmt.h"
+#include "dbpool/db_conn.h"
 
 using namespace dbpool;
 

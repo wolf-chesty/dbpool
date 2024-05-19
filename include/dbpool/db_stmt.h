@@ -46,7 +46,7 @@ public:
     virtual void bind_int64(int32_t const index, int64_t const value) = 0;
     virtual void bind_null(int32_t const index) = 0;
     virtual void bind_text(int32_t const index, std::string_view text) = 0;
-    virtual void bind_uuid(int32_t const index, std::span<std::byte const, 16> const &value) = 0;
+    virtual void bind_uuid(int32_t const index, std::span<unsigned char const> const &value) = 0;
 
     virtual bool get_bool(int32_t const index) = 0;
     virtual std::string get_date(int32_t const index) = 0;

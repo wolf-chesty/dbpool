@@ -130,7 +130,7 @@ void sqlite_stmt::bind_null(int32_t const index)
         throw std::runtime_error(fmt::format("sqlite_stmt::bind_null: {}", sqlite3_errmsg(mDb)));
 }
 
-void sqlite_stmt::bind_uuid(int32_t const index, std::span<std::byte const, 16> const &value)
+void sqlite_stmt::bind_uuid(int32_t const index, std::span<unsigned char const> const &value)
 {
     if (sqlite3_bind_blob(mStmt, index, &value[0], value.size(), SQLITE_TRANSIENT))
         throw std::runtime_error(fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(mDb)));

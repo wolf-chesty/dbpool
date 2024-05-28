@@ -181,9 +181,9 @@ std::string sqlite_stmt::get_text(int32_t const index)
     return reinterpret_cast<char const *>(sqlite3_column_text(mStmt, index));
 }
 
-std::array<std::byte, 16> sqlite_stmt::get_uuid(int32_t const index)
+std::array<uint8_t, 16> sqlite_stmt::get_uuid(int32_t const index)
 {
-    std::array<std::byte, 16> blob;
+    std::array<uint8_t, 16> blob;
     if (auto b = sqlite3_column_blob(mStmt, index))
         memcpy((void *)&blob[0], b, blob.size());
     return blob;

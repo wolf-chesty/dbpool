@@ -54,7 +54,7 @@ public:
     virtual int32_t get_int32(int32_t const index) = 0;
     virtual int64_t get_int64(int32_t const index) = 0;
     virtual std::string get_text(int32_t const index) = 0;
-    virtual std::array<std::byte, 16> get_uuid(int32_t const index) = 0;
+    virtual std::array<uint8_t, 16> get_uuid(int32_t const index) = 0;
 
 private:
     // Nothing is really done with this mConn member; this is just here to make sure that the db_conn object that

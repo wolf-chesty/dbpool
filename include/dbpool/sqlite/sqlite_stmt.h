@@ -36,7 +36,7 @@ public:
     int32_t get_int32(int32_t const index) override;
     int64_t get_int64(int32_t const index) override;
     std::string get_text(int32_t const index) override;
-    std::array<std::byte, 16> get_uuid(int32_t const index) override;
+    std::array<uint8_t, 16> get_uuid(int32_t const index) override;
 
     static return_code to_error_code(int code);
 

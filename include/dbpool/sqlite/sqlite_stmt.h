@@ -20,7 +20,7 @@ public:
 
     return_code execute() override;
 
-    void bind_blob(int32_t const index, void const *data, size_t const nbytes) override;
+    void bind_blob(int32_t const index, std::span<std::byte const> const &value) override;
     void bind_bool(int32_t const index, bool const value) override;
     void bind_date(int32_t const index, std::string_view value) override;
     void bind_double(int32_t const index, double const value) override;

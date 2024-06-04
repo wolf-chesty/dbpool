@@ -38,7 +38,7 @@ public:
     //!
     virtual return_code execute() = 0;
 
-    virtual void bind_blob(int32_t const index, void const *data, size_t const nbytes) = 0;
+    virtual void bind_blob(int32_t const index, std::span<std::byte const> const &value) = 0;
     virtual void bind_bool(int32_t const index, bool const value) = 0;
     virtual void bind_date(int32_t const index, std::string_view date) = 0;
     virtual void bind_double(int32_t const index, double const value) = 0;

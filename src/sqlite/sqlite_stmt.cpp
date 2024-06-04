@@ -58,9 +58,9 @@ sqlite_stmt::return_code sqlite_stmt::execute()
     return to_error_code(sqlite3_step(mStmt));
 }
 
-void sqlite_stmt::bind_blob(int32_t const index, void const *data, size_t const nbytes)
+void sqlite_stmt::bind_blob(int32_t const index, std::span<std::byte const> const &value)
 {
-    if (sqlite3_bind_blob(mStmt, index, data, nbytes, SQLITE_TRANSIENT))
+    if (sqlite3_bind_blob(mStmt, index, &value[0], value.size_bytes(), SQLITE_TRANSIENT))
         throw std::runtime_error(fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(mDb)));
 }
 

@@ -60,7 +60,7 @@ private:
     // Nothing is really done with this mConn member; this is just here to make sure that the db_conn object that
     // created this prepared statement isn't destroyed and the database connection isn't prematurely returned to the
     // connection pool before the current thread is done using this prepared statement
-    std::shared_ptr<db_conn> mConn;
+    std::shared_ptr<db_conn> m_conn;
 };
 
 } // namespace dbpool

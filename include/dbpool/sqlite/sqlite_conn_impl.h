@@ -31,8 +31,8 @@ public:
     std::unique_ptr<db_stmt> get_stmt(std::shared_ptr<db_conn> conn, std::string const &sql) override;
 
 private:
-    sqlite3 *mDb{};
-    stmt_cache_type mStmtCache;
+    sqlite3 *m_db{};
+    stmt_cache_type m_stmt_cache;
 };
 
 } // namespace dbpool

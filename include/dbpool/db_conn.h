@@ -22,7 +22,7 @@ class db_conn : public std::enable_shared_from_this<db_conn> {
 public:
     db_conn(db_conn const &) = delete;
     db_conn(db_conn &&) = delete;
-    db_conn(std::unique_ptr<db_conn_impl> conn, std::shared_ptr<db_conn_pool> connPool);
+    db_conn(std::unique_ptr<db_conn_impl> conn, std::shared_ptr<db_conn_pool> conn_pool);
 
     virtual ~db_conn();
 
@@ -33,8 +33,8 @@ public:
     std::unique_ptr<db_stmt> get_stmt(std::string const &sql);
 
 private:
-    std::unique_ptr<db_conn_impl> mConn;
-    std::shared_ptr<db_conn_pool> mConnPool;
+    std::unique_ptr<db_conn_impl> m_conn;
+    std::shared_ptr<db_conn_pool> m_conn_pool;
 };
 
 } // namespace dbpool

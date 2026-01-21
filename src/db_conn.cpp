@@ -12,14 +12,14 @@ using namespace dbpool;
 //! connection pool.
 //!
 //! \param conn Database connection.
-//! \param connPool Connection pool that owns the database connection \c conn.
+//! \param conn_pool Connection pool that owns the database connection \c conn.
 //!
-db_conn::db_conn(std::unique_ptr<db_conn_impl> conn, std::shared_ptr<db_conn_pool> connPool)
-    : mConn(std::move(conn))
-    , mConnPool(connPool)
+db_conn::db_conn(std::unique_ptr<db_conn_impl> conn, std::shared_ptr<db_conn_pool> conn_pool)
+    : m_conn(std::move(conn))
+    , m_conn_pool(conn_pool)
 {
-    assert(mConn);
-    assert(mConnPool);
+    assert(m_conn);
+    assert(m_conn_pool);
 }
 
 //!
@@ -27,9 +27,9 @@ db_conn::db_conn(std::unique_ptr<db_conn_impl> conn, std::shared_ptr<db_conn_poo
 //!
 db_conn::~db_conn()
 {
-    assert(mConn);
-    assert(mConnPool);
-    mConnPool->push_conn(std::move(mConn));
+    assert(m_conn);
+    assert(m_conn_pool);
+    m_conn_pool->push_conn(std::move(m_conn));
 }
 
 //!
@@ -41,8 +41,8 @@ db_conn::~db_conn()
 //!
 db_stmt::return_code db_conn::exec(std::string_view sql)
 {
-    assert(mConn);
-    return mConn->exec(sql);
+    assert(m_conn);
+    return m_conn->exec(sql);
 }
 
 //!
@@ -54,6 +54,6 @@ db_stmt::return_code db_conn::exec(std::string_view sql)
 //!
 std::unique_ptr<db_stmt> db_conn::get_stmt(std::string const &sql)
 {
-    assert(mConn);
-    return mConn->get_stmt(shared_from_this(), sql);
+    assert(m_conn);
+    return m_conn->get_stmt(shared_from_this(), sql);
 }

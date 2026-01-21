@@ -73,11 +73,11 @@ protected:
     virtual void prep_conn(db_conn_impl &);
 
 private:
-    std::condition_variable mConnectionCondition;
-    std::mutex mConnectionMutex;
-    conn_cache_type mAvailableConnections;
+    std::condition_variable m_conn_condition;
+    std::mutex m_conn_mutex;
+    conn_cache_type m_available_conns;
 
-    std::string mPrepSql;
+    std::string m_prep_sql;
 };
 
 } // namespace dbpool

@@ -14,7 +14,7 @@ using namespace dbpool;
 //! \param poolSize Size of the connection pool.
 //!
 db_conn_pool::db_conn_pool(size_t const poolSize)
-    : mAvailableConnections(poolSize)
+    : m_available_conns(poolSize)
 {
 }
 
@@ -37,12 +37,12 @@ std::unique_ptr<db_conn_impl> db_conn_pool::pop_conn()
 {
     // If there are available connections then remove the connection from the pool and return it; otherwise wait for a
     // connection to become available
-    std::unique_lock<std::mutex> lk(mConnectionMutex);
-    mConnectionCondition.wait(lk, [this]() -> bool { return !mAvailableConnections.empty(); });
+    std::unique_lock<std::mutex> lk(m_conn_mutex);
+    m_conn_condition.wait(lk, [this]() -> bool { return !m_available_conns.empty(); });
 
     // Grab connection from available pool
-    auto conn = std::move(mAvailableConnections.front());
-    mAvailableConnections.pop_front();
+    auto conn = std::move(m_available_conns.front());
+    m_available_conns.pop_front();
 
     // Open new database connection
     if (!conn) {
@@ -63,12 +63,12 @@ void db_conn_pool::push_conn(std::unique_ptr<db_conn_impl> conn)
     assert(conn);
 
     // add database connection back to pool
-    std::unique_lock<std::mutex> lk(mConnectionMutex);
-    mAvailableConnections.emplace_front(std::move(conn));
+    std::unique_lock<std::mutex> lk(m_conn_mutex);
+    m_available_conns.emplace_front(std::move(conn));
     lk.unlock();
 
     // notify threads that a connection has been returned to the pool
-    mConnectionCondition.notify_all();
+    m_conn_condition.notify_all();
 }
 
 //!
@@ -83,7 +83,7 @@ void db_conn_pool::push_conn(std::unique_ptr<db_conn_impl> conn)
 //!
 void db_conn_pool::set_prep_sql(std::string_view sql)
 {
-    mPrepSql = sql;
+    m_prep_sql = sql;
 }
 
 //!
@@ -95,6 +95,7 @@ void db_conn_pool::set_prep_sql(std::string_view sql)
 //!
 void db_conn_pool::prep_conn(db_conn_impl &conn)
 {
-    if (!mPrepSql.empty())
-        conn.exec(mPrepSql);
+    if (!m_prep_sql.empty()) {
+        conn.exec(m_prep_sql);
+    }
 }

@@ -9,7 +9,7 @@ using namespace dbpool;
 //! \param conn Connection guard that created this prepared statement.
 //!
 db_stmt::db_stmt(std::shared_ptr<db_conn> conn) noexcept
-    : mConn(conn)
+    : m_conn(conn)
 {
 }
 
@@ -20,5 +20,5 @@ db_stmt::db_stmt(std::shared_ptr<db_conn> conn) noexcept
 //!
 std::shared_ptr<db_conn> db_stmt::get_conn()
 {
-    return mConn;
+    return m_conn;
 }

@@ -41,8 +41,8 @@ public:
     static return_code to_error_code(int code);
 
 private:
-    sqlite3 *mDb{};
-    sqlite3_stmt *mStmt{};
+    sqlite3 *m_db{};
+    sqlite3_stmt *m_stmt{};
 };
 
 } // namespace dbpool

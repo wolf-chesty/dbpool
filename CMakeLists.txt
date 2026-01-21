@@ -9,7 +9,7 @@ add_library (dbpool STATIC "")
 
 target_include_directories (dbpool
     PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}/include
+    ${CMAKE_CURRENT_LIST_DIR}/include
 )
 
 include (cmake/date.cmake)

@@ -13,7 +13,7 @@ using namespace dbpool;
 //! \param db SQLite3 API database connection.
 //!
 sqlite_conn_impl::sqlite_conn_impl(sqlite3 *db)
-    : mDb(db)
+    : m_db(db)
 {
 }
 
@@ -24,13 +24,13 @@ sqlite_conn_impl::sqlite_conn_impl(sqlite3 *db)
 sqlite_conn_impl::~sqlite_conn_impl()
 {
     // Make sure to clean up memory for cached prepared statements
-    for (auto &stmt : mStmtCache) {
+    for (auto &stmt : m_stmt_cache) {
         sqlite3_finalize(stmt.second);
     }
 
     // Close database handle
-    assert(mDb);
-    sqlite3_close(mDb);
+    assert(m_db);
+    sqlite3_close(m_db);
 }
 
 //!
@@ -41,8 +41,8 @@ sqlite_conn_impl::~sqlite_conn_impl()
 //!
 db_stmt::return_code sqlite_conn_impl::exec(std::string_view sql)
 {
-    assert(mDb);
-    return sqlite_stmt::to_error_code(sqlite3_exec(mDb, sql.data(), nullptr, nullptr, nullptr));
+    assert(m_db);
+    return sqlite_stmt::to_error_code(sqlite3_exec(m_db, sql.data(), nullptr, nullptr, nullptr));
 }
 
 //!
@@ -54,18 +54,19 @@ db_stmt::return_code sqlite_conn_impl::exec(std::string_view sql)
 //!
 std::unique_ptr<db_stmt> sqlite_conn_impl::get_stmt(std::shared_ptr<db_conn> conn, std::string const &sql)
 {
-    assert(mDb);
+    assert(m_db);
 
-    auto it = mStmtCache.find(sql);
-    if (it != mStmtCache.end()) {
-        return std::make_unique<sqlite_stmt>(conn, mDb, it->second);
+    auto it = m_stmt_cache.find(sql);
+    if (it != m_stmt_cache.end()) {
+        return std::make_unique<sqlite_stmt>(conn, m_db, it->second);
     }
 
     // Create new stored procedure for connection
     sqlite3_stmt *stmt;
-    if (sqlite3_prepare_v2(mDb, sql.data(), sql.length() + 1, &stmt, nullptr))
-        throw std::runtime_error(fmt::format("sqlite_conn_impl::get_stmt: {}", sqlite3_errmsg(mDb)));
+    if (sqlite3_prepare_v2(m_db, sql.data(), sql.length() + 1, &stmt, nullptr)) {
+        throw std::runtime_error(fmt::format("sqlite_conn_impl::get_stmt: {}", sqlite3_errmsg(m_db)));
+    }
 
-    mStmtCache.emplace(std::make_pair(sql, stmt));
-    return std::make_unique<sqlite_stmt>(conn, mDb, stmt);
+    m_stmt_cache.emplace(std::make_pair(sql, stmt));
+    return std::make_unique<sqlite_stmt>(conn, m_db, stmt);
 }

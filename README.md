@@ -20,7 +20,7 @@ int main() {
     auto conn = dbPool->get_conn();
     
     // execute an SQL statement against the connection
-    auto ret = conn.exec("CREATE TABLE t1(x INT)");
+    auto ret = conn->exec("CREATE TABLE t1(x INT)");
 }
 ```
 
@@ -50,7 +50,7 @@ int main() {
     // notice that we are sharing conn with the thread; this will cause issues
     std::thread worker(worker_thread, conn);
 
-    conn.exec("SELECT * FROM table2;");
+    conn->exec("SELECT * FROM table2;");
     
     // iterating over the returned records from conn can result in bad things since
     // worker_thread can potentially overwrite the return results if the SQL statement
@@ -79,6 +79,6 @@ int main() {
     // give the thread its own connection to work with
     std::thread worker(worker_thread, dbPool->get_conn());
 
-    conn.exec("SELECT * FROM table2;");
+    conn->exec("SELECT * FROM table2;");
 }
 ```

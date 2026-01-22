@@ -129,7 +129,8 @@ BOOST_AUTO_TEST_CASE(bad_get_index)
     stmt = conn->get_stmt("SELECT x FROM t1");
     stmt->execute();
 
-    BOOST_TEST((stmt->get_int64(1) == 0));
+    BOOST_TEST((stmt->get_int64(0) == 10));
+    BOOST_CHECK_THROW(stmt->get_int64(1), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(default_schema)
@@ -189,7 +190,10 @@ BOOST_AUTO_TEST_CASE(thread_test)
 
 BOOST_AUTO_TEST_CASE(connection_guard_scope_test)
 {
-    auto conn = dbpool::sqlite_conn_pool::create(":memory:")->get_conn();
+    std::shared_ptr<dbpool::db_conn> conn;
+    {
+        conn = dbpool::sqlite_conn_pool::create(":memory:")->get_conn();
+    }
 
     // make sure that conn is not invalid once the connection pool shared pointer has died
     BOOST_TEST((dbpool::db_stmt::return_code::ok == conn->exec("CREATE TABLE t1(x INT)")));

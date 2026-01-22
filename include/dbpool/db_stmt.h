@@ -3,6 +3,7 @@
 #include <memory>
 #include <span>
 #include <string>
+#include <vector>
 
 namespace dbpool {
 
@@ -46,14 +47,17 @@ public:
     virtual void bind_int64(int32_t const index, int64_t const value) = 0;
     virtual void bind_null(int32_t const index) = 0;
     virtual void bind_text(int32_t const index, std::string_view text) = 0;
+    virtual void bind_text16(int32_t const index, std::u16string_view text) = 0;
     virtual void bind_uuid(int32_t const index, std::span<std::byte const> const &value) = 0;
 
+    virtual std::vector<std::byte> get_blob(int32_t index) = 0;
     virtual bool get_bool(int32_t const index) = 0;
     virtual std::string get_date(int32_t const index) = 0;
     virtual double get_double(int32_t const index) = 0;
     virtual int32_t get_int32(int32_t const index) = 0;
     virtual int64_t get_int64(int32_t const index) = 0;
     virtual std::string get_text(int32_t const index) = 0;
+    virtual std::u16string get_text16(int32_t const index) = 0;
     virtual std::array<uint8_t, 16> get_uuid(int32_t const index) = 0;
 
 private:

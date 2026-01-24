@@ -48,6 +48,14 @@ if (USE_SQLITE3)
     )
 endif ()
 
+if (DBPOOL_SANITIZE_ADDRESS)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined -fno-omit-frame-pointer -g")
+endif ()
+
+if (DBPOOL_SANITIZE_THREAD)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -fno-omit-frame-pointer -g")
+endif ()
+
 option (BUILD_TESTS "Build database tests" ON)
 if (BUILD_TESTS)
     add_subdirectory (tests)

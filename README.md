@@ -52,9 +52,9 @@ int main() {
 
     conn->exec("SELECT * FROM table2;");
     
-    // Since the connection is shared across threads the results from worker_thread can overwrite the query results
-    // for this thread (or vice-versa). In order to avoid this each thread should have their own pointer to the
-    // database.
+    // Since the connection is shared across threads the results from worker_thread can
+    // overwrite the query results for this thread (or vice-versa). In order to avoid this
+    // each thread should have their own pointer to the database.
 }
 ```
 
@@ -81,7 +81,7 @@ int main() {
 
     conn->exec("SELECT * FROM table2;");
     
-    // Since work_thread and this thread of execution have their own pointer to the underlying database the returned
-    // results will not overwrite each other.
+    // Since work_thread and this thread of execution have their own pointer to the underlying
+    // database the returned results will not overwrite each other.
 }
 ```

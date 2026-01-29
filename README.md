@@ -9,76 +9,79 @@ database. This example is really simple since there is only a single thread of e
 contention when using the database handle.
 
 ```
-#include "sqlite/sqlite_conn_pool.h"
-#include "db_conn.h"
-#include "db_stmt.h"
+#include "dbpool/sqlite/ConnectionPool.hpp"
+#include "dbpool/Connection.hpp"
+#include "dbpool/PreparedStmt.hpp"
 
 int main() {
-    auto dbPool = sqlite_conn_pool::create(":memory:");
+    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
 
-    // get a connection from the pool
+    // Get a connection from the pool
     auto conn = dbPool->get_conn();
     
-    // execute an SQL statement against the connection
+    // Execute an SQL statement against the connection
     auto ret = conn->exec("CREATE TABLE t1(x INT)");
 }
 ```
 
 When trying to reuse a database connection across multiple threads of execution you can run into an issue where records
-returned from an SQL statement can overwrite an already existing result causing undefined behavior, such as the
-following example.
+returned from an SQL statement can overwrite an already existing result (in another thread) causing undefined behavior
+(see item 2 [here](https://www.sqlite.org/threadsafe.html)), such as in the following example.
 
 ```
 #include <thread>
-#include "sqlite/sqlite_conn_pool.h"
-#include "db_conn.h"
-#include "db_stmt.h"
+#include "dbpool/sqlite/ConnectionPool.hpp"
+#include "dbpool/Connection.hpp"
+#include "dbpool/PreparedStmt.hpp"
  
-void worker_thread(db_connd& conn) {
-    conn.exec("SELECT * FROM table1;");
+void worker_thread(std::shared_ptr<dbpool::Connection> const &conn) {
+    conn->exec("SELECT * FROM table1;");
     
     // iterating over the returned records from conn can result in bad things
     // since the database connection was shared between two threads of execution
 }
  
 int main() {
-    auto dbPool = sqlite_conn_pool::create(":memory:");
+    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
 
-    // get a connection from the pool
+    // Get a connection from the pool
     auto conn = dbPool->get_conn();
 
-    // notice that we are sharing conn with the thread; this will cause issues
+    // Notice that we are sharing conn with the thread; this will cause issues
     std::thread worker(worker_thread, conn);
 
     conn->exec("SELECT * FROM table2;");
     
-    // iterating over the returned records from conn can result in bad things since
-    // worker_thread can potentially overwrite the return results if the SQL statement
-    // in worker_thread is executed after this line of code
+    // Since the connection is shared across threads the results from worker_thread can overwrite the query results
+    // for this thread (or vice-versa). In order to avoid this each thread should have their own pointer to the
+    // database.
 }
 ```
 
-In order to avoid invalidating the returned record from contending threads you can try the following.
+In order to avoid invalidating the returned record from contending threads you can do the following.
 
 ```
 #include <thread>
-#include "sqlite/sqlite_conn_pool.h"
-#include "db_conn.h"
-#include "db_stmt.h"
+#include "dbpool/sqlite/ConnectionPool.hpp"
+#include "dbpool/Connection.hpp"
+#include "dbpool/PreparedStmt.hpp"
  
-void worker_thread(db_connd& conn) {
-    conn.exec("SELECT * FROM table1;");
+void worker_thread(std::shared_ptr<dbpool::Connection> const &conn) {
+    conn->exec("SELECT * FROM table1;");
 }
  
 int main() {
-    auto dbPool = sqlite_conn_pool::create(":memory:");
+    auto dbPool = dbpool::sqlite::Connection::create(":memory:");
 
-    // get a connection from the pool
+    // Get a connection from the pool
     auto conn = dbPool->get_conn();
 
-    // give the thread its own connection to work with
+    // Give the thread its own connection to work with
     std::thread worker(worker_thread, dbPool->get_conn());
 
     conn->exec("SELECT * FROM table2;");
+    
+    // Since work_thread and this thread of execution have their own pointer to the underlying database the returned
+    // results will not overwrite each other.
 }
 ```

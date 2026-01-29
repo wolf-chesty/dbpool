@@ -7,6 +7,11 @@ set (CMAKE_CXX_STANDARD 20)
 
 add_library (dbpool STATIC "")
 
+option (DBPOOL_ENABLE_SQLITE3 "Build SQLite3 code" ON)
+option (DBPOOL_BUILD_TESTS "Build database tests" ON)
+option (DBPOOL_SANITIZE_ADDRESS "Enable GCC Address Sanitizer (ASan)" OFF)
+option (DBPOOL_SANITIZE_THREAD "Enable GCC Thread Sanitizer (TSan)" OFF)
+
 target_include_directories (dbpool
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/include
@@ -26,13 +31,12 @@ target_link_libraries (dbpool
 
 target_sources (dbpool
     PRIVATE
-    src/db_conn.cpp
-    src/db_conn_pool.cpp
-    src/db_stmt.cpp
+    src/Connection.cpp
+    src/ConnectionPool.cpp
+    src/PreparedStmt.cpp
 )
 
-option (USE_SQLITE3 "Build SQLite3 code" ON)
-if (USE_SQLITE3)
+if (DBPOOL_ENABLE_SQLITE3)
     find_package (SQLite3 REQUIRED)
 
     target_link_libraries (dbpool
@@ -42,9 +46,9 @@ if (USE_SQLITE3)
 
     target_sources (dbpool
         PRIVATE
-        src/sqlite/sqlite_conn_impl.cpp
-        src/sqlite/sqlite_conn_pool.cpp
-        src/sqlite/sqlite_stmt.cpp
+        src/sqlite/ConnectionImpl.cpp
+        src/sqlite/ConnectionPool.cpp
+        src/sqlite/PreparedStmt.cpp
     )
 endif ()
 
@@ -56,7 +60,6 @@ if (DBPOOL_SANITIZE_THREAD)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -fno-omit-frame-pointer -g")
 endif ()
 
-option (BUILD_TESTS "Build database tests" ON)
 if (BUILD_TESTS)
     add_subdirectory (tests)
 endif ()

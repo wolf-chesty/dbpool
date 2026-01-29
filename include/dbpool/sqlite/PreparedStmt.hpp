@@ -1,22 +1,23 @@
-#pragma once
+#ifndef DBPOOL_SQLITE_PREPARED_STATEMENT_HPP
+#define DBPOOL_SQLITE_PREPARED_STATEMENT_HPP
+
+#include "dbpool/PreparedStmt.hpp"
 
 #include <span>
 #include <sqlite3.h>
 
-#include "dbpool/db_stmt.h"
+namespace dbpool::sqlite {
 
-namespace dbpool {
-
-class sqlite_stmt : public db_stmt {
+class PreparedStmt : public dbpool::PreparedStmt {
 public:
-    sqlite_stmt(sqlite_stmt const &) = delete;
-    sqlite_stmt(sqlite_stmt &&) = delete;
-    explicit sqlite_stmt(std::shared_ptr<db_conn> conn, sqlite3 *db, sqlite3_stmt *stmt) noexcept;
+    PreparedStmt(PreparedStmt const &) = delete;
+    PreparedStmt(PreparedStmt &&) = delete;
+    explicit PreparedStmt(std::shared_ptr<dbpool::Connection> conn, sqlite3 *db, sqlite3_stmt *stmt) noexcept;
 
-    ~sqlite_stmt() override;
+    ~PreparedStmt() override;
 
-    sqlite_stmt &operator=(sqlite_stmt const &) = delete;
-    sqlite_stmt &operator=(sqlite_stmt &&) = delete;
+    PreparedStmt &operator=(PreparedStmt const &) = delete;
+    PreparedStmt &operator=(PreparedStmt &&) = delete;
 
     return_code execute() override;
 
@@ -48,4 +49,6 @@ private:
     sqlite3_stmt *m_stmt{};
 };
 
-} // namespace dbpool
+} // namespace dbpool::sqlite
+
+#endif

@@ -1,18 +1,17 @@
-#include "dbpool/sqlite/sqlite_conn_impl.h"
+#include "dbpool/sqlite/ConnectionImpl.hpp"
 
+#include "dbpool/sqlite/PreparedStmt.hpp"
 #include <cassert>
 #include <fmt/core.h>
 
-#include "dbpool/sqlite/sqlite_stmt.h"
-
-using namespace dbpool;
+using namespace dbpool::sqlite;
 
 //!
 //! \brief Creates an \c sqlite_conn_impl wrapper around an \c sqlite3 connection pointer.
 //!
 //! \param db SQLite3 API database connection.
 //!
-sqlite_conn_impl::sqlite_conn_impl(sqlite3 *db)
+ConnectionImpl::ConnectionImpl(sqlite3 *db)
     : m_db(db)
 {
 }
@@ -21,7 +20,7 @@ sqlite_conn_impl::sqlite_conn_impl(sqlite3 *db)
 //! \brief Destroys the \c sqlite_conn_impl connection class and resets any cached compiled
 //! statements.
 //!
-sqlite_conn_impl::~sqlite_conn_impl()
+ConnectionImpl::~ConnectionImpl()
 {
     // Make sure to clean up memory for cached prepared statements
     for (auto &stmt : m_stmt_cache) {
@@ -39,10 +38,10 @@ sqlite_conn_impl::~sqlite_conn_impl()
 //! \param sql SQL statement to execute.
 //! \return Return code for statement executed.
 //!
-db_stmt::return_code sqlite_conn_impl::exec(std::string_view sql)
+dbpool::PreparedStmt::return_code ConnectionImpl::exec(std::string_view sql)
 {
     assert(m_db);
-    return sqlite_stmt::to_error_code(sqlite3_exec(m_db, sql.data(), nullptr, nullptr, nullptr));
+    return PreparedStmt::to_error_code(sqlite3_exec(m_db, sql.data(), nullptr, nullptr, nullptr));
 }
 
 //!
@@ -52,13 +51,14 @@ db_stmt::return_code sqlite_conn_impl::exec(std::string_view sql)
 //! \param sql SQL statement of the prepared statement.
 //! \return Pointer to a prepared statement.
 //!
-std::unique_ptr<db_stmt> sqlite_conn_impl::get_stmt(std::shared_ptr<db_conn> conn, std::string const &sql)
+std::unique_ptr<dbpool::PreparedStmt> ConnectionImpl::get_stmt(std::shared_ptr<dbpool::Connection> conn,
+                                                               std::string const &sql)
 {
     assert(m_db);
 
     auto it = m_stmt_cache.find(sql);
     if (it != m_stmt_cache.end()) {
-        return std::make_unique<sqlite_stmt>(conn, m_db, it->second);
+        return std::make_unique<PreparedStmt>(conn, m_db, it->second);
     }
 
     // Create new stored procedure for connection
@@ -68,5 +68,5 @@ std::unique_ptr<db_stmt> sqlite_conn_impl::get_stmt(std::shared_ptr<db_conn> con
     }
 
     m_stmt_cache.emplace(std::make_pair(sql, stmt));
-    return std::make_unique<sqlite_stmt>(conn, m_db, stmt);
+    return std::make_unique<PreparedStmt>(conn, m_db, stmt);
 }

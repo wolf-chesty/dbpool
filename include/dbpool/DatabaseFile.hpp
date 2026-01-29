@@ -1,16 +1,17 @@
-#pragma once
+#ifndef DBPOOL_DATABASE_FILE_HPP
+#define DBPOOL_DATABASE_FILE_HPP
 
-#include <string_view>
+#include <string>
 
 namespace dbpool {
 
 //!
-//! \class db_file
+//! \class DatabaseFile
 //! \brief Provides an interface for databases that are file backed (i.e., SQLite3).
 //!
-class db_file {
+class DatabaseFile {
 public:
-    virtual ~db_file() = default;
+    virtual ~DatabaseFile() = default;
 
     //!
     //! \brief Flushes database changes from memory to disk.
@@ -33,3 +34,5 @@ public:
 };
 
 } // namespace dbpool
+
+#endif

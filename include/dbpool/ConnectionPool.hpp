@@ -1,19 +1,19 @@
-#pragma once
+#ifndef DBPOOL_CONNECTION_POOL_HPP
+#define DBPOOL_CONNECTION_POOL_HPP
 
+#include "dbpool/Connection.hpp"
 #include <condition_variable>
 #include <forward_list>
 #include <memory>
 #include <mutex>
 #include <string>
 
-#include "db_conn.h"
-
 namespace dbpool {
 
-class db_conn_impl;
+class ConnectionImpl;
 
 //!
-//! \class db_conn_pool
+//! \class ConnectionPool
 //! \brief A database connection pool class.
 //!
 //! The responsibility of this class is to manage (create and destroy) \c db_conn objects that will
@@ -23,23 +23,23 @@ class db_conn_impl;
 //! Classes that derive from this will need to implement the API specific code required to return a
 //! \c db_conn object that wraps a API specific database handle.
 //!
-class db_conn_pool {
-    friend db_conn;
+class ConnectionPool {
+    friend Connection;
 
 public:
-    using conn_cache_type = std::forward_list<std::unique_ptr<db_conn_impl>>;
+    using conn_cache_type = std::forward_list<std::unique_ptr<ConnectionImpl>>;
 
 public:
-    db_conn_pool(db_conn_pool const &) = delete;
-    db_conn_pool(db_conn_pool &&) = delete;
-    explicit db_conn_pool(size_t const poolSize = 5);
+    ConnectionPool(ConnectionPool const &) = delete;
+    ConnectionPool(ConnectionPool &&) = delete;
+    explicit ConnectionPool(size_t const poolSize = 5);
 
-    virtual ~db_conn_pool() = default;
+    virtual ~ConnectionPool() = default;
 
-    db_conn_pool &operator=(db_conn_pool const &) = delete;
-    db_conn_pool &operator=(db_conn_pool &&) = delete;
+    ConnectionPool &operator=(ConnectionPool const &) = delete;
+    ConnectionPool &operator=(ConnectionPool &&) = delete;
 
-    std::shared_ptr<db_conn> get_conn();
+    std::shared_ptr<Connection> get_conn();
 
     virtual int64_t get_schema() = 0;
     virtual void set_schema(int64_t schema) = 0;
@@ -47,15 +47,15 @@ public:
     void set_prep_sql(std::string_view sql);
 
 protected:
-    std::unique_ptr<db_conn_impl> pop_conn();
-    void push_conn(std::unique_ptr<db_conn_impl> conn);
+    std::unique_ptr<ConnectionImpl> pop_conn();
+    void push_conn(std::unique_ptr<ConnectionImpl> conn);
 
     //!
     //! \brief Function to create a new \c db_conn object to keep in the connection pool.
     //!
     //! \return A \c db_conn object on the stack.
     //!
-    virtual std::unique_ptr<db_conn_impl> new_conn() = 0;
+    virtual std::unique_ptr<ConnectionImpl> new_conn() = 0;
 
     //!
     //! \brief Returns an \c std::shared_ptr to this object.
@@ -68,9 +68,9 @@ protected:
     //! using managed pointers we can avoid prematurely closing the database connections in the pool by having each
     //! \c db_conn keep a \c std::shared_ptr to the owning connection pool.
     //!
-    virtual std::shared_ptr<db_conn_pool> shared_base_ptr() = 0;
+    virtual std::shared_ptr<ConnectionPool> shared_base_ptr() = 0;
 
-    virtual void prep_conn(db_conn_impl &);
+    virtual void prep_conn(ConnectionImpl &);
 
 private:
     std::condition_variable m_conn_condition;
@@ -81,3 +81,5 @@ private:
 };
 
 } // namespace dbpool
+
+#endif

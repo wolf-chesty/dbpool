@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DBPOOL_PREPARED_STATEMENT_HPP
+#define DBPOOL_PREPARED_STATEMENT_HPP
 
 #include <memory>
 #include <span>
@@ -7,30 +8,30 @@
 
 namespace dbpool {
 
-class db_conn;
+class Connection;
 
 //!
-//! \class db_stmt
+//! \class PreparedStmt
 //! \brief Interface for a database prepared statement.
 //!
 //! The responsibility of this class is to provide a standard interface for inter-oping with prepared statements from
 //! different database APIs.
 //!
-class db_stmt {
+class PreparedStmt {
 public:
     enum class return_code { ok, error, row, done };
 
 public:
-    db_stmt(db_stmt const &) = delete;
-    db_stmt(db_stmt &&) = delete;
-    explicit db_stmt(std::shared_ptr<db_conn> conn) noexcept;
+    PreparedStmt(PreparedStmt const &) = delete;
+    PreparedStmt(PreparedStmt &&) = delete;
+    explicit PreparedStmt(std::shared_ptr<Connection> conn) noexcept;
 
-    virtual ~db_stmt() = default;
+    virtual ~PreparedStmt() = default;
 
-    db_stmt &operator=(db_stmt const &) = delete;
-    db_stmt &operator=(db_stmt &&) = delete;
+    PreparedStmt &operator=(PreparedStmt const &) = delete;
+    PreparedStmt &operator=(PreparedStmt &&) = delete;
 
-    std::shared_ptr<db_conn> get_conn();
+    std::shared_ptr<Connection> get_conn();
 
     //!
     //! \brief Executes the prepared statement.
@@ -64,7 +65,9 @@ private:
     // Nothing is really done with this mConn member; this is just here to make sure that the db_conn object that
     // created this prepared statement isn't destroyed and the database connection isn't prematurely returned to the
     // connection pool before the current thread is done using this prepared statement
-    std::shared_ptr<db_conn> m_conn;
+    std::shared_ptr<Connection> m_conn;
 };
 
 } // namespace dbpool
+
+#endif

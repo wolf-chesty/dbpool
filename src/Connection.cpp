@@ -1,9 +1,8 @@
-#include "dbpool/db_conn.h"
+#include "dbpool/Connection.hpp"
 
+#include "dbpool/ConnectionImpl.hpp"
+#include "dbpool/ConnectionPool.hpp"
 #include <cassert>
-
-#include "dbpool/db_conn_impl.h"
-#include "dbpool/db_conn_pool.h"
 
 using namespace dbpool;
 
@@ -14,7 +13,7 @@ using namespace dbpool;
 //! \param conn Database connection.
 //! \param conn_pool Connection pool that owns the database connection \c conn.
 //!
-db_conn::db_conn(std::unique_ptr<db_conn_impl> conn, std::shared_ptr<db_conn_pool> conn_pool)
+Connection::Connection(std::unique_ptr<ConnectionImpl> conn, std::shared_ptr<ConnectionPool> conn_pool)
     : m_conn(std::move(conn))
     , m_conn_pool(conn_pool)
 {
@@ -25,7 +24,7 @@ db_conn::db_conn(std::unique_ptr<db_conn_impl> conn, std::shared_ptr<db_conn_poo
 //!
 //! \brief Destroys this object, returning the database connection to its connection pool.
 //!
-db_conn::~db_conn()
+Connection::~Connection()
 {
     assert(m_conn);
     assert(m_conn_pool);
@@ -39,7 +38,7 @@ db_conn::~db_conn()
 //!
 //! \return \c db_stmt::return_code.
 //!
-db_stmt::return_code db_conn::exec(std::string_view sql)
+PreparedStmt::return_code Connection::exec(std::string_view sql)
 {
     assert(m_conn);
     return m_conn->exec(sql);
@@ -52,7 +51,7 @@ db_stmt::return_code db_conn::exec(std::string_view sql)
 //!
 //! \return Pointer to a prepared statement object.
 //!
-std::unique_ptr<db_stmt> db_conn::get_stmt(std::string const &sql)
+std::unique_ptr<PreparedStmt> Connection::get_stmt(std::string const &sql)
 {
     assert(m_conn);
     return m_conn->get_stmt(shared_from_this(), sql);

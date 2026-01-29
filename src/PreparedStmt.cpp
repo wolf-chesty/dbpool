@@ -1,5 +1,5 @@
-#include "dbpool/db_stmt.h"
-#include "dbpool/db_conn.h"
+#include "dbpool/PreparedStmt.hpp"
+#include "dbpool/Connection.hpp"
 
 using namespace dbpool;
 
@@ -8,7 +8,7 @@ using namespace dbpool;
 //!
 //! \param conn Connection guard that created this prepared statement.
 //!
-db_stmt::db_stmt(std::shared_ptr<db_conn> conn) noexcept
+PreparedStmt::PreparedStmt(std::shared_ptr<Connection> conn) noexcept
     : m_conn(conn)
 {
 }
@@ -18,7 +18,7 @@ db_stmt::db_stmt(std::shared_ptr<db_conn> conn) noexcept
 //!
 //! \return Connection that created this statement.
 //!
-std::shared_ptr<db_conn> db_stmt::get_conn()
+std::shared_ptr<Connection> PreparedStmt::get_conn()
 {
     return m_conn;
 }

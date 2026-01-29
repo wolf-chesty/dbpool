@@ -1,10 +1,9 @@
-#include "dbpool/db_conn_pool.h"
+#include "dbpool/ConnectionPool.hpp"
 
+#include "dbpool/ConnectionImpl.hpp"
+#include "dbpool/PreparedStmt.hpp"
 #include <algorithm>
 #include <cassert>
-
-#include "dbpool/db_conn_impl.h"
-#include "dbpool/db_stmt.h"
 
 using namespace dbpool;
 
@@ -13,7 +12,7 @@ using namespace dbpool;
 //!
 //! \param poolSize Size of the connection pool.
 //!
-db_conn_pool::db_conn_pool(size_t const poolSize)
+ConnectionPool::ConnectionPool(size_t const poolSize)
     : m_available_conns(poolSize)
 {
 }
@@ -23,9 +22,9 @@ db_conn_pool::db_conn_pool(size_t const poolSize)
 //!
 //! \return A new \c db_conn.
 //!
-std::shared_ptr<db_conn> db_conn_pool::get_conn()
+std::shared_ptr<Connection> ConnectionPool::get_conn()
 {
-    return std::make_shared<db_conn>(pop_conn(), shared_base_ptr());
+    return std::make_shared<Connection>(pop_conn(), shared_base_ptr());
 }
 
 //!
@@ -33,7 +32,7 @@ std::shared_ptr<db_conn> db_conn_pool::get_conn()
 //!
 //! \return An open \c db_conn.
 //!
-std::unique_ptr<db_conn_impl> db_conn_pool::pop_conn()
+std::unique_ptr<ConnectionImpl> ConnectionPool::pop_conn()
 {
     // If there are available connections then remove the connection from the pool and return it; otherwise wait for a
     // connection to become available
@@ -58,7 +57,7 @@ std::unique_ptr<db_conn_impl> db_conn_pool::pop_conn()
 //!
 //! \param conn Database connection to return to the connection pool.
 //!
-void db_conn_pool::push_conn(std::unique_ptr<db_conn_impl> conn)
+void ConnectionPool::push_conn(std::unique_ptr<ConnectionImpl> conn)
 {
     assert(conn);
 
@@ -81,7 +80,7 @@ void db_conn_pool::push_conn(std::unique_ptr<db_conn_impl> conn)
 //! of the database. This function sets the statement that you want to have executed on any newly created database
 //! connections that get opened by this connection pool.
 //!
-void db_conn_pool::set_prep_sql(std::string_view sql)
+void ConnectionPool::set_prep_sql(std::string_view sql)
 {
     m_prep_sql = sql;
 }
@@ -93,7 +92,7 @@ void db_conn_pool::set_prep_sql(std::string_view sql)
 //!
 //! This function executes the preparatory statement against the \c conn database connection.
 //!
-void db_conn_pool::prep_conn(db_conn_impl &conn)
+void ConnectionPool::prep_conn(ConnectionImpl &conn)
 {
     if (!m_prep_sql.empty()) {
         conn.exec(m_prep_sql);

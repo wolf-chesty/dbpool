@@ -1,17 +1,19 @@
-#pragma once
+#ifndef DBPOOL_SQLITE_CONNECTION_POOL_HPP
+#define DBPOOL_SQLITE_CONNECTION_POOL_HPP
+
+#include "dbpool/ConnectionPool.hpp"
+#include "dbpool/DatabaseFile.hpp"
+#include <memory>
 
 #include <atomic>
 #include <chrono>
 #include <sqlite3.h>
 #include <thread>
 
-#include "dbpool/db_conn_pool.h"
-#include "dbpool/db_file.h"
-
-namespace dbpool {
+namespace dbpool::sqlite {
 
 //!
-//! \class sqlite_conn_pool
+//! \class ConnectionPool
 //! \brief Implements the \c db_conn_pool interface for an SQLite database connection pool.
 //!
 //! This class implements the factory functions needed by the \c db_conn_pool class to construct SQLite database
@@ -22,25 +24,26 @@ namespace dbpool {
 //! database backend such as: vacuuming (defragmentation) upon database close and periodic database optimization. Keep
 //! this in mind as there will be one more connection than specified for this connection pool.
 //!
-class sqlite_conn_pool
-    : public db_conn_pool
-    , public db_file
-    , public std::enable_shared_from_this<sqlite_conn_pool> {
+class ConnectionPool
+    : public dbpool::ConnectionPool
+    , public dbpool::DatabaseFile
+    , public std::enable_shared_from_this<ConnectionPool> {
 public:
     using optimization_period_t = std::chrono::minutes;
 
 public:
-    sqlite_conn_pool(sqlite_conn_pool const &) = delete;
-    sqlite_conn_pool(sqlite_conn_pool &&) = delete;
-    sqlite_conn_pool(std::string_view filename, size_t pool_size, optimization_period_t optimization_period);
+    ConnectionPool(ConnectionPool const &) = delete;
+    ConnectionPool(ConnectionPool &&) = delete;
+    ConnectionPool(std::string_view filename, size_t pool_size, optimization_period_t optimization_period);
 
-    ~sqlite_conn_pool() override;
+    ~ConnectionPool() override;
 
-    sqlite_conn_pool &operator=(sqlite_conn_pool const &) = delete;
-    sqlite_conn_pool &operator=(sqlite_conn_pool &&) = delete;
+    ConnectionPool &operator=(ConnectionPool const &) = delete;
+    ConnectionPool &operator=(ConnectionPool &&) = delete;
 
-    static std::shared_ptr<db_conn_pool> create(std::string_view filename, size_t pool_size = 15,
-                                                optimization_period_t optimization_period = optimization_period_t(10));
+    static std::shared_ptr<dbpool::ConnectionPool>
+        create(std::string_view filename, size_t pool_size = 15,
+               optimization_period_t optimization_period = optimization_period_t(10));
 
     void commit() override;
     std::string get_filename() const override;
@@ -50,8 +53,8 @@ public:
     void set_schema(int64_t schema) override;
 
 protected:
-    std::unique_ptr<db_conn_impl> new_conn() override;
-    std::shared_ptr<db_conn_pool> shared_base_ptr() override;
+    std::unique_ptr<dbpool::ConnectionImpl> new_conn() override;
+    std::shared_ptr<dbpool::ConnectionPool> shared_base_ptr() override;
 
 private:
     void start_optimization_thread(optimization_period_t period, size_t threshold);
@@ -68,4 +71,6 @@ private:
     sqlite3 *m_db{nullptr};
 };
 
-} // namespace dbpool
+} // namespace dbpool::sqlite
+
+#endif

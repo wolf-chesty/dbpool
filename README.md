@@ -81,7 +81,7 @@ int main() {
 
     conn->exec("SELECT * FROM table2;");
     
-    // Since work_thread and this thread of execution have their own pointer to the underlying
-    // database the returned results will not overwrite each other.
+    // Since work_thread and this thread of execution have their own pointer to the
+    // underlying database the returned results will not overwrite each other.
 }
 ```

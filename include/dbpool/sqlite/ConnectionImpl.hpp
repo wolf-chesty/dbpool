@@ -22,7 +22,6 @@ public:
     ConnectionImpl(ConnectionImpl const &) = delete;
     ConnectionImpl(ConnectionImpl &&) noexcept = delete;
     explicit ConnectionImpl(sqlite3 *db);
-
     ~ConnectionImpl() override;
 
     ConnectionImpl &operator=(ConnectionImpl const &) = delete;

@@ -12,9 +12,10 @@ contention when using the database handle.
 #include "dbpool/sqlite/ConnectionPool.hpp"
 #include "dbpool/Connection.hpp"
 #include "dbpool/PreparedStmt.hpp"
+#include <memory>
 
 int main() {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 
     // Get a connection from the pool
     auto conn = dbPool->get_conn();
@@ -29,10 +30,11 @@ returned from an SQL statement can overwrite an already existing result (in anot
 (see item 2 [here](https://www.sqlite.org/threadsafe.html)), such as in the following example.
 
 ```
-#include <thread>
 #include "dbpool/sqlite/ConnectionPool.hpp"
 #include "dbpool/Connection.hpp"
 #include "dbpool/PreparedStmt.hpp"
+#include <memory>
+#include <thread>
  
 void worker_thread(std::shared_ptr<dbpool::Connection> const &conn) {
     conn->exec("SELECT * FROM table1;");
@@ -42,7 +44,7 @@ void worker_thread(std::shared_ptr<dbpool::Connection> const &conn) {
 }
  
 int main() {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 
     // Get a connection from the pool
     auto conn = dbPool->get_conn();
@@ -61,17 +63,18 @@ int main() {
 In order to avoid invalidating the returned record from contending threads you can do the following.
 
 ```
-#include <thread>
 #include "dbpool/sqlite/ConnectionPool.hpp"
 #include "dbpool/Connection.hpp"
 #include "dbpool/PreparedStmt.hpp"
+#include <memory>
+#include <thread>
  
 void worker_thread(std::shared_ptr<dbpool::Connection> const &conn) {
     conn->exec("SELECT * FROM table1;");
 }
  
 int main() {
-    auto dbPool = dbpool::sqlite::Connection::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 
     // Get a connection from the pool
     auto conn = dbPool->get_conn();

@@ -41,12 +41,15 @@ int exec_callback(void *data, int c_num, char **c_vals, char **c_names)
 }
 */
 
+size_t ConnectionPool::sqlite_use_count_ = 0;
+
 //!
 //! \brief Constructs \c sqlite_conn_pool object.
 //!
 //! \param filename Database filename.
 //! \param pool_size Number of connections in the database connection pool.
 //! \param optimization_period Number of minutes to wait between database optimizations.
+//! \param analysis_limit Number of records to process during database optimizations.
 //!
 //! This class will construct an \c sqlite_conn_pool object. This database will have \c filename as its filename and
 //! contain \c poolSize database connections. Every \c optimizationTimeout minutes the connection pool will invoke a
@@ -55,9 +58,12 @@ int exec_callback(void *data, int c_num, char **c_vals, char **c_names)
 //! An \c optimizationTimeout value <= 0 will cause this class to not start the optimization thread and optimization
 //! will not be performed.
 //!
-ConnectionPool::ConnectionPool(std::string_view filename, size_t pool_size, optimization_period_t optimization_period)
+ConnectionPool::ConnectionPool(std::string_view filename, size_t pool_size, optimization_period_t optimization_period,
+                               size_t analysis_limit)
     : dbpool::ConnectionPool(pool_size)
 {
+    initialize_sqlite();
+
     // set SQLite3 to multi-threaded mode
     sqlite3_config(SQLITE_CONFIG_MULTITHREAD, nullptr);
 
@@ -66,7 +72,7 @@ ConnectionPool::ConnectionPool(std::string_view filename, size_t pool_size, opti
         throw std::runtime_error(fmt::format("Unable to open file '{}'", filename));
     }
 
-    start_optimization_thread(std::move(optimization_period), 400);
+    start_optimization_thread(std::move(optimization_period), analysis_limit);
 }
 
 //!
@@ -78,27 +84,40 @@ ConnectionPool::ConnectionPool(std::string_view filename, size_t pool_size, opti
 //!
 ConnectionPool::~ConnectionPool()
 {
-    if (m_db) {
-        stop_optimization_thread();
-        commit();
+    assert(m_db);
 
-        sqlite3_close(m_db);
+    stop_optimization_thread();
+    commit();
+    sqlite3_close(m_db);
+
+    shutdown_sqlite();
+}
+
+//!
+//! \brief Initializes the sqlite3 library.
+//!
+void ConnectionPool::initialize_sqlite()
+{
+    std::unique_lock const lock(sqlite_init_mutex_);
+    if (sqlite_use_count_++ == 0) {
+        if (auto const ret = sqlite3_initialize(); ret != SQLITE_OK) {
+            throw std::runtime_error(fmt::format("Unable to initialize sqlite3; got return code {}", ret));
+        }
     }
 }
 
 //!
-//! \brief Creates and returns an \c sqlite_conn_pool connection pool object.
+//! \brief Uninitializes the sqlite3 library.
 //!
-//! \param filename Filename of the SQLite database.
-//! \param pool_size Number of connections in the connection pool.
-//! \param optimization_period Number of minutes to wait between optimization calls.
-//!
-//! \return Pointer to the connection pool.
-//!
-std::shared_ptr<dbpool::ConnectionPool> ConnectionPool::create(std::string_view filename, size_t pool_size,
-                                                               optimization_period_t optimization_period)
+void ConnectionPool::shutdown_sqlite()
 {
-    return std::make_shared<ConnectionPool>(filename, pool_size, optimization_period);
+    if (--sqlite_use_count_ == 0) {
+#ifdef NDEBUG
+        sqlite3_shutdown();
+#else
+        assert(SQLITE_OK == sqlite3_shutdown());
+#endif
+    }
 }
 
 //!
@@ -139,6 +158,7 @@ int64_t ConnectionPool::get_schema()
 
     return schema;
 }
+
 //!
 //! \brief Sets the schema number of the database.
 //!

@@ -33,7 +33,6 @@ public:
     ConnectionPool(ConnectionPool const &) = delete;
     ConnectionPool(ConnectionPool &&) noexcept = delete;
     explicit ConnectionPool(size_t poolSize = 5);
-
     virtual ~ConnectionPool() = default;
 
     ConnectionPool &operator=(ConnectionPool const &) = delete;

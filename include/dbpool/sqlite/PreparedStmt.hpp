@@ -13,7 +13,6 @@ public:
     PreparedStmt(PreparedStmt const &) = delete;
     PreparedStmt(PreparedStmt &&right) noexcept;
     explicit PreparedStmt(std::shared_ptr<dbpool::Connection> conn, sqlite3 *db, sqlite3_stmt *stmt) noexcept;
-
     ~PreparedStmt() override;
 
     PreparedStmt &operator=(PreparedStmt const &) = delete;

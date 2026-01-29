@@ -23,8 +23,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
 public:
     Connection(Connection const &) = delete;
     Connection(Connection &&) noexcept = default;
-    Connection(std::unique_ptr<ConnectionImpl> conn, std::shared_ptr<ConnectionPool> conn_pool);
-
+    explicit Connection(std::unique_ptr<ConnectionImpl> conn, std::shared_ptr<ConnectionPool> conn_pool);
     virtual ~Connection();
 
     Connection &operator=(Connection const &) = delete;

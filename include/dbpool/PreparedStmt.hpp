@@ -25,7 +25,6 @@ public:
     PreparedStmt(PreparedStmt const &) = delete;
     PreparedStmt(PreparedStmt &&) noexcept = default;
     explicit PreparedStmt(std::shared_ptr<Connection> conn) noexcept;
-
     virtual ~PreparedStmt() = default;
 
     PreparedStmt &operator=(PreparedStmt const &) = delete;

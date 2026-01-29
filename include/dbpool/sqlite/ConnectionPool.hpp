@@ -14,10 +14,10 @@ namespace dbpool::sqlite {
 
 //!
 //! \class ConnectionPool
-//! \brief Implements the \c db_conn_pool interface for an SQLite database connection pool.
+//! \brief Implements the \c ConnectionPool interface for an SQLite database connection pool.
 //!
-//! This class implements the factory functions needed by the \c db_conn_pool class to construct SQLite database
-//! connections that will be managed by the \c db_conn_pool class.
+//! This class implements the factory functions needed by the \c ConnectionPool class to construct SQLite database
+//! connections that will be managed by the \c ConnectionPool class.
 //!
 //! This object keeps a file handle to the SQLite database file that it manages the connection pool for. This connection
 //! isn't counted in the total number of connections for the pool and is used to performs housekeeping on the underlying
@@ -34,16 +34,13 @@ public:
 public:
     ConnectionPool(ConnectionPool const &) = delete;
     ConnectionPool(ConnectionPool &&) noexcept = delete;
-    ConnectionPool(std::string_view filename, size_t pool_size, optimization_period_t optimization_period);
-
+    explicit ConnectionPool(std::string_view filename, size_t pool_size = 15,
+                            optimization_period_t optimization_period = optimization_period_t(10),
+                            size_t analysis_limit = 400);
     ~ConnectionPool() override;
 
     ConnectionPool &operator=(ConnectionPool const &) = delete;
     ConnectionPool &operator=(ConnectionPool &&) noexcept = delete;
-
-    static std::shared_ptr<dbpool::ConnectionPool>
-        create(std::string_view filename, size_t pool_size = 15,
-               optimization_period_t optimization_period = optimization_period_t(10));
 
     void commit() override;
     std::string get_filename() const override;
@@ -60,6 +57,12 @@ private:
     void start_optimization_thread(optimization_period_t period, size_t threshold);
     void stop_optimization_thread();
     void optimization_thread(sqlite3_stmt *stmt, optimization_period_t period, size_t threshold);
+
+    void initialize_sqlite();
+    void shutdown_sqlite();
+
+    std::mutex sqlite_init_mutex_;
+    static size_t sqlite_use_count_;
 
     std::unique_ptr<std::thread> m_optimization_thread;
     std::mutex m_optimization_thread_mutex;

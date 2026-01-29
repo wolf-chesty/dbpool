@@ -19,7 +19,6 @@ public:
     ConnectionImpl() = default;
     ConnectionImpl(ConnectionImpl const &) = delete;
     ConnectionImpl(ConnectionImpl &&) noexcept = delete;
-
     virtual ~ConnectionImpl() = default;
 
     ConnectionImpl &operator=(ConnectionImpl const &) = delete;

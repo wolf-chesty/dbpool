@@ -9,26 +9,26 @@ BOOST_AUTO_TEST_SUITE(sqlite)
 
 BOOST_AUTO_TEST_CASE(bad_file)
 {
-    BOOST_CHECK_THROW(dbpool::sqlite::ConnectionPool::create("/dev/null/test.sqlite3"), std::runtime_error);
+    BOOST_CHECK_THROW(std::make_shared<dbpool::sqlite::ConnectionPool>("/dev/null/test.sqlite3"), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(file_type)
 {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
     auto dbFile = std::dynamic_pointer_cast<dbpool::DatabaseFile>(dbPool);
     BOOST_TEST(dbFile != nullptr);
 }
 
 BOOST_AUTO_TEST_CASE(file_name)
 {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
     auto dbFile = std::dynamic_pointer_cast<dbpool::DatabaseFile>(dbPool);
     BOOST_TEST(dbFile->get_filename() == ":memory:");
 }
 
 BOOST_AUTO_TEST_CASE(table_creation)
 {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 
     auto conn = dbPool->get_conn();
     auto ret = conn->exec("CREATE TABLE t1(x INT)");
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(table_creation)
 
 BOOST_AUTO_TEST_CASE(table_insertion)
 {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 
     auto conn = dbPool->get_conn();
     conn->exec("CREATE TABLE t1(x INT)");
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(table_insertion)
 
 BOOST_AUTO_TEST_CASE(table_deletion)
 {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 
     auto conn = dbPool->get_conn();
     conn->exec("CREATE TABLE t1(x INT)");
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(table_deletion)
 
 BOOST_AUTO_TEST_CASE(table_selection)
 {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 
     auto conn = dbPool->get_conn();
     conn->exec("CREATE TABLE t1(x INT)");
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(table_selection)
 
 BOOST_AUTO_TEST_CASE(bad_bind_index)
 {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 
     auto conn = dbPool->get_conn();
     conn->exec("CREATE TABLE t1(x INT)");
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(bad_bind_index)
 
 BOOST_AUTO_TEST_CASE(bad_get_index)
 {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 
     auto conn = dbPool->get_conn();
     conn->exec("CREATE TABLE t1(x INT)");
@@ -134,13 +134,13 @@ BOOST_AUTO_TEST_CASE(bad_get_index)
 
 BOOST_AUTO_TEST_CASE(default_schema)
 {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
     BOOST_TEST(dbPool->get_schema() == 0);
 }
 
 BOOST_AUTO_TEST_CASE(set_schema)
 {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 
     auto conn = dbPool->get_conn();
     conn->exec("CREATE TABLE t1(x INT)");
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(set_schema)
 
 BOOST_AUTO_TEST_CASE(thread_test)
 {
-    auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 
     // create table with values
     auto conn1 = dbPool->get_conn();
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(connection_guard_scope_test)
 {
     std::shared_ptr<dbpool::Connection> conn;
     {
-        conn = dbpool::sqlite::ConnectionPool::create(":memory:")->get_conn();
+        conn = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:")->get_conn();
     }
 
     // make sure that conn is not invalid once the connection pool shared pointer has died
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(statement_scope_test)
 {
     std::unique_ptr<PreparedStmt> stmt;
     {
-        auto dbPool = dbpool::sqlite::ConnectionPool::create(":memory:");
+        auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 
         // create table with values
         auto conn = dbPool->get_conn();

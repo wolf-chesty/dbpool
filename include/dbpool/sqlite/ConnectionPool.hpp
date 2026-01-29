@@ -33,13 +33,13 @@ public:
 
 public:
     ConnectionPool(ConnectionPool const &) = delete;
-    ConnectionPool(ConnectionPool &&) = delete;
+    ConnectionPool(ConnectionPool &&) noexcept = delete;
     ConnectionPool(std::string_view filename, size_t pool_size, optimization_period_t optimization_period);
 
     ~ConnectionPool() override;
 
     ConnectionPool &operator=(ConnectionPool const &) = delete;
-    ConnectionPool &operator=(ConnectionPool &&) = delete;
+    ConnectionPool &operator=(ConnectionPool &&) noexcept = delete;
 
     static std::shared_ptr<dbpool::ConnectionPool>
         create(std::string_view filename, size_t pool_size = 15,

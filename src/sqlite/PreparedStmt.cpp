@@ -11,13 +11,25 @@
 using namespace dbpool::sqlite;
 
 //!
+//! \brief Move constructor.
+//!
+//! \param right Object to take members from.
+//!
+PreparedStmt::PreparedStmt(PreparedStmt &&right) noexcept
+    : dbpool::PreparedStmt(std::move(right))
+    , m_db(std::exchange(right.m_db, nullptr))
+    , m_stmt(std::exchange(right.m_stmt, nullptr))
+{
+}
+
+//!
 //! \brief Constructs a prepared statement for connection \c db using SQL statement \c stmt.
 //!
 //! \param db Database connection that this prepared statement is bound to.
 //! \param stmt SQL statement to create prepared statement from.
 //!
 PreparedStmt::PreparedStmt(std::shared_ptr<dbpool::Connection> conn, sqlite3 *db, sqlite3_stmt *stmt) noexcept
-    : dbpool::PreparedStmt(conn)
+    : dbpool::PreparedStmt(std::move(conn))
     , m_db(db)
     , m_stmt(stmt)
 {
@@ -32,12 +44,29 @@ PreparedStmt::PreparedStmt(std::shared_ptr<dbpool::Connection> conn, sqlite3 *db
 //!
 PreparedStmt::~PreparedStmt()
 {
-    assert(m_stmt);
-
-    if (sqlite3_bind_parameter_count(m_stmt)) {
-        sqlite3_clear_bindings(m_stmt);
+    if (m_stmt) {
+        if (sqlite3_bind_parameter_count(m_stmt)) {
+            sqlite3_clear_bindings(m_stmt);
+        }
+        sqlite3_reset(m_stmt);
     }
-    sqlite3_reset(m_stmt);
+}
+
+//!
+//! \brief Move assignment.
+//!
+//! \return Reference to this.
+//!
+//! \param right Object to take members of.
+//!
+PreparedStmt &PreparedStmt::operator=(PreparedStmt &&right) noexcept
+{
+    dbpool::PreparedStmt::operator=(std::move(right));
+
+    m_db = std::exchange(right.m_db, nullptr);
+    m_stmt = std::exchange(right.m_stmt, nullptr);
+
+    return *this;
 }
 
 PreparedStmt::return_code PreparedStmt::to_error_code(int code)

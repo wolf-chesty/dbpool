@@ -31,13 +31,13 @@ public:
 
 public:
     ConnectionPool(ConnectionPool const &) = delete;
-    ConnectionPool(ConnectionPool &&) = delete;
-    explicit ConnectionPool(size_t const poolSize = 5);
+    ConnectionPool(ConnectionPool &&) noexcept = delete;
+    explicit ConnectionPool(size_t poolSize = 5);
 
     virtual ~ConnectionPool() = default;
 
     ConnectionPool &operator=(ConnectionPool const &) = delete;
-    ConnectionPool &operator=(ConnectionPool &&) = delete;
+    ConnectionPool &operator=(ConnectionPool &&) noexcept = delete;
 
     std::shared_ptr<Connection> get_conn();
 

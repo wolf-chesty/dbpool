@@ -22,13 +22,13 @@ class ConnectionPool;
 class Connection : public std::enable_shared_from_this<Connection> {
 public:
     Connection(Connection const &) = delete;
-    Connection(Connection &&) = delete;
+    Connection(Connection &&) noexcept = default;
     Connection(std::unique_ptr<ConnectionImpl> conn, std::shared_ptr<ConnectionPool> conn_pool);
 
     virtual ~Connection();
 
     Connection &operator=(Connection const &) = delete;
-    Connection &operator=(Connection &&) = delete;
+    Connection &operator=(Connection &&) noexcept = default;
 
     PreparedStmt::return_code exec(std::string_view sql);
     std::unique_ptr<PreparedStmt> get_stmt(std::string const &sql);

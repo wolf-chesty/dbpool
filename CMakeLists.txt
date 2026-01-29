@@ -60,6 +60,6 @@ if (DBPOOL_SANITIZE_THREAD)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -fno-omit-frame-pointer -g")
 endif ()
 
-if (BUILD_TESTS)
+if (DBPOOL_BUILD_TESTS)
     add_subdirectory (tests)
 endif ()

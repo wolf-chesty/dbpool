@@ -15,7 +15,7 @@ using namespace dbpool;
 //!
 Connection::Connection(std::unique_ptr<ConnectionImpl> conn, std::shared_ptr<ConnectionPool> conn_pool)
     : m_conn(std::move(conn))
-    , m_conn_pool(conn_pool)
+    , m_conn_pool(std::move(conn_pool))
 {
     assert(m_conn);
     assert(m_conn_pool);

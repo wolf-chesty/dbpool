@@ -23,13 +23,13 @@ public:
 
 public:
     PreparedStmt(PreparedStmt const &) = delete;
-    PreparedStmt(PreparedStmt &&) = delete;
+    PreparedStmt(PreparedStmt &&) noexcept = default;
     explicit PreparedStmt(std::shared_ptr<Connection> conn) noexcept;
 
     virtual ~PreparedStmt() = default;
 
     PreparedStmt &operator=(PreparedStmt const &) = delete;
-    PreparedStmt &operator=(PreparedStmt &&) = delete;
+    PreparedStmt &operator=(PreparedStmt &&) noexcept = default;
 
     std::shared_ptr<Connection> get_conn();
 

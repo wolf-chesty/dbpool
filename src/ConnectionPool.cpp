@@ -12,7 +12,7 @@ using namespace dbpool;
 //!
 //! \param poolSize Size of the connection pool.
 //!
-ConnectionPool::ConnectionPool(size_t const poolSize)
+ConnectionPool::ConnectionPool(size_t poolSize)
     : m_available_conns(poolSize)
 {
 }

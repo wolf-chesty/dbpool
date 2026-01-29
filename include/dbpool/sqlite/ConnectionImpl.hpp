@@ -20,13 +20,13 @@ public:
 
 public:
     ConnectionImpl(ConnectionImpl const &) = delete;
-    ConnectionImpl(ConnectionImpl &&) = delete;
+    ConnectionImpl(ConnectionImpl &&) noexcept = delete;
     explicit ConnectionImpl(sqlite3 *db);
 
     ~ConnectionImpl() override;
 
     ConnectionImpl &operator=(ConnectionImpl const &) = delete;
-    ConnectionImpl &operator=(ConnectionImpl &&conn) = delete;
+    ConnectionImpl &operator=(ConnectionImpl &&conn) noexcept = delete;
 
     dbpool::PreparedStmt::return_code exec(std::string_view sql) override;
     std::unique_ptr<PreparedStmt> get_stmt(std::shared_ptr<dbpool::Connection> conn, std::string const &sql) override;

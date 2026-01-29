@@ -18,12 +18,12 @@ class ConnectionImpl {
 public:
     ConnectionImpl() = default;
     ConnectionImpl(ConnectionImpl const &) = delete;
-    ConnectionImpl(ConnectionImpl &&) = delete;
+    ConnectionImpl(ConnectionImpl &&) noexcept = delete;
 
     virtual ~ConnectionImpl() = default;
 
     ConnectionImpl &operator=(ConnectionImpl const &) = delete;
-    ConnectionImpl &operator=(ConnectionImpl &&) = delete;
+    ConnectionImpl &operator=(ConnectionImpl &&) noexcept = delete;
 
     //!
     //! \brief Executes an SQL statements directly on this database connection.

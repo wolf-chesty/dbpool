@@ -11,13 +11,13 @@ namespace dbpool::sqlite {
 class PreparedStmt : public dbpool::PreparedStmt {
 public:
     PreparedStmt(PreparedStmt const &) = delete;
-    PreparedStmt(PreparedStmt &&) = delete;
+    PreparedStmt(PreparedStmt &&right) noexcept;
     explicit PreparedStmt(std::shared_ptr<dbpool::Connection> conn, sqlite3 *db, sqlite3_stmt *stmt) noexcept;
 
     ~PreparedStmt() override;
 
     PreparedStmt &operator=(PreparedStmt const &) = delete;
-    PreparedStmt &operator=(PreparedStmt &&) = delete;
+    PreparedStmt &operator=(PreparedStmt &&right) noexcept;
 
     return_code execute() override;
 

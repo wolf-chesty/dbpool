@@ -1,24 +1,18 @@
+// Copyright (c) 2026 Christopher L Walker
+// SPDX-License-Identifier: MIT
+
 #include "dbpool/PreparedStmt.hpp"
+
 #include "dbpool/Connection.hpp"
 
 using namespace dbpool;
 
-//!
-//! \brief Creates a prepared statement connected to the connect \c conn.
-//!
-//! \param conn Connection guard that created this prepared statement.
-//!
 PreparedStmt::PreparedStmt(std::shared_ptr<Connection> conn) noexcept
-    : m_conn(conn)
+    : conn_(conn)
 {
 }
 
-//!
-//! \brief Returns the connection that created this statement.
-//!
-//! \return Connection that created this statement.
-//!
 std::shared_ptr<Connection> PreparedStmt::get_conn()
 {
-    return m_conn;
+    return conn_;
 }

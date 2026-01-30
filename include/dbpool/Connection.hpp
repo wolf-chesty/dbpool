@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Christopher L Walker
+// SPDX-License-Identifier: MIT
+
 #ifndef DBPOOL_CONNECTION_HPP
 #define DBPOOL_CONNECTION_HPP
 
@@ -10,31 +13,52 @@ namespace dbpool {
 class ConnectionImpl;
 class ConnectionPool;
 
-//!
-//! \class Connection
-//! \brief Database connection guard.
-//!
-//! The responsibility of this class is to return the \c db_conn_impl class back to its parent \c db_conn_pool object.
-//! This class provides a thin wrapper around the \c db_conn_impl object and will delegate most of its function calls to
-//! its //! \c db_conn_impl member. Upon destruction, objects of this type will return their \c db_conn_impl database
-//! handle to the connection pool for reuse.
-//!
+///
+/// @class Connection
+///
+/// @brief This class wraps the concrete implementations of \c ConnectionImpl and will return the implementation back to
+///        the managing \c ConnectionPool.
+///
+/// This object manages the concrete database connection implementations and is responsible for returning unused
+/// database connections to the connection pool object that created them. This object delegates all database
+/// functionality to the underlying concrete \c ConnectionImpl class which implements any API specific database code.
+///
 class Connection : public std::enable_shared_from_this<Connection> {
 public:
     Connection(Connection const &) = delete;
     Connection(Connection &&) noexcept = default;
+
+    /// @brief ctor for the object.
+    ///
+    /// @param conn Database connection.
+    /// @param conn_pool Connection pool that owns the database connection \c conn.
     explicit Connection(std::unique_ptr<ConnectionImpl> conn, std::shared_ptr<ConnectionPool> conn_pool);
+
+    /// @brief dtor for the object.
+    ///
+    /// Returns the managed connection object to its connection pool.
     virtual ~Connection();
 
     Connection &operator=(Connection const &) = delete;
     Connection &operator=(Connection &&) noexcept = default;
 
+    /// @brief Executes an SQL statements on the managed database connection.
+    ///
+    /// @return Error code.
+    ///
+    /// @param sql SQL statement to execute.
     PreparedStmt::return_code exec(std::string_view sql);
+
+    /// @brief Get a prepared statement for this database connection.
+    ///
+    /// @return Pointer to a prepared statement.
+    ///
+    /// \param sql SQL statement to create the prepared statement from.
     std::unique_ptr<PreparedStmt> get_stmt(std::string const &sql);
 
 private:
-    std::unique_ptr<ConnectionImpl> m_conn;
-    std::shared_ptr<ConnectionPool> m_conn_pool;
+    std::unique_ptr<ConnectionImpl> conn_;      ///< Implements database specific code.
+    std::shared_ptr<ConnectionPool> conn_pool_; ///< Connection pool that created the managed connection object.
 };
 
 } // namespace dbpool

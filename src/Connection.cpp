@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Christopher L Walker
+// SPDX-License-Identifier: MIT
+
 #include "dbpool/Connection.hpp"
 
 #include "dbpool/ConnectionImpl.hpp"
@@ -6,53 +9,29 @@
 
 using namespace dbpool;
 
-//!
-//! \brief Construct a connection guard with \c conn database connection and \c connPool database
-//! connection pool.
-//!
-//! \param conn Database connection.
-//! \param conn_pool Connection pool that owns the database connection \c conn.
-//!
 Connection::Connection(std::unique_ptr<ConnectionImpl> conn, std::shared_ptr<ConnectionPool> conn_pool)
-    : m_conn(std::move(conn))
-    , m_conn_pool(std::move(conn_pool))
+    : conn_(std::move(conn))
+    , conn_pool_(std::move(conn_pool))
 {
-    assert(m_conn);
-    assert(m_conn_pool);
+    assert(conn_);
+    assert(conn_pool_);
 }
 
-//!
-//! \brief Destroys this object, returning the database connection to its connection pool.
-//!
 Connection::~Connection()
 {
-    assert(m_conn);
-    assert(m_conn_pool);
-    m_conn_pool->push_conn(std::move(m_conn));
+    assert(conn_);
+    assert(conn_pool_);
+    conn_pool_->push_conn(std::move(conn_));
 }
 
-//!
-//! \brief Executes an SQL statements on this database connection.
-//!
-//! \param sql SQL statement to execute.
-//!
-//! \return \c db_stmt::return_code.
-//!
 PreparedStmt::return_code Connection::exec(std::string_view sql)
 {
-    assert(m_conn);
-    return m_conn->exec(sql);
+    assert(conn_);
+    return conn_->exec(sql);
 }
 
-//!
-//! \brief Get a prepared statement for this database connection.
-//!
-//! \param sql SQL statement to create the prepared statement from.
-//!
-//! \return Pointer to a prepared statement object.
-//!
 std::unique_ptr<PreparedStmt> Connection::get_stmt(std::string const &sql)
 {
-    assert(m_conn);
-    return m_conn->get_stmt(shared_from_this(), sql);
+    assert(conn_);
+    return conn_->get_stmt(shared_from_this(), sql);
 }

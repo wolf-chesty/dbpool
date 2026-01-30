@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Christopher L Walker
+// SPDX-License-Identifier: MIT
+
 #include <boost/test/unit_test.hpp>
 
 #include "dbpool/PreparedStmt.hpp"

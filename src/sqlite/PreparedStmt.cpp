@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Christopher L Walker
+// SPDX-License-Identifier: MIT
+
 #include "dbpool/sqlite/PreparedStmt.hpp"
 
 #include <cassert>
@@ -10,61 +13,36 @@
 
 using namespace dbpool::sqlite;
 
-//!
-//! \brief Move constructor.
-//!
-//! \param right Object to take members from.
-//!
 PreparedStmt::PreparedStmt(PreparedStmt &&right) noexcept
     : dbpool::PreparedStmt(std::move(right))
-    , m_db(std::exchange(right.m_db, nullptr))
-    , m_stmt(std::exchange(right.m_stmt, nullptr))
+    , db_(std::exchange(right.db_, nullptr))
+    , stmt_(std::exchange(right.stmt_, nullptr))
 {
 }
 
-//!
-//! \brief Constructs a prepared statement for connection \c db using SQL statement \c stmt.
-//!
-//! \param db Database connection that this prepared statement is bound to.
-//! \param stmt SQL statement to create prepared statement from.
-//!
 PreparedStmt::PreparedStmt(std::shared_ptr<dbpool::Connection> conn, sqlite3 *db, sqlite3_stmt *stmt) noexcept
     : dbpool::PreparedStmt(std::move(conn))
-    , m_db(db)
-    , m_stmt(stmt)
+    , db_(db)
+    , stmt_(stmt)
 {
 }
 
-//!
-//! \brief Resets the underlying prepared statement for reuse.
-//!
-//! Prepared statements are cached for reuse so rather than actually freeing the prepared statement memory this function
-//! will unbind and reset the prepared statement to its initial state for reuse by another process. Prepared statement
-//! deletion will actually be performed by the database connection that created it.
-//!
 PreparedStmt::~PreparedStmt()
 {
-    if (m_stmt) {
-        if (sqlite3_bind_parameter_count(m_stmt)) {
-            sqlite3_clear_bindings(m_stmt);
+    if (stmt_) {
+        if (sqlite3_bind_parameter_count(stmt_)) {
+            sqlite3_clear_bindings(stmt_);
         }
-        sqlite3_reset(m_stmt);
+        sqlite3_reset(stmt_);
     }
 }
 
-//!
-//! \brief Move assignment.
-//!
-//! \return Reference to this.
-//!
-//! \param right Object to take members of.
-//!
 PreparedStmt &PreparedStmt::operator=(PreparedStmt &&right) noexcept
 {
     dbpool::PreparedStmt::operator=(std::move(right));
 
-    m_db = std::exchange(right.m_db, nullptr);
-    m_stmt = std::exchange(right.m_stmt, nullptr);
+    db_ = std::exchange(right.db_, nullptr);
+    stmt_ = std::exchange(right.stmt_, nullptr);
 
     return *this;
 }
@@ -84,20 +62,20 @@ PreparedStmt::return_code PreparedStmt::to_error_code(int code)
 
 PreparedStmt::return_code PreparedStmt::execute()
 {
-    return to_error_code(sqlite3_step(m_stmt));
+    return to_error_code(sqlite3_step(stmt_));
 }
 
 void PreparedStmt::bind_blob(int32_t const index, std::span<std::byte const> const &value)
 {
-    if (sqlite3_bind_blob(m_stmt, index, &value[0], value.size_bytes(), SQLITE_TRANSIENT) != SQLITE_OK) {
-        throw std::runtime_error(fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(m_db)));
+    if (sqlite3_bind_blob(stmt_, index, &value[0], value.size_bytes(), SQLITE_TRANSIENT) != SQLITE_OK) {
+        throw std::runtime_error(fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(db_)));
     }
 }
 
 void PreparedStmt::bind_bool(int32_t const index, bool const value)
 {
-    if (sqlite3_bind_int(m_stmt, index, value ? 1 : 0) != SQLITE_OK) {
-        throw std::runtime_error(fmt::format("sqlite_stmt::bind_bool: {}", sqlite3_errmsg(m_db)));
+    if (sqlite3_bind_int(stmt_, index, value ? 1 : 0) != SQLITE_OK) {
+        throw std::runtime_error(fmt::format("sqlite_stmt::bind_bool: {}", sqlite3_errmsg(db_)));
     }
 }
 
@@ -105,17 +83,9 @@ void PreparedStmt::bind_date(int32_t const index, std::string_view value)
 {
     int ret{};
     if (value.empty()) {
-        ret = sqlite3_bind_null(m_stmt, index);
+        ret = sqlite3_bind_null(stmt_, index);
     }
     else {
-        // TODO:
-        //  We need to evaluate this code; according to sources on the internet parsing dates using
-        //  the standard template library can be slower than parsing the JSON data. Perhaps
-        //  switching to a database with native ISO 8601 date support would allow us to offload date
-        //  parsing to another process? In the mean time, since parsing	happens on a separate thread
-        //  we can safely assume that the web interface isn't hung up waiting for date parsing to
-        //  complete.
-
         // Parse ISO 8601 date
         std::string const v(value);
         std::istringstream ss{v};
@@ -130,86 +100,86 @@ void PreparedStmt::bind_date(int32_t const index, std::string_view value)
 
         // Place number of milliseconds since epoch into database
         int64_t const millis = t.time_since_epoch().count();
-        ret = sqlite3_bind_int(m_stmt, index, millis);
+        ret = sqlite3_bind_int(stmt_, index, millis);
     }
 
     if (ret != SQLITE_OK) {
-        throw std::runtime_error(fmt::format("sqlite_stmt::bind_date: {}", sqlite3_errmsg(m_db)));
+        throw std::runtime_error(fmt::format("sqlite_stmt::bind_date: {}", sqlite3_errmsg(db_)));
     }
 }
 
 void PreparedStmt::bind_double(int32_t const index, double const value)
 {
-    if (sqlite3_bind_double(m_stmt, index, value) != SQLITE_OK) {
-        throw std::runtime_error(fmt::format("sqlite_stmt::bind_double: {}", sqlite3_errmsg(m_db)));
+    if (sqlite3_bind_double(stmt_, index, value) != SQLITE_OK) {
+        throw std::runtime_error(fmt::format("sqlite_stmt::bind_double: {}", sqlite3_errmsg(db_)));
     }
 }
 
 void PreparedStmt::bind_int32(int32_t const index, int32_t const value)
 {
-    if (sqlite3_bind_int(m_stmt, index, value) != SQLITE_OK) {
-        throw std::runtime_error(fmt::format("sqlite_stmt::bind_int32: {}", sqlite3_errmsg(m_db)));
+    if (sqlite3_bind_int(stmt_, index, value) != SQLITE_OK) {
+        throw std::runtime_error(fmt::format("sqlite_stmt::bind_int32: {}", sqlite3_errmsg(db_)));
     }
 }
 
 void PreparedStmt::bind_int64(int32_t const index, int64_t const value)
 {
-    if (sqlite3_bind_int64(m_stmt, index, value) != SQLITE_OK) {
-        throw std::runtime_error(fmt::format("sqlite_stmt::bind_int64: {}", sqlite3_errmsg(m_db)));
+    if (sqlite3_bind_int64(stmt_, index, value) != SQLITE_OK) {
+        throw std::runtime_error(fmt::format("sqlite_stmt::bind_int64: {}", sqlite3_errmsg(db_)));
     }
 }
 
 void PreparedStmt::bind_null(int32_t const index)
 {
-    if (sqlite3_bind_null(m_stmt, index) != SQLITE_OK) {
-        throw std::runtime_error(fmt::format("sqlite_stmt::bind_null: {}", sqlite3_errmsg(m_db)));
+    if (sqlite3_bind_null(stmt_, index) != SQLITE_OK) {
+        throw std::runtime_error(fmt::format("sqlite_stmt::bind_null: {}", sqlite3_errmsg(db_)));
     }
 }
 
 void PreparedStmt::bind_uuid(int32_t const index, std::span<std::byte const> const &value)
 {
-    if (sqlite3_bind_blob(m_stmt, index, &value[0], value.size(), SQLITE_TRANSIENT) != SQLITE_OK) {
-        throw std::runtime_error(fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(m_db)));
+    if (sqlite3_bind_blob(stmt_, index, &value[0], value.size(), SQLITE_TRANSIENT) != SQLITE_OK) {
+        throw std::runtime_error(fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(db_)));
     }
 }
 
 void PreparedStmt::bind_text(int32_t const index, std::string_view value)
 {
-    auto const ret = value.empty() ? sqlite3_bind_null(m_stmt, index)
-                                   : sqlite3_bind_text(m_stmt, index, value.data(), static_cast<int>(value.length()),
+    auto const ret = value.empty() ? sqlite3_bind_null(stmt_, index)
+                                   : sqlite3_bind_text(stmt_, index, value.data(), static_cast<int>(value.length()),
                                                        SQLITE_TRANSIENT);
     if (ret != SQLITE_OK) {
-        throw std::runtime_error(fmt::format("sqlite::bind_text: {}", sqlite3_errmsg(m_db)));
+        throw std::runtime_error(fmt::format("sqlite::bind_text: {}", sqlite3_errmsg(db_)));
     }
 }
 
 void PreparedStmt::bind_text16(int32_t const index, std::u16string_view value)
 {
-    auto const ret = value.empty() ? sqlite3_bind_null(m_stmt, index)
-                                   : sqlite3_bind_text16(m_stmt, index, value.data(), static_cast<int>(value.length()),
+    auto const ret = value.empty() ? sqlite3_bind_null(stmt_, index)
+                                   : sqlite3_bind_text16(stmt_, index, value.data(), static_cast<int>(value.length()),
                                                          SQLITE_TRANSIENT);
     if (ret != SQLITE_OK) {
-        throw std::runtime_error(fmt::format("sqlite::bind_text16: {}", sqlite3_errmsg(m_db)));
+        throw std::runtime_error(fmt::format("sqlite::bind_text16: {}", sqlite3_errmsg(db_)));
     }
 }
 
 std::vector<std::byte> PreparedStmt::get_blob(int32_t const index)
 {
-    if (index < 0 || index >= sqlite3_column_count(m_stmt)) {
+    if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_blob: invalid index {}", index));
     }
 
-    auto ptr = sqlite3_column_blob(m_stmt, index);
+    auto ptr = sqlite3_column_blob(stmt_, index);
 
     // nullptr may indicate an error; handle nullptr case
     if (!ptr) {
-        if (sqlite3_errcode(m_db) != SQLITE_OK) {
+        if (sqlite3_errcode(db_) != SQLITE_OK) {
             throw std::runtime_error(fmt::format("sqlite::column_blob: out of memory exception {}", index));
         }
         return std::vector<std::byte>();
     }
 
-    auto len = sqlite3_column_bytes(m_stmt, index);
+    auto len = sqlite3_column_bytes(stmt_, index);
     std::vector<std::byte> buf(len);
     std::memcpy(buf.data(), ptr, len);
     return buf;
@@ -217,20 +187,20 @@ std::vector<std::byte> PreparedStmt::get_blob(int32_t const index)
 
 bool PreparedStmt::get_bool(int32_t const index)
 {
-    if (index < 0 || index >= sqlite3_column_count(m_stmt)) {
+    if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_int: invalid index {}", index));
     }
-    return sqlite3_column_int(m_stmt, index) != 0;
+    return sqlite3_column_int(stmt_, index) != 0;
 }
 
 std::string PreparedStmt::get_date(int32_t const index)
 {
-    if (index < 0 || index >= sqlite3_column_count(m_stmt)) {
+    if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_int64: invalid index {}", index));
     }
 
     // Sqlite doesn't have a native date field; keep number of milliseconds since epoch in database
-    auto millis = sqlite3_column_int64(m_stmt, index);
+    auto millis = sqlite3_column_int64(stmt_, index);
     // Format timestamp
     std::chrono::milliseconds d{millis};
     date::sys_time<std::chrono::milliseconds> tp{d};
@@ -239,45 +209,45 @@ std::string PreparedStmt::get_date(int32_t const index)
 
 double PreparedStmt::get_double(int32_t const index)
 {
-    if (index < 0 || index >= sqlite3_column_count(m_stmt)) {
+    if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_double: invalid index {}", index));
     }
-    return sqlite3_column_double(m_stmt, index);
+    return sqlite3_column_double(stmt_, index);
 }
 
 int32_t PreparedStmt::get_int32(int32_t const index)
 {
-    if (index < 0 || index >= sqlite3_column_count(m_stmt)) {
+    if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_int: invalid index {}", index));
     }
-    return sqlite3_column_int(m_stmt, index);
+    return sqlite3_column_int(stmt_, index);
 }
 
 int64_t PreparedStmt::get_int64(int32_t const index)
 {
-    if (index < 0 || index >= sqlite3_column_count(m_stmt)) {
+    if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_int32: invalid index {}", index));
     }
-    return sqlite3_column_int64(m_stmt, index);
+    return sqlite3_column_int64(stmt_, index);
 }
 
 std::string PreparedStmt::get_text(int32_t const index)
 {
-    if (index < 0 || index >= sqlite3_column_count(m_stmt)) {
+    if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_text: invalid index {}", index));
     }
 
-    auto ptr = sqlite3_column_text(m_stmt, index);
+    auto ptr = sqlite3_column_text(stmt_, index);
 
     // nullptr may indicate an error; handle nullptr case
     if (!ptr) {
-        if (sqlite3_errcode(m_db) != SQLITE_OK) {
+        if (sqlite3_errcode(db_) != SQLITE_OK) {
             throw std::runtime_error(fmt::format("sqlite::column_text: out of memory exception {}", index));
         }
         return std::string();
     }
 
-    auto len = sqlite3_column_bytes(m_stmt, index);
+    auto len = sqlite3_column_bytes(stmt_, index);
     std::string val(len, '\0');
     std::memcpy(val.data(), ptr, len);
     return val;
@@ -285,21 +255,21 @@ std::string PreparedStmt::get_text(int32_t const index)
 
 std::u16string PreparedStmt::get_text16(int32_t const index)
 {
-    if (index < 0 || index >= sqlite3_column_count(m_stmt)) {
+    if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_text16: invalid index {}", index));
     }
 
-    auto ptr = sqlite3_column_text16(m_stmt, index);
+    auto ptr = sqlite3_column_text16(stmt_, index);
 
     // nullptr may indicate an error; handle nullptr case
     if (!ptr) {
-        if (sqlite3_errcode(m_db) != SQLITE_OK) {
-            throw std::runtime_error(fmt::format("sqlite::column_text16: {}", sqlite3_errmsg(m_db)));
+        if (sqlite3_errcode(db_) != SQLITE_OK) {
+            throw std::runtime_error(fmt::format("sqlite::column_text16: {}", sqlite3_errmsg(db_)));
         }
         return std::u16string();
     }
 
-    auto len = sqlite3_column_bytes16(m_stmt, index);
+    auto len = sqlite3_column_bytes16(stmt_, index);
     std::u16string val(len, '\0');
     std::memcpy(val.data(), ptr, len);
     return val;
@@ -307,12 +277,12 @@ std::u16string PreparedStmt::get_text16(int32_t const index)
 
 std::array<uint8_t, 16> PreparedStmt::get_uuid(int32_t const index)
 {
-    if (index < 0 || index >= sqlite3_column_count(m_stmt)) {
+    if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_blob: invalid index {}", index));
     }
 
     std::array<uint8_t, 16> blob;
-    if (auto b = sqlite3_column_blob(m_stmt, index)) {
+    if (auto b = sqlite3_column_blob(stmt_, index)) {
         memcpy((void *)&blob[0], b, blob.size());
     }
     return blob;

@@ -1,14 +1,14 @@
 cmake_minimum_required (VERSION 3.11)
 cmake_policy (VERSION 3.11)
 
-project (dbpool VERSION 0.0.1.0 LANGUAGES C CXX)
+project (dbpool VERSION 0.0.0.0 LANGUAGES C CXX)
 
 set (CMAKE_CXX_STANDARD 20)
 
-add_library (dbpool STATIC "")
+add_library (dbpool OBJECT "")
 
-option (DBPOOL_ENABLE_SQLITE3 "Build SQLite3 code" ON)
-option (DBPOOL_BUILD_TESTS "Build database tests" ON)
+option (DBPOOL_ENABLE_SQLITE3 "Enable SQLite3 support" ON)
+option (DBPOOL_BUILD_TESTS "Build tests" ON)
 option (DBPOOL_SANITIZE_ADDRESS "Enable GCC Address Sanitizer (ASan)" OFF)
 option (DBPOOL_SANITIZE_THREAD "Enable GCC Thread Sanitizer (TSan)" OFF)
 

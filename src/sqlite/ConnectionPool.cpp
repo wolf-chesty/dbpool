@@ -173,6 +173,10 @@ void ConnectionPool::start_optimization_thread(optimization_period_t period, siz
         run_optimization_thread_ = true;
         optimization_thread_ = std::make_unique<std::thread>(&ConnectionPool::optimization_thread, this, stmt,
                                                               std::move(period), threshold);
+
+        std::string_view thread_name("sqlite_opt");
+        assert(thread_name.length() <= 16);
+        pthread_setname_np(optimization_thread_->native_handle(), thread_name.data());
     }
 }
 

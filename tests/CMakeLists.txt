@@ -26,6 +26,6 @@ target_link_libraries (dbpool_unit_tests
 
 target_sources (dbpool_unit_tests
     PRIVATE
-    main.cpp
-    dbpool_tests.cpp
+    src/main.cpp
+    src/dbpool_tests.cpp
 )

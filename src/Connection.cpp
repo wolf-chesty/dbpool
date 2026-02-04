@@ -4,12 +4,12 @@
 #include "dbpool/Connection.hpp"
 
 #include "dbpool/ConnectionImpl.hpp"
-#include "dbpool/ConnectionPool.hpp"
+#include "dbpool/ConnectionPoolImpl.hpp"
 #include <cassert>
 
 using namespace dbpool;
 
-Connection::Connection(std::unique_ptr<ConnectionImpl> conn, std::shared_ptr<ConnectionPool> conn_pool)
+Connection::Connection(std::unique_ptr<ConnectionImpl> conn, std::shared_ptr<ConnectionPoolImpl> conn_pool)
     : conn_(std::move(conn))
     , conn_pool_(std::move(conn_pool))
 {

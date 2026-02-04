@@ -38,11 +38,6 @@ public:
     PreparedStmt &operator=(PreparedStmt const &) = delete;
     PreparedStmt &operator=(PreparedStmt &&) noexcept = default;
 
-    /// @brief Returns the connection that created this statement.
-    ///
-    /// @return Pointer to connection that created this statement.
-    std::shared_ptr<Connection> get_conn();
-
     /// @brief Executes the prepared statement.
     ///
     /// @return \c return_code for the statement execution.
@@ -112,7 +107,7 @@ public:
     /// @return Binary data from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-    virtual std::vector<std::byte> get_blob(int32_t index) = 0;
+    virtual std::vector<std::byte> get_blob(int32_t const index) = 0;
 
     /// @brief Returns a \c bool value from a prepared statement result.
     ///
@@ -174,7 +169,7 @@ private:
     // Nothing is really done with the conn_ pointer; this is just here to make sure that the connection object that
     // created this prepared statement isn't destroyed causing the database connection to be prematurely returned to the
     // connection pool before the current thread is done using this prepared statement
-    std::shared_ptr<Connection> conn_;  ///< Connection that created this object.
+    std::shared_ptr<Connection> conn_; ///< Connection that created this object.
 };
 
 } // namespace dbpool

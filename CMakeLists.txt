@@ -32,7 +32,7 @@ target_link_libraries (dbpool
 target_sources (dbpool
     PRIVATE
     src/Connection.cpp
-    src/ConnectionPool.cpp
+    src/ConnectionPoolImpl.cpp
     src/PreparedStmt.cpp
 )
 
@@ -48,6 +48,7 @@ if (DBPOOL_ENABLE_SQLITE3)
         PRIVATE
         src/sqlite/ConnectionImpl.cpp
         src/sqlite/ConnectionPool.cpp
+        src/sqlite/ConnectionPoolImpl.cpp
         src/sqlite/PreparedStmt.cpp
     )
 endif ()

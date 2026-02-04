@@ -8,11 +8,6 @@
 using namespace dbpool;
 
 PreparedStmt::PreparedStmt(std::shared_ptr<Connection> conn) noexcept
-    : conn_(conn)
+    : conn_(std::move(conn))
 {
-}
-
-std::shared_ptr<Connection> PreparedStmt::get_conn()
-{
-    return conn_;
 }

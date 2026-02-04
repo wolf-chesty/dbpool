@@ -11,7 +11,7 @@
 namespace dbpool {
 
 class ConnectionImpl;
-class ConnectionPool;
+class ConnectionPoolImpl;
 
 ///
 /// @class Connection
@@ -25,6 +25,7 @@ class ConnectionPool;
 ///
 class Connection : public std::enable_shared_from_this<Connection> {
 public:
+    Connection() = delete;
     Connection(Connection const &) = delete;
     Connection(Connection &&) noexcept = default;
 
@@ -32,7 +33,7 @@ public:
     ///
     /// @param conn Database connection.
     /// @param conn_pool Connection pool that owns the database connection \c conn.
-    explicit Connection(std::unique_ptr<ConnectionImpl> conn, std::shared_ptr<ConnectionPool> conn_pool);
+    explicit Connection(std::unique_ptr<ConnectionImpl> conn, std::shared_ptr<ConnectionPoolImpl> conn_pool);
 
     /// @brief dtor for the object.
     ///
@@ -57,8 +58,8 @@ public:
     std::unique_ptr<PreparedStmt> get_stmt(std::string const &sql);
 
 private:
-    std::unique_ptr<ConnectionImpl> conn_;      ///< Implements database specific code.
-    std::shared_ptr<ConnectionPool> conn_pool_; ///< Connection pool that created the managed connection object.
+    std::unique_ptr<ConnectionImpl> conn_;          ///< Implements database specific code.
+    std::shared_ptr<ConnectionPoolImpl> conn_pool_; ///< Connection pool that created the managed connection object.
 };
 
 } // namespace dbpool

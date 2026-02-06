@@ -4,8 +4,7 @@
 #ifndef DBPOOL_CONNECTION_IMPL_HPP
 #define DBPOOL_CONNECTION_IMPL_HPP
 
-#include "dbpool/Connection.hpp"
-#include "dbpool/PreparedStmt.hpp"
+#include "dbpool/PreparedStmtImpl.hpp"
 #include <memory>
 
 namespace dbpool {
@@ -35,18 +34,17 @@ public:
     /// @param sql SQL statement to execute.
     ///
     /// Executes an SQL statement directly on the database connection without creating a prepared statement.
-    virtual PreparedStmt::return_code exec(std::string_view sql) = 0;
+    virtual PreparedStmtImpl::ReturnCode exec(std::string_view sql) = 0;
 
     /// @brief Get a prepared statement for this database connection.
     ///
     /// @return Pointer to a prepared statement object.
     ///
-    /// @param conn Database connection that owns the prepared statement.
     /// @param sql SQL statement to create the prepared statement from.
     ///
     /// Implementers of this function should return a pointer to a prepared statement that can be used with this
     /// database connection.
-    virtual std::unique_ptr<PreparedStmt> get_stmt(std::shared_ptr<Connection> conn, std::string const &sql) = 0;
+    virtual std::unique_ptr<PreparedStmtImpl> get_stmt(std::string const &sql) = 0;
 };
 
 } // namespace dbpool

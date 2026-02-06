@@ -50,26 +50,27 @@ public:
     /// @brief Executes statement \c sql on the managed database connection.
     ///
     /// @return Return code for statement executed.
+    ///
     /// @param sql SQL statement to execute.
     ///
     /// This function will execute the SQL statement \c sql on the managed database connection. bypassing the creation
     /// of a prepared statement. The use of this function is ideal for one-off, infrequently executed SQL statements.
-    dbpool::PreparedStmt::return_code exec(std::string_view sql) override;
+    PreparedStmtImpl::ReturnCode exec(std::string_view sql) override;
 
     /// @brief Returns a prepared statement for this object's managed database connection.
     ///
-    /// \return Pointer to a prepared statement.
-    /// \param conn Connection guard that initiated the construction of the prepared statement.
-    /// \param sql SQL statement of the prepared statement.
+    /// @return Pointer to a prepared statement.
+    ///
+    /// @param sql SQL statement of the prepared statement.
     ///
     /// Searches the object's collection of cached prepared statements for the SQL staement \c sql. If the prepared
     /// statement exists it is returned for re-use. If not, a new prepared statement is created and then cached using
     /// the SQL statement \c sql as the statement key.
-    std::unique_ptr<PreparedStmt> get_stmt(std::shared_ptr<dbpool::Connection> conn, std::string const &sql) override;
+    std::unique_ptr<dbpool::PreparedStmtImpl> get_stmt(std::string const &sql) override;
 
 private:
-    sqlite3 *db_{};                 ///< Pointer to SQLite3 database.
-    stmt_cache_type stmt_cache_;    ///< Collection of prepared statements.
+    sqlite3 *db_{};              ///< Pointer to SQLite3 database.
+    stmt_cache_type stmt_cache_; ///< Collection of prepared statements.
 };
 
 } // namespace dbpool::sqlite

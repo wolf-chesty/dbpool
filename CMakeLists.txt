@@ -49,7 +49,7 @@ if (DBPOOL_ENABLE_SQLITE3)
         src/sqlite/ConnectionImpl.cpp
         src/sqlite/ConnectionPool.cpp
         src/sqlite/ConnectionPoolImpl.cpp
-        src/sqlite/PreparedStmt.cpp
+        src/sqlite/PreparedStmtImpl.cpp
     )
 endif ()
 

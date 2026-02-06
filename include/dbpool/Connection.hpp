@@ -48,7 +48,7 @@ public:
     /// @return Error code.
     ///
     /// @param sql SQL statement to execute.
-    PreparedStmt::return_code exec(std::string_view sql);
+    PreparedStmt::ReturnCode exec(std::string_view sql);
 
     /// @brief Get a prepared statement for this database connection.
     ///
@@ -58,7 +58,7 @@ public:
     std::unique_ptr<PreparedStmt> get_stmt(std::string const &sql);
 
 private:
-    std::unique_ptr<ConnectionImpl> conn_;          ///< Implements database specific code.
+    std::unique_ptr<ConnectionImpl> conn_;          ///< API specific database connection implementation.
     std::shared_ptr<ConnectionPoolImpl> conn_pool_; ///< Connection pool that created the managed connection object.
 };
 

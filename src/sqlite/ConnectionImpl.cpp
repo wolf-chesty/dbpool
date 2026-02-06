@@ -3,7 +3,7 @@
 
 #include "dbpool/sqlite/ConnectionImpl.hpp"
 
-#include "dbpool/sqlite/PreparedStmt.hpp"
+#include "dbpool/sqlite/PreparedStmtImpl.hpp"
 #include <cassert>
 #include <fmt/core.h>
 
@@ -24,19 +24,18 @@ ConnectionImpl::~ConnectionImpl()
     sqlite3_close(db_);
 }
 
-dbpool::PreparedStmt::return_code ConnectionImpl::exec(std::string_view sql)
+PreparedStmtImpl::ReturnCode ConnectionImpl::exec(std::string_view sql)
 {
     assert(db_);
-    return PreparedStmt::to_error_code(sqlite3_exec(db_, sql.data(), nullptr, nullptr, nullptr));
+    return PreparedStmtImpl::to_error_code(sqlite3_exec(db_, sql.data(), nullptr, nullptr, nullptr));
 }
 
-std::unique_ptr<dbpool::PreparedStmt> ConnectionImpl::get_stmt(std::shared_ptr<dbpool::Connection> conn,
-                                                               std::string const &sql)
+std::unique_ptr<dbpool::PreparedStmtImpl> ConnectionImpl::get_stmt(std::string const &sql)
 {
     assert(db_);
 
     if (auto it = stmt_cache_.find(sql); it != stmt_cache_.end()) {
-        return std::make_unique<PreparedStmt>(conn, db_, it->second);
+        return std::make_unique<PreparedStmtImpl>(db_, it->second);
     }
 
     sqlite3_stmt *stmt;
@@ -45,5 +44,5 @@ std::unique_ptr<dbpool::PreparedStmt> ConnectionImpl::get_stmt(std::shared_ptr<d
     }
     stmt_cache_.emplace(sql, stmt);
 
-    return std::make_unique<PreparedStmt>(conn, db_, stmt);
+    return std::make_unique<PreparedStmtImpl>(db_, stmt);
 }

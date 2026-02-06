@@ -5,6 +5,7 @@
 
 #include "dbpool/ConnectionImpl.hpp"
 #include "dbpool/ConnectionPoolImpl.hpp"
+#include "dbpool/PreparedStmtImpl.hpp"
 #include <cassert>
 
 using namespace dbpool;
@@ -24,7 +25,7 @@ Connection::~Connection()
     conn_pool_->push_conn(std::move(conn_));
 }
 
-PreparedStmt::return_code Connection::exec(std::string_view sql)
+PreparedStmt::ReturnCode Connection::exec(std::string_view sql)
 {
     assert(conn_);
     return conn_->exec(sql);
@@ -33,5 +34,5 @@ PreparedStmt::return_code Connection::exec(std::string_view sql)
 std::unique_ptr<PreparedStmt> Connection::get_stmt(std::string const &sql)
 {
     assert(conn_);
-    return conn_->get_stmt(shared_from_this(), sql);
+    return std::make_unique<dbpool::PreparedStmt>(shared_from_this(), conn_->get_stmt(sql));
 }

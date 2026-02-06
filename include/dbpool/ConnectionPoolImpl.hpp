@@ -63,7 +63,7 @@ private:
     /// @brief Executes the stored SQL preparation statement against the database connection \c conn.
     ///
     /// \param conn Database connection to execute the preparation statement against.
-    void prep_conn(ConnectionImpl &) const;
+    void prep_conn(ConnectionImpl &conn) const;
 
     std::condition_variable conn_cv_; ///< Condition variable used when pushing/popping connections from the collection.
     std::mutex conn_mutex_;           ///< Locking mutex used to control access to the connection collection.

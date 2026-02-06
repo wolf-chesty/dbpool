@@ -34,17 +34,17 @@ BOOST_AUTO_TEST_CASE(table_creation)
 
     auto conn = db_pool->get_conn();
     auto ret = conn->exec("CREATE TABLE t1(x INT)");
-    BOOST_TEST((dbpool::PreparedStmt::return_code::ok == ret));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::ok == ret));
 
     auto stmt = conn->get_stmt("SELECT name FROM sqlite_master WHERE type='table' and name='t1'");
     BOOST_TEST((stmt != nullptr));
 
-    BOOST_TEST((dbpool::PreparedStmt::return_code::row == stmt->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::row == stmt->execute()));
 
     auto const name = stmt->get_text(0);
     BOOST_TEST(name == "t1");
 
-    BOOST_TEST((dbpool::PreparedStmt::return_code::done == stmt->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == stmt->execute()));
 }
 
 BOOST_AUTO_TEST_CASE(table_insertion)
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(table_insertion)
 
     int32_t const val{10};
     stmt->bind_int32(1, val);
-    BOOST_TEST((dbpool::PreparedStmt::return_code::done == stmt->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == stmt->execute()));
 }
 
 BOOST_AUTO_TEST_CASE(table_deletion)
@@ -76,10 +76,10 @@ BOOST_AUTO_TEST_CASE(table_deletion)
 
     stmt = conn->get_stmt("DELETE FROM t1 WHERE x = ?");
     stmt->bind_int32(1, val);
-    BOOST_TEST((dbpool::PreparedStmt::return_code::done == stmt->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == stmt->execute()));
 
     stmt = conn->get_stmt("SELECT x from t1");
-    BOOST_TEST((dbpool::PreparedStmt::return_code::done == stmt->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == stmt->execute()));
 }
 
 BOOST_AUTO_TEST_CASE(table_selection)
@@ -98,10 +98,10 @@ BOOST_AUTO_TEST_CASE(table_selection)
     stmt = conn->get_stmt("SELECT x FROM t1");
     BOOST_TEST((stmt != nullptr));
 
-    BOOST_TEST((dbpool::PreparedStmt::return_code::row == stmt->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::row == stmt->execute()));
     BOOST_TEST(stmt->get_int64(0) == val);
 
-    BOOST_TEST((dbpool::PreparedStmt::return_code::done == stmt->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == stmt->execute()));
 }
 
 BOOST_AUTO_TEST_CASE(bad_bind_index)
@@ -168,10 +168,10 @@ BOOST_AUTO_TEST_CASE(thread_test)
     conn2->exec("INSERT INTO t2(x) VALUES(1)");
 
     auto stmt1 = conn1->get_stmt("SELECT * FROM t1 ORDER BY x");
-    BOOST_TEST((dbpool::PreparedStmt::return_code::row == stmt1->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::row == stmt1->execute()));
 
     auto stmt2 = conn2->get_stmt("SELECT * FROM t2 ORDER BY x");
-    auto thread2 = [&stmt2]() { BOOST_TEST((PreparedStmt::return_code::row == stmt2->execute())); };
+    auto thread2 = [&stmt2]() { BOOST_TEST((PreparedStmt::ReturnCode::row == stmt2->execute())); };
 
     // execute stmt2 while stmt1 still has a selection index and wait for stmt2 to complete; both
     // selection indices should be correct
@@ -180,13 +180,13 @@ BOOST_AUTO_TEST_CASE(thread_test)
 
     // make sure t1 index is still valid
     BOOST_TEST((stmt1->get_int32(0) == 1));
-    BOOST_TEST((dbpool::PreparedStmt::return_code::row == stmt1->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::row == stmt1->execute()));
     BOOST_TEST((stmt1->get_int32(0) == 5));
-    BOOST_TEST((dbpool::PreparedStmt::return_code::done == stmt1->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == stmt1->execute()));
 
     // make sure t2 index is still valid
     BOOST_TEST((stmt2->get_int32(0) == 1));
-    BOOST_TEST((dbpool::PreparedStmt::return_code::done == stmt2->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == stmt2->execute()));
 }
 
 BOOST_AUTO_TEST_CASE(connection_guard_scope_test)
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE(connection_guard_scope_test)
     }
 
     // make sure that conn is not invalid once the connection pool shared pointer has died
-    BOOST_TEST((dbpool::PreparedStmt::return_code::ok == conn->exec("CREATE TABLE t1(x INT)")));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::ok == conn->exec("CREATE TABLE t1(x INT)")));
 }
 
 BOOST_AUTO_TEST_CASE(statement_scope_test)
@@ -216,11 +216,11 @@ BOOST_AUTO_TEST_CASE(statement_scope_test)
     }
 
     // make sure that conn falling out of scope doesn't cause the prepared statement to crash
-    BOOST_TEST((dbpool::PreparedStmt::return_code::row == stmt->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::row == stmt->execute()));
     BOOST_TEST((stmt->get_int32(0) == 1));
-    BOOST_TEST((dbpool::PreparedStmt::return_code::row == stmt->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::row == stmt->execute()));
     BOOST_TEST((stmt->get_int32(0) == 5));
-    BOOST_TEST((dbpool::PreparedStmt::return_code::done == stmt->execute()));
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == stmt->execute()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -6,6 +6,7 @@
 
 #include "dbpool/Connection.hpp"
 #include "dbpool/ConnectionPoolImpl.hpp"
+#include <cassert>
 #include <memory>
 #include <string_view>
 

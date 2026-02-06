@@ -10,6 +10,14 @@
 
 namespace dbpool {
 
+///
+/// @class PreparedStmtImpl
+///
+/// @brief Class that implements API specific prepared statement function calls.
+///
+/// Provides a standard interface for inter-oping with prepared statements from different database APIs. The
+/// \c PreparedStmt object will invoke functions on this object.
+///
 class PreparedStmtImpl {
 public:
     enum class ReturnCode { ok, error, row, done };

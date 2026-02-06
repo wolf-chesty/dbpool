@@ -9,6 +9,13 @@
 
 namespace dbpool {
 
+///
+/// @class ConnectionPoolImpl
+////// @brief Factor class for creates database connection.
+///
+/// When adding new database types to the library this class needs to be overridden to create the new database
+/// \c ConnectionImpl objects that will support connections to the new database.
+///
 class ConnectionPoolImpl {
     friend Connection;
 

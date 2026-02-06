@@ -8,6 +8,12 @@
 
 namespace dbpool::sqlite {
 
+///
+/// @class ConnectionPool
+///
+/// @brief Class provides additional interfaces for managing SQLite3 type database. Along with the normal
+///        \c ConnectionPool specific interfaces SQLite3 databases must implement the \c DatabaseFile interface.
+///
 class ConnectionPool
     : public dbpool::ConnectionPool<ConnectionPoolImpl>
     , public dbpool::DatabaseFile {

@@ -15,6 +15,7 @@ class ConnectionImpl;
 
 ///
 /// @class ConnectionPool
+///
 /// @brief A database connection pool class.
 ///
 /// The responsibility of this class is to manage (create and destroy) \c db_conn objects that will be used by the

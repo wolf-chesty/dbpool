@@ -20,8 +20,6 @@ class PreparedStmtImpl;
 ///
 /// @brief Interface for a database prepared statement.
 ///
-/// Provides a standard interface for inter-oping with prepared statements from different database APIs.
-///
 class PreparedStmt {
 public:
     using ReturnCode = dbpool::PreparedStmtImpl::ReturnCode;

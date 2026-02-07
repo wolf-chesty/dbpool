@@ -33,7 +33,7 @@ public:
     ConnectionPool(ConnectionPool const &) = delete;
     ConnectionPool(ConnectionPool &&) noexcept = default;
 
-    ConnectionPool(std::shared_ptr<connection_pool_t> conn_pool)
+    explicit ConnectionPool(std::shared_ptr<connection_pool_t> conn_pool)
         : conn_pool_(std::move(conn_pool))
     {
     }

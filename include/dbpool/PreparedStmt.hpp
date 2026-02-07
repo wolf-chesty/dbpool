@@ -33,7 +33,8 @@ public:
     ///
     /// @param pooled_conn Pointer to a scoped connection.
     /// @param impl Prepared statement implementation.
-    PreparedStmt(std::shared_ptr<PooledConnection> pooled_conn, std::unique_ptr<PreparedStmtImpl> impl) noexcept;
+    explicit PreparedStmt(std::shared_ptr<PooledConnection> pooled_conn,
+                          std::unique_ptr<PreparedStmtImpl> impl) noexcept;
 
     virtual ~PreparedStmt();
 

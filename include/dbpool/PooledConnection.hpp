@@ -26,7 +26,7 @@ public:
     ///
     /// @param conn_pool Connection pool that created \c conn.
     /// @param conn Database connection to be returned to \c conn_pool up destruction.
-    PooledConnection(std::shared_ptr<ConnectionPoolImpl> conn_pool, std::unique_ptr<ConnectionImpl> conn);
+    explicit PooledConnection(std::shared_ptr<ConnectionPoolImpl> conn_pool, std::unique_ptr<ConnectionImpl> conn);
 
     /// @brief Returns database connection to connection pool.
     ~PooledConnection();

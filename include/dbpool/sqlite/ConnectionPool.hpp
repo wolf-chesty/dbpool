@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Christopher L Walker
+// SPDX-License-Identifier: MIT
+
 #ifndef DBPOOL_SQLITE_CONNECTIONPOOL_HPP
 #define DBPOOL_SQLITE_CONNECTIONPOOL_HPP
 
@@ -18,6 +21,9 @@ class ConnectionPool
     : public dbpool::ConnectionPool<ConnectionPoolImpl>
     , public dbpool::DatabaseFile {
 public:
+    using optimization_period_t = ConnectionPoolImpl::optimization_period_t;
+
+public:
     ConnectionPool() = delete;
     ConnectionPool(ConnectionPool const &) = delete;
     ConnectionPool(ConnectionPool &&) noexcept = default;
@@ -28,10 +34,9 @@ public:
     /// @param pool_size Number of connections in the database connection pool.
     /// @param optimization_period Number of minutes to wait between database optimizations.
     /// @param analysis_limit Number of records to process during database optimizations.
-    explicit ConnectionPool(
-        std::string_view filename, size_t pool_size = 15,
-        ConnectionPoolImpl::optimization_period_t optimization_period = ConnectionPoolImpl::optimization_period_t(10),
-        size_t analysis_limit = 400);
+    explicit ConnectionPool(std::string_view filename, size_t pool_size = 15,
+                            optimization_period_t optimization_period = optimization_period_t(10),
+                            size_t analysis_limit = 400);
 
     ~ConnectionPool() override = default;
 

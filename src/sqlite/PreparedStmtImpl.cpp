@@ -38,8 +38,9 @@ PreparedStmtImpl::ReturnCode PreparedStmtImpl::to_error_code(int code)
         return ReturnCode::row;
     case SQLITE_DONE:
         return ReturnCode::done;
+    default:
+        assert(false);
     }
-    assert(false);
     return ReturnCode::error;
 }
 
@@ -152,7 +153,7 @@ std::vector<std::byte> PreparedStmtImpl::get_blob(int32_t const index)
         throw std::runtime_error(fmt::format("sqlite::column_blob: invalid index {}", index));
     }
 
-    auto ptr = sqlite3_column_blob(stmt_, index);
+    auto const ptr = sqlite3_column_blob(stmt_, index);
 
     // nullptr may indicate an error; handle nullptr case
     if (!ptr) {
@@ -162,7 +163,7 @@ std::vector<std::byte> PreparedStmtImpl::get_blob(int32_t const index)
         return std::vector<std::byte>();
     }
 
-    auto len = sqlite3_column_bytes(stmt_, index);
+    auto const len = sqlite3_column_bytes(stmt_, index);
     std::vector<std::byte> buf(len);
     std::memcpy(buf.data(), ptr, len);
     return buf;
@@ -183,7 +184,7 @@ std::string PreparedStmtImpl::get_date(int32_t const index)
     }
 
     // Sqlite doesn't have a native date field; keep number of milliseconds since epoch in database
-    auto millis = sqlite3_column_int64(stmt_, index);
+    auto const millis = sqlite3_column_int64(stmt_, index);
     // Format timestamp
     std::chrono::milliseconds d{millis};
     date::sys_time<std::chrono::milliseconds> tp{d};
@@ -220,7 +221,7 @@ std::string PreparedStmtImpl::get_text(int32_t const index)
         throw std::runtime_error(fmt::format("sqlite::column_text: invalid index {}", index));
     }
 
-    auto ptr = sqlite3_column_text(stmt_, index);
+    auto const ptr = sqlite3_column_text(stmt_, index);
 
     // nullptr may indicate an error; handle nullptr case
     if (!ptr) {
@@ -230,7 +231,7 @@ std::string PreparedStmtImpl::get_text(int32_t const index)
         return std::string();
     }
 
-    auto len = sqlite3_column_bytes(stmt_, index);
+    auto const len = sqlite3_column_bytes(stmt_, index);
     std::string val(len, '\0');
     std::memcpy(val.data(), ptr, len);
     return val;
@@ -242,7 +243,7 @@ std::u16string PreparedStmtImpl::get_text16(int32_t const index)
         throw std::runtime_error(fmt::format("sqlite::column_text16: invalid index {}", index));
     }
 
-    auto ptr = sqlite3_column_text16(stmt_, index);
+    auto const ptr = sqlite3_column_text16(stmt_, index);
 
     // nullptr may indicate an error; handle nullptr case
     if (!ptr) {
@@ -252,7 +253,7 @@ std::u16string PreparedStmtImpl::get_text16(int32_t const index)
         return std::u16string();
     }
 
-    auto len = sqlite3_column_bytes16(stmt_, index);
+    auto const len = sqlite3_column_bytes16(stmt_, index);
     std::u16string val(len, '\0');
     std::memcpy(val.data(), ptr, len);
     return val;
@@ -265,7 +266,7 @@ std::array<uint8_t, 16> PreparedStmtImpl::get_uuid(int32_t const index)
     }
 
     std::array<uint8_t, 16> blob;
-    if (auto b = sqlite3_column_blob(stmt_, index)) {
+    if (auto const b = sqlite3_column_blob(stmt_, index)) {
         memcpy((void *)&blob[0], b, blob.size());
     }
     return blob;

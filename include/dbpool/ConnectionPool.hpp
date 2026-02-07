@@ -6,6 +6,7 @@
 
 #include "dbpool/Connection.hpp"
 #include "dbpool/ConnectionPoolImpl.hpp"
+#include "dbpool/PooledConnection.hpp"
 #include <cassert>
 #include <memory>
 #include <string_view>
@@ -64,10 +65,10 @@ public:
     ///        database.
     ///
     /// @return Pointer to a new \c Connection object.
-    std::shared_ptr<Connection> get_conn()
+    Connection get_conn()
     {
         assert(conn_pool_);
-        return std::make_shared<Connection>(conn_pool_->pop_conn(), conn_pool_);
+        return Connection(std::make_shared<PooledConnection>(conn_pool_, conn_pool_->pop_conn()));
     }
 
     /// @brief Stores the SQL statement, \c sql, for use when preparing new database connections.
@@ -88,9 +89,9 @@ protected:
     /// @brief Returns pointer to the connection pool implementation.
     ///
     /// @return Pointer to connection pool implementation.
-    std::shared_ptr<connection_pool_t> get_conn_pool() const
+    connection_pool_t *get_conn_pool() const
     {
-        return conn_pool_;
+        return conn_pool_.get();
     }
 
 private:

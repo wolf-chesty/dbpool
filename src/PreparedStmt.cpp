@@ -3,18 +3,19 @@
 
 #include "dbpool/PreparedStmt.hpp"
 
-#include "dbpool/Connection.hpp"
+#include "dbpool/PooledConnection.hpp"
 #include "dbpool/PreparedStmtImpl.hpp"
 #include <cassert>
 
 using namespace dbpool;
 
-PreparedStmt::PreparedStmt(std::shared_ptr<Connection> connection, std::unique_ptr<PreparedStmtImpl> impl) noexcept
-    : connection_(std::move(connection))
+PreparedStmt::PreparedStmt(std::shared_ptr<PooledConnection> pooled_conn,
+                           std::unique_ptr<PreparedStmtImpl> impl) noexcept
+    : pooled_conn_(std::move(pooled_conn))
     , impl_(std::move(impl))
 {
+    assert(pooled_conn_);
     assert(impl_);
-    assert(connection_);
 }
 
 PreparedStmt::~PreparedStmt()
@@ -23,7 +24,7 @@ PreparedStmt::~PreparedStmt()
     // is destructed before connection_. We could rely on member ordering here but that would lead to fragile code and
     // things will break if someone reorders the members of this object.
     impl_.reset();
-    connection_.reset();
+    pooled_conn_.reset();
 }
 
 PreparedStmt::ReturnCode PreparedStmt::execute()
@@ -44,10 +45,10 @@ void PreparedStmt::bind_bool(int32_t const index, bool const value)
     impl_->bind_bool(index, value);
 }
 
-void PreparedStmt::bind_date(int32_t const index, std::string_view date)
+void PreparedStmt::bind_date(int32_t const index, std::string_view value)
 {
     assert(impl_);
-    impl_->bind_date(index, date);
+    impl_->bind_date(index, value);
 }
 
 void PreparedStmt::bind_double(int32_t const index, double const value)

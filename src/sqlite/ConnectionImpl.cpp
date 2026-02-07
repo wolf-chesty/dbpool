@@ -16,7 +16,7 @@ ConnectionImpl::ConnectionImpl(sqlite3 *db)
 
 ConnectionImpl::~ConnectionImpl()
 {
-    for (auto &stmt : stmt_cache_) {
+    for (auto const &stmt : stmt_cache_) {
         sqlite3_finalize(stmt.second);
     }
 
@@ -34,7 +34,7 @@ std::unique_ptr<dbpool::PreparedStmtImpl> ConnectionImpl::get_stmt(std::string c
 {
     assert(db_);
 
-    if (auto it = stmt_cache_.find(sql); it != stmt_cache_.end()) {
+    if (auto const it = stmt_cache_.find(sql); it != stmt_cache_.end()) {
         return std::make_unique<PreparedStmtImpl>(db_, it->second);
     }
 

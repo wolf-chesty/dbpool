@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Christopher L Walker
+// SPDX-License-Identifier: MIT
+
 #include "dbpool/sqlite/ConnectionPool.hpp"
 
 #include "dbpool/sqlite/ConnectionPoolImpl.hpp"

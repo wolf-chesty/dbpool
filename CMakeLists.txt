@@ -33,6 +33,7 @@ target_sources (dbpool
     PRIVATE
     src/Connection.cpp
     src/ConnectionPoolImpl.cpp
+    src/PooledConnection.cpp
     src/PreparedStmt.cpp
 )
 

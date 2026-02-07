@@ -101,6 +101,8 @@ int64_t ConnectionPoolImpl::get_schema()
 {
     assert(db_);
 
+    std::unique_lock const lock(db_mutex_);
+
     // Compile prepared statement
     std::string_view sql{"PRAGMA user_version"};
     sqlite3_stmt *stmt{};
@@ -125,6 +127,7 @@ void ConnectionPoolImpl::set_schema(int64_t schema)
 {
     assert(db_);
     auto const sqlStmt = fmt::format("PRAGMA user_version = {}", schema);
+    std::unique_lock const lock(db_mutex_);
     if (sqlite3_exec(db_, sqlStmt.data(), nullptr, nullptr, nullptr)) {
         throw std::runtime_error(fmt::format("sqlite_conn_pool::set_schema: {}", sqlite3_errmsg(db_)));
     }
@@ -140,33 +143,36 @@ std::unique_ptr<dbpool::ConnectionImpl> ConnectionPoolImpl::new_conn()
     return std::make_unique<ConnectionImpl>(db);
 }
 
-void ConnectionPoolImpl::optimization_thread(sqlite3_stmt *stmt, optimization_period_t period,
-                                             [[maybe_unused]] size_t threshold)
+void ConnectionPoolImpl::optimization_thread(optimization_period_t period, [[maybe_unused]] size_t threshold)
 {
     assert(period.count() > 0);
 
-    do {
-        std::unique_lock lock(optimization_mutex_);
-        optimization_cv_.wait_for(lock, period, [this]() -> bool { return !run_optimization_thread_; });
-
-        sqlite3_step(stmt);
-        sqlite3_reset(stmt);
-    } while (run_optimization_thread_);
-
-    sqlite3_finalize(stmt);
-}
-
-void ConnectionPoolImpl::start_optimization_thread(optimization_period_t period, size_t threshold)
-{
-    if (period.count() > 0 && !run_optimization_thread_.exchange(true)) {
+    try {
         sqlite3_stmt *stmt{};
         auto const sql = fmt::format("PRAGMA analysis_limit = {}; PRAGMA optimize;", threshold);
         if (sqlite3_prepare_v2(db_, sql.data(), sql.length() + 1, &stmt, nullptr)) {
             throw std::runtime_error(fmt::format("sqlite_conn_pool::optimization_thread: {}", sqlite3_errmsg(db_)));
         }
 
+        do {
+            std::unique_lock lock(db_mutex_);
+            optimization_cv_.wait_for(lock, period, [this]() -> bool { return !run_optimization_thread_; });
+
+            sqlite3_step(stmt);
+            sqlite3_reset(stmt);
+        } while (run_optimization_thread_);
+
+        sqlite3_finalize(stmt);
+    }
+    catch (std::exception const &e) {
+    }
+}
+
+void ConnectionPoolImpl::start_optimization_thread(optimization_period_t period, size_t threshold)
+{
+    if (period.count() > 0 && !run_optimization_thread_.exchange(true)) {
         optimization_thread_ =
-            std::thread(&ConnectionPoolImpl::optimization_thread, this, stmt, std::move(period), threshold);
+            std::thread(&ConnectionPoolImpl::optimization_thread, this, std::move(period), threshold);
 
         std::string_view thread_name("sqlite_opt");
         assert(thread_name.length() <= 16);
@@ -176,7 +182,6 @@ void ConnectionPoolImpl::start_optimization_thread(optimization_period_t period,
 
 void ConnectionPoolImpl::stop_optimization_thread()
 {
-    // Optimize database one last time before exiting
     if (run_optimization_thread_.exchange(false)) {
         optimization_cv_.notify_one();
     }
@@ -186,6 +191,7 @@ void ConnectionPoolImpl::stop_optimization_thread()
 void ConnectionPoolImpl::commit()
 {
     assert(db_);
+    std::unique_lock const lock(db_mutex_);
     if (sqlite3_exec(db_, "VACUUM", nullptr, nullptr, nullptr)) {
         throw std::runtime_error(fmt::format("sqlite_conn_pool::commit: {}", sqlite3_errmsg(db_)));
     }

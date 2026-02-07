@@ -12,7 +12,7 @@
 
 namespace dbpool {
 
-class Connection;
+class PooledConnection;
 class PreparedStmtImpl;
 
 ///
@@ -25,14 +25,15 @@ public:
     using ReturnCode = dbpool::PreparedStmtImpl::ReturnCode;
 
 public:
-    PreparedStmt() = delete;
+    PreparedStmt() = default;
     PreparedStmt(PreparedStmt const &) = delete;
     PreparedStmt(PreparedStmt &&) noexcept = default;
 
     /// @brief Creates a prepared statement wrapping impl.
     ///
-    /// @ param impl Prepared statement implementation.
-    PreparedStmt(std::shared_ptr<Connection> connection, std::unique_ptr<PreparedStmtImpl> impl) noexcept;
+    /// @param pooled_conn Pointer to a scoped connection.
+    /// @param impl Prepared statement implementation.
+    PreparedStmt(std::shared_ptr<PooledConnection> pooled_conn, std::unique_ptr<PreparedStmtImpl> impl) noexcept;
 
     virtual ~PreparedStmt();
 
@@ -60,7 +61,7 @@ public:
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-    void bind_date(int32_t const index, std::string_view date);
+    void bind_date(int32_t const index, std::string_view value);
 
     /// @brief Binds a double value to a prepared statement field.
     ///
@@ -167,8 +168,8 @@ public:
     std::array<uint8_t, 16> get_uuid(int32_t const index);
 
 private:
-    std::shared_ptr<Connection> connection_;
-    std::unique_ptr<PreparedStmtImpl> impl_;
+    std::shared_ptr<PooledConnection> pooled_conn_; ///< Pointer to a scoped connection.
+    std::unique_ptr<PreparedStmtImpl> impl_;        ///< Pointer to the prepared statement implementation.
 };
 
 } // namespace dbpool

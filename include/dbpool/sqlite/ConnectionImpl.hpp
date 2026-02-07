@@ -53,7 +53,7 @@ public:
     ///
     /// @param sql SQL statement to execute.
     ///
-    /// This function will execute the SQL statement \c sql on the managed database connection. bypassing the creation
+    /// This function will execute the SQL statement \c sql on the managed database connection, bypassing the creation
     /// of a prepared statement. The use of this function is ideal for one-off, infrequently executed SQL statements.
     PreparedStmtImpl::ReturnCode exec(std::string_view sql) override;
 
@@ -63,7 +63,7 @@ public:
     ///
     /// @param sql SQL statement of the prepared statement.
     ///
-    /// Searches the object's collection of cached prepared statements for the SQL staement \c sql. If the prepared
+    /// Searches the object's collection of cached prepared statements for the SQL statement \c sql. If the prepared
     /// statement exists it is returned for re-use. If not, a new prepared statement is created and then cached using
     /// the SQL statement \c sql as the statement key.
     std::unique_ptr<dbpool::PreparedStmtImpl> get_stmt(std::string const &sql) override;

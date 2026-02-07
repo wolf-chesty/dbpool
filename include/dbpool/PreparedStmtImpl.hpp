@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Christopher L Walker
+// SPDX-License-Identifier: MIT
+
 #ifndef DBPOOL_PREPARED_STMT_IMPL_HPP
 #define DBPOOL_PREPARED_STMT_IMPL_HPP
 

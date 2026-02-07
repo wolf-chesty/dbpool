@@ -99,14 +99,13 @@ private:
 
     /// @brief Function that implements the thread that periodically optimizes the database.
     ///
-    /// @param stmt Prepared statement that will optimize the database..
     /// @param period Number of minutes to wait between optimization calls.
     /// @param threshold Number of records to examine when performing the optimization.
     ///
     /// @note Time taken to optimize the database does not count towards the timeout length.
     ///
     /// This function will wake up periodically and perform an optimization on the SQLite database file.
-    void optimization_thread(sqlite3_stmt *stmt, optimization_period_t period, size_t threshold);
+    void optimization_thread(optimization_period_t period, size_t threshold);
 
     /// @brief Initializes the sqlite3 library for use by the application.
     void initialize_sqlite();
@@ -118,11 +117,11 @@ private:
     static size_t sqlite_use_count_;
 
     std::thread optimization_thread_;
-    std::mutex optimization_mutex_;
     std::condition_variable optimization_cv_;
     std::atomic<bool> run_optimization_thread_{false};
 
     sqlite3 *db_{nullptr};
+    std::mutex db_mutex_;
 };
 
 } // namespace dbpool::sqlite

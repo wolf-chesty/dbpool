@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Christopher L Walker
+// SPDX-License-Identifier: MIT
+
 #ifndef DBPOOL_CONNECTIONPOOLIMPL_HPP
 #define DBPOOL_CONNECTIONPOOLIMPL_HPP
 
@@ -11,7 +14,8 @@ namespace dbpool {
 
 ///
 /// @class ConnectionPoolImpl
-////// @brief Factor class for creates database connection.
+///
+/// @brief Factor class for creates database connection.
 ///
 /// When adding new database types to the library this class needs to be overridden to create the new database
 /// \c ConnectionImpl objects that will support connections to the new database.
@@ -69,7 +73,7 @@ protected:
 private:
     /// @brief Executes the stored SQL preparation statement against the database connection \c conn.
     ///
-    /// \param conn Database connection to execute the preparation statement against.
+    /// @param conn Database connection to execute the preparation statement against.
     void prep_conn(ConnectionImpl &conn) const;
 
     std::condition_variable conn_cv_; ///< Condition variable used when pushing/popping connections from the collection.

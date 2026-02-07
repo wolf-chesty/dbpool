@@ -5,34 +5,28 @@
 
 #include "dbpool/ConnectionImpl.hpp"
 #include "dbpool/ConnectionPoolImpl.hpp"
+#include "dbpool/PooledConnection.hpp"
 #include "dbpool/PreparedStmtImpl.hpp"
 #include <cassert>
 
 using namespace dbpool;
 
-Connection::Connection(std::unique_ptr<ConnectionImpl> conn, std::shared_ptr<ConnectionPoolImpl> conn_pool)
-    : conn_(std::move(conn))
-    , conn_pool_(std::move(conn_pool))
+Connection::Connection(std::shared_ptr<PooledConnection> pooled_conn)
+    : pooled_conn_(std::move(pooled_conn))
 {
-    assert(conn_);
-    assert(conn_pool_);
-}
-
-Connection::~Connection()
-{
-    assert(conn_);
-    assert(conn_pool_);
-    conn_pool_->push_conn(std::move(conn_));
+    assert(pooled_conn_);
 }
 
 PreparedStmt::ReturnCode Connection::exec(std::string_view sql)
 {
-    assert(conn_);
-    return conn_->exec(sql);
+    assert(pooled_conn_);
+    auto conn = pooled_conn_->get_conn();
+    return conn->exec(sql);
 }
 
-std::unique_ptr<PreparedStmt> Connection::get_stmt(std::string const &sql)
+PreparedStmt Connection::get_stmt(std::string const &sql)
 {
-    assert(conn_);
-    return std::make_unique<dbpool::PreparedStmt>(shared_from_this(), conn_->get_stmt(sql));
+    assert(pooled_conn_);
+    auto conn = pooled_conn_->get_conn();
+    return PreparedStmt(pooled_conn_, conn->get_stmt(sql));
 }

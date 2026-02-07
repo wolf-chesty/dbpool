@@ -15,13 +15,13 @@ contention when using the database handle.
 #include <memory>
 
 int main() {
-    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
+    dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
     // Get a connection from the pool
-    auto conn = dbPool->get_conn();
+    auto conn = db_pool.get_conn();
     
     // Execute an SQL statement against the connection
-    auto ret = conn->exec("CREATE TABLE t1(x INT)");
+    auto ret = conn.exec("CREATE TABLE t1(x INT)");
 }
 ```
 
@@ -36,27 +36,27 @@ returned from an SQL statement can overwrite an already existing result (in anot
 #include <memory>
 #include <thread>
  
-void worker_thread(std::shared_ptr<dbpool::Connection> const &conn) {
-    conn->exec("SELECT * FROM table1;");
+void worker_thread(dbpool::Connection &conn) {
+    conn.exec("SELECT * FROM table1;");
     
     // iterating over the returned records from conn can result in bad things
     // since the database connection was shared between two threads of execution
 }
  
 int main() {
-    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
+    dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
     // Get a connection from the pool
-    auto conn = dbPool->get_conn();
+    auto conn = db_pool.get_conn();
 
     // Notice that we are sharing conn with the thread; this will cause issues
     std::thread worker(worker_thread, conn);
 
-    conn->exec("SELECT * FROM table2;");
+    conn.exec("SELECT * FROM table2;");
     
     // Since the connection is shared across threads the results from worker_thread can
     // overwrite the query results for this thread (or vice-versa). In order to avoid this
-    // each thread should have their own pointer to the database.
+    // each thread should have their own connection to the database.
 }
 ```
 
@@ -69,20 +69,20 @@ In order to avoid invalidating the returned record from contending threads you c
 #include <memory>
 #include <thread>
  
-void worker_thread(std::shared_ptr<dbpool::Connection> const &conn) {
-    conn->exec("SELECT * FROM table1;");
+void worker_thread(dbpool::Connection conn) {
+    conn.exec("SELECT * FROM table1;");
 }
  
 int main() {
-    auto dbPool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
+    dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
     // Get a connection from the pool
-    auto conn = dbPool->get_conn();
+    auto conn = db_pool.get_conn();
 
     // Give the thread its own connection to work with
-    std::thread worker(worker_thread, dbPool->get_conn());
+    std::thread worker(worker_thread, db_pool.get_conn());
 
-    conn->exec("SELECT * FROM table2;");
+    conn.exec("SELECT * FROM table2;");
     
     // Since work_thread and this thread of execution have their own pointer to the
     // underlying database the returned results will not overwrite each other.

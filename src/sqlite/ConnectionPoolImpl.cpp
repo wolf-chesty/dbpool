@@ -145,6 +145,7 @@ std::unique_ptr<dbpool::ConnectionImpl> ConnectionPoolImpl::new_conn()
 
 void ConnectionPoolImpl::optimization_thread(optimization_period_t period, [[maybe_unused]] size_t threshold)
 {
+    assert(db_);
     assert(period.count() > 0);
 
     try {
@@ -199,6 +200,7 @@ void ConnectionPoolImpl::commit()
 
 std::string ConnectionPoolImpl::get_filename() const
 {
+    assert(db_);
     auto f = sqlite3_db_filename(db_, nullptr);
     return std::string{!f || strlen(f) == 0 ? ":memory:" : f};
 }

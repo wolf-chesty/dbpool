@@ -12,6 +12,7 @@ using namespace dbpool::sqlite;
 ConnectionImpl::ConnectionImpl(sqlite3 *db)
     : db_(db)
 {
+    assert(db_);
 }
 
 ConnectionImpl::~ConnectionImpl()

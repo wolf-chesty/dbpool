@@ -17,6 +17,8 @@ PreparedStmtImpl::PreparedStmtImpl(sqlite3 *db, sqlite3_stmt *stmt) noexcept
     : db_(db)
     , stmt_(stmt)
 {
+    assert(db_);
+    assert(stmt_);
 }
 
 PreparedStmtImpl::~PreparedStmtImpl()
@@ -46,11 +48,13 @@ PreparedStmtImpl::ReturnCode PreparedStmtImpl::to_error_code(int code)
 
 PreparedStmtImpl::ReturnCode PreparedStmtImpl::execute()
 {
+    assert(stmt_);
     return to_error_code(sqlite3_step(stmt_));
 }
 
 void PreparedStmtImpl::bind_blob(int32_t const index, std::span<std::byte const> const &value)
 {
+    assert(stmt_);
     if (sqlite3_bind_blob(stmt_, index, &value[0], value.size_bytes(), SQLITE_TRANSIENT) != SQLITE_OK) {
         throw std::runtime_error(fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(db_)));
     }
@@ -58,6 +62,7 @@ void PreparedStmtImpl::bind_blob(int32_t const index, std::span<std::byte const>
 
 void PreparedStmtImpl::bind_bool(int32_t const index, bool const value)
 {
+    assert(stmt_);
     if (sqlite3_bind_int(stmt_, index, value ? 1 : 0) != SQLITE_OK) {
         throw std::runtime_error(fmt::format("sqlite_stmt::bind_bool: {}", sqlite3_errmsg(db_)));
     }
@@ -65,6 +70,8 @@ void PreparedStmtImpl::bind_bool(int32_t const index, bool const value)
 
 void PreparedStmtImpl::bind_date(int32_t const index, std::string_view value)
 {
+    assert(stmt_);
+
     int ret{};
     if (value.empty()) {
         ret = sqlite3_bind_null(stmt_, index);
@@ -94,6 +101,7 @@ void PreparedStmtImpl::bind_date(int32_t const index, std::string_view value)
 
 void PreparedStmtImpl::bind_double(int32_t const index, double const value)
 {
+    assert(stmt_);
     if (sqlite3_bind_double(stmt_, index, value) != SQLITE_OK) {
         throw std::runtime_error(fmt::format("sqlite_stmt::bind_double: {}", sqlite3_errmsg(db_)));
     }
@@ -101,6 +109,7 @@ void PreparedStmtImpl::bind_double(int32_t const index, double const value)
 
 void PreparedStmtImpl::bind_int32(int32_t const index, int32_t const value)
 {
+    assert(stmt_);
     if (sqlite3_bind_int(stmt_, index, value) != SQLITE_OK) {
         throw std::runtime_error(fmt::format("sqlite_stmt::bind_int32: {}", sqlite3_errmsg(db_)));
     }
@@ -108,6 +117,7 @@ void PreparedStmtImpl::bind_int32(int32_t const index, int32_t const value)
 
 void PreparedStmtImpl::bind_int64(int32_t const index, int64_t const value)
 {
+    assert(stmt_);
     if (sqlite3_bind_int64(stmt_, index, value) != SQLITE_OK) {
         throw std::runtime_error(fmt::format("sqlite_stmt::bind_int64: {}", sqlite3_errmsg(db_)));
     }
@@ -115,6 +125,7 @@ void PreparedStmtImpl::bind_int64(int32_t const index, int64_t const value)
 
 void PreparedStmtImpl::bind_null(int32_t const index)
 {
+    assert(stmt_);
     if (sqlite3_bind_null(stmt_, index) != SQLITE_OK) {
         throw std::runtime_error(fmt::format("sqlite_stmt::bind_null: {}", sqlite3_errmsg(db_)));
     }
@@ -122,6 +133,7 @@ void PreparedStmtImpl::bind_null(int32_t const index)
 
 void PreparedStmtImpl::bind_uuid(int32_t const index, std::span<std::byte const> const &value)
 {
+    assert(stmt_);
     if (sqlite3_bind_blob(stmt_, index, &value[0], value.size(), SQLITE_TRANSIENT) != SQLITE_OK) {
         throw std::runtime_error(fmt::format("sqlite_stmt::bind_blob: {}", sqlite3_errmsg(db_)));
     }
@@ -129,6 +141,7 @@ void PreparedStmtImpl::bind_uuid(int32_t const index, std::span<std::byte const>
 
 void PreparedStmtImpl::bind_text(int32_t const index, std::string_view value)
 {
+    assert(stmt_);
     auto const ret = value.empty() ? sqlite3_bind_null(stmt_, index)
                                    : sqlite3_bind_text(stmt_, index, value.data(), static_cast<int>(value.length()),
                                                        SQLITE_TRANSIENT);
@@ -139,6 +152,7 @@ void PreparedStmtImpl::bind_text(int32_t const index, std::string_view value)
 
 void PreparedStmtImpl::bind_text16(int32_t const index, std::u16string_view value)
 {
+    assert(stmt_);
     auto const ret = value.empty() ? sqlite3_bind_null(stmt_, index)
                                    : sqlite3_bind_text16(stmt_, index, value.data(), static_cast<int>(value.length()),
                                                          SQLITE_TRANSIENT);
@@ -149,6 +163,8 @@ void PreparedStmtImpl::bind_text16(int32_t const index, std::u16string_view valu
 
 std::vector<std::byte> PreparedStmtImpl::get_blob(int32_t const index)
 {
+    assert(stmt_);
+
     if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_blob: invalid index {}", index));
     }
@@ -171,6 +187,7 @@ std::vector<std::byte> PreparedStmtImpl::get_blob(int32_t const index)
 
 bool PreparedStmtImpl::get_bool(int32_t const index)
 {
+    assert(stmt_);
     if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_int: invalid index {}", index));
     }
@@ -179,6 +196,7 @@ bool PreparedStmtImpl::get_bool(int32_t const index)
 
 std::string PreparedStmtImpl::get_date(int32_t const index)
 {
+    assert(stmt_);
     if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_int64: invalid index {}", index));
     }
@@ -193,6 +211,7 @@ std::string PreparedStmtImpl::get_date(int32_t const index)
 
 double PreparedStmtImpl::get_double(int32_t const index)
 {
+    assert(stmt_);
     if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_double: invalid index {}", index));
     }
@@ -201,6 +220,7 @@ double PreparedStmtImpl::get_double(int32_t const index)
 
 int32_t PreparedStmtImpl::get_int32(int32_t const index)
 {
+    assert(stmt_);
     if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_int: invalid index {}", index));
     }
@@ -209,6 +229,7 @@ int32_t PreparedStmtImpl::get_int32(int32_t const index)
 
 int64_t PreparedStmtImpl::get_int64(int32_t const index)
 {
+    assert(stmt_);
     if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_int32: invalid index {}", index));
     }
@@ -217,6 +238,8 @@ int64_t PreparedStmtImpl::get_int64(int32_t const index)
 
 std::string PreparedStmtImpl::get_text(int32_t const index)
 {
+    assert(stmt_);
+
     if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_text: invalid index {}", index));
     }
@@ -239,6 +262,8 @@ std::string PreparedStmtImpl::get_text(int32_t const index)
 
 std::u16string PreparedStmtImpl::get_text16(int32_t const index)
 {
+    assert(stmt_);
+
     if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_text16: invalid index {}", index));
     }
@@ -261,6 +286,8 @@ std::u16string PreparedStmtImpl::get_text16(int32_t const index)
 
 std::array<uint8_t, 16> PreparedStmtImpl::get_uuid(int32_t const index)
 {
+    assert(stmt_);
+
     if (index < 0 || index >= sqlite3_column_count(stmt_)) {
         throw std::runtime_error(fmt::format("sqlite::column_blob: invalid index {}", index));
     }

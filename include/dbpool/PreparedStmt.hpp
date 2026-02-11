@@ -4,7 +4,7 @@
 #ifndef DBPOOL_PREPARED_STATEMENT_HPP
 #define DBPOOL_PREPARED_STATEMENT_HPP
 
-#include "dbpool/PreparedStmtImpl.hpp"
+#include "impl/PreparedStmtImpl.hpp"
 #include <memory>
 #include <span>
 #include <string>

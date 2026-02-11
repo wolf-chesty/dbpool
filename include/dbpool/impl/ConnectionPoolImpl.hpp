@@ -4,8 +4,8 @@
 #ifndef DBPOOL_CONNECTIONPOOLIMPL_HPP
 #define DBPOOL_CONNECTIONPOOLIMPL_HPP
 
+#include "ConnectionImpl.hpp"
 #include "dbpool/Connection.hpp"
-#include "dbpool/ConnectionImpl.hpp"
 #include <condition_variable>
 #include <forward_list>
 #include <memory>

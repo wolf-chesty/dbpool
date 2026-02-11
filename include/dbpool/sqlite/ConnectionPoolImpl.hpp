@@ -4,8 +4,8 @@
 #ifndef DBPOOL_SQLITE_CONNECTIONPOOLIMPL_HPP
 #define DBPOOL_SQLITE_CONNECTIONPOOLIMPL_HPP
 
-#include "dbpool/ConnectionPoolImpl.hpp"
 #include "dbpool/DatabaseFile.hpp"
+#include "dbpool/impl/ConnectionPoolImpl.hpp"
 #include <memory>
 
 #include <atomic>

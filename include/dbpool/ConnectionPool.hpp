@@ -5,8 +5,8 @@
 #define DBPOOL_CONNECTION_POOL_HPP
 
 #include "dbpool/Connection.hpp"
-#include "dbpool/ConnectionPoolImpl.hpp"
-#include "dbpool/PooledConnection.hpp"
+#include "dbpool/util/PooledConnection.hpp"
+#include "impl/ConnectionPoolImpl.hpp"
 #include <cassert>
 #include <memory>
 #include <string_view>

@@ -4,8 +4,9 @@
 #ifndef DBPOOL_CONNECTION_IMPL_HPP
 #define DBPOOL_CONNECTION_IMPL_HPP
 
-#include "dbpool/PreparedStmtImpl.hpp"
+#include "PreparedStmtImpl.hpp"
 #include <memory>
+#include <string>
 
 namespace dbpool {
 

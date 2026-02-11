@@ -13,22 +13,25 @@
 
 using namespace dbpool::sqlite;
 
-PreparedStmtImpl::PreparedStmtImpl(sqlite3 *db, sqlite3_stmt *stmt) noexcept
+PreparedStmtImpl::PreparedStmtImpl(sqlite3 *db, std::string_view sql)
     : db_(db)
-    , stmt_(stmt)
 {
     assert(db_);
-    assert(stmt_);
+    if (sqlite3_prepare_v2(db_, sql.data(), static_cast<int>(sql.length() + 1), &stmt_, nullptr)) {
+        throw std::runtime_error(fmt::format("sqlite_conn_impl::get_stmt: {}", sqlite3_errmsg(db_)));
+    }
 }
 
 PreparedStmtImpl::~PreparedStmtImpl()
 {
-    if (stmt_) {
-        if (sqlite3_bind_parameter_count(stmt_)) {
-            sqlite3_clear_bindings(stmt_);
-        }
-        sqlite3_reset(stmt_);
+    assert(stmt_);
+
+    if (sqlite3_bind_parameter_count(stmt_)) {
+        sqlite3_clear_bindings(stmt_);
     }
+    sqlite3_reset(stmt_);
+
+    sqlite3_finalize(stmt_);
 }
 
 PreparedStmtImpl::ReturnCode PreparedStmtImpl::to_error_code(int code)

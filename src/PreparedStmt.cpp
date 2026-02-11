@@ -3,8 +3,8 @@
 
 #include "dbpool/PreparedStmt.hpp"
 
-#include "dbpool/PooledConnection.hpp"
-#include "dbpool/PreparedStmtImpl.hpp"
+#include "dbpool/impl/PreparedStmtImpl.hpp"
+#include "dbpool/util/PooledConnection.hpp"
 #include <cassert>
 
 using namespace dbpool;

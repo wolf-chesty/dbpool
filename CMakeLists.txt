@@ -31,9 +31,9 @@ target_link_libraries (dbpool
 
 target_sources (dbpool
     PRIVATE
+    src/impl/ConnectionPoolImpl.cpp
+    src/util/PooledConnection.cpp
     src/Connection.cpp
-    src/ConnectionPoolImpl.cpp
-    src/PooledConnection.cpp
     src/PreparedStmt.cpp
 )
 

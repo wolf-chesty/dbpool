@@ -1,9 +1,9 @@
 // Copyright (c) 2026 Christopher L Walker
 // SPDX-License-Identifier: MIT
 
-#include "dbpool/ConnectionPoolImpl.hpp"
+#include "dbpool/impl/ConnectionPoolImpl.hpp"
 
-#include "dbpool/ConnectionImpl.hpp"
+#include "dbpool/impl/ConnectionImpl.hpp"
 #include <cassert>
 
 using namespace dbpool;

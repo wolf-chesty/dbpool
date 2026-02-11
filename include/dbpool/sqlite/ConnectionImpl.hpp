@@ -4,13 +4,10 @@
 #ifndef DBPOOL_SQLITE_CONNECTION_IMPL_HPP
 #define DBPOOL_SQLITE_CONNECTION_IMPL_HPP
 
-#include "dbpool/ConnectionImpl.hpp"
+#include "dbpool/impl/ConnectionImpl.hpp"
 
 #include <memory>
 #include <sqlite3.h>
-#include <string>
-#include <string_view>
-#include <unordered_map>
 
 namespace dbpool::sqlite {
 
@@ -25,9 +22,6 @@ namespace dbpool::sqlite {
 /// The object also maintains a cache of prepared statements in order to minimize the re-compilation of frequently used
 /// prepared statements.
 class ConnectionImpl : public dbpool::ConnectionImpl {
-public:
-    using stmt_cache_type = std::unordered_map<std::string, sqlite3_stmt *>;
-
 public:
     ConnectionImpl(ConnectionImpl const &) = delete;
     ConnectionImpl(ConnectionImpl &&) noexcept = delete;
@@ -69,8 +63,7 @@ public:
     std::unique_ptr<dbpool::PreparedStmtImpl> get_stmt(std::string const &sql) override;
 
 private:
-    sqlite3 *db_{};              ///< Pointer to SQLite3 database.
-    stmt_cache_type stmt_cache_; ///< Collection of prepared statements.
+    sqlite3 *db_{}; ///< Pointer to SQLite3 database.
 };
 
 } // namespace dbpool::sqlite

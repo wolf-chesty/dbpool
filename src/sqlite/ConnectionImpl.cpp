@@ -17,10 +17,6 @@ ConnectionImpl::ConnectionImpl(sqlite3 *db)
 
 ConnectionImpl::~ConnectionImpl()
 {
-    for (auto const &stmt : stmt_cache_) {
-        sqlite3_finalize(stmt.second);
-    }
-
     assert(db_);
     sqlite3_close(db_);
 }
@@ -34,16 +30,5 @@ PreparedStmtImpl::ReturnCode ConnectionImpl::exec(std::string_view sql)
 std::unique_ptr<dbpool::PreparedStmtImpl> ConnectionImpl::get_stmt(std::string const &sql)
 {
     assert(db_);
-
-    if (auto const it = stmt_cache_.find(sql); it != stmt_cache_.end()) {
-        return std::make_unique<PreparedStmtImpl>(db_, it->second);
-    }
-
-    sqlite3_stmt *stmt;
-    if (sqlite3_prepare_v2(db_, sql.data(), static_cast<int>(sql.length() + 1), &stmt, nullptr)) {
-        throw std::runtime_error(fmt::format("sqlite_conn_impl::get_stmt: {}", sqlite3_errmsg(db_)));
-    }
-    stmt_cache_.emplace(sql, stmt);
-
-    return std::make_unique<PreparedStmtImpl>(db_, stmt);
+    return std::make_unique<PreparedStmtImpl>(db_, sql);
 }

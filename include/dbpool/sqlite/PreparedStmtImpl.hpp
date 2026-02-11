@@ -4,10 +4,11 @@
 #ifndef DBPOOL_SQLITE_PREPARED_STATEMENT_HPP
 #define DBPOOL_SQLITE_PREPARED_STATEMENT_HPP
 
-#include "dbpool/PreparedStmtImpl.hpp"
+#include "dbpool/impl/PreparedStmtImpl.hpp"
 
 #include <span>
 #include <sqlite3.h>
+#include <string_view>
 
 namespace dbpool::sqlite {
 
@@ -25,8 +26,8 @@ public:
     /// @brief ctor for the object.
     ///
     /// @param db Pointer to a sqlite3 database pointer that this prepared statement was created against.
-    /// @param stmt Pointer to an sqlite3 prepared statement.
-    explicit PreparedStmtImpl(sqlite3 *db, sqlite3_stmt *stmt) noexcept;
+    /// @param sql SQL statement.
+    explicit PreparedStmtImpl(sqlite3 *db, std::string_view sql);
 
     /// @brief dtor for the object.
     ///

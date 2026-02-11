@@ -3,10 +3,10 @@
 
 #include "dbpool/Connection.hpp"
 
-#include "dbpool/ConnectionImpl.hpp"
-#include "dbpool/ConnectionPoolImpl.hpp"
-#include "dbpool/PooledConnection.hpp"
-#include "dbpool/PreparedStmtImpl.hpp"
+#include "dbpool/impl/ConnectionImpl.hpp"
+#include "dbpool/impl/ConnectionPoolImpl.hpp"
+#include "dbpool/impl/PreparedStmtImpl.hpp"
+#include "dbpool/util/PooledConnection.hpp"
 #include <cassert>
 
 using namespace dbpool;

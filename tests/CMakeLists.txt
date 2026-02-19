@@ -22,6 +22,7 @@ target_link_libraries (dbpool_unit_tests
     Boost::filesystem
     Boost::unit_test_framework
     dbpool
+    uuid
 )
 
 target_sources (dbpool_unit_tests

@@ -39,6 +39,18 @@ public:
     /// @return \c return_code for the statement execution.
     virtual ReturnCode execute() = 0;
 
+    /// @brief Resets the prepared statement for reuse.
+    ///
+    /// @return Return code for reset function.
+    virtual ReturnCode reset() = 0;
+
+    /// @brief Returns \c true if the column is null.
+    ///
+    /// @param index Index of the column to bind \c value to.
+    ///
+    /// @return \c true if the column is null.
+    virtual bool is_null(int32_t const index) = 0;
+
     /// @brief Binds memory to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
@@ -159,7 +171,7 @@ public:
     /// @return UUID value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-    virtual std::array<uint8_t, 16> get_uuid(int32_t const index) = 0;
+    virtual std::array<std::byte, 16> get_uuid(int32_t const index) = 0;
 };
 
 } // namespace dbpool

@@ -42,6 +42,18 @@ public:
     /// @return Return code from executing the prepared statement.
     ReturnCode execute() override;
 
+    /// @brief Resets the prepared statement for reuse.
+    ///
+    /// @return Return code from resetting the prepared statement.
+    PreparedStmtImpl::ReturnCode reset() override;
+
+    /// @brief Returns \c true if the column is null.
+    ///
+    /// @param index Index of the column to bind \c value to.
+    ///
+    /// @return \c true if the column is null.
+    bool is_null(int32_t const index) override;
+
     /// @brief Binds memory to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
@@ -162,7 +174,7 @@ public:
     /// @return UUID value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-    std::array<uint8_t, 16> get_uuid(int32_t const index) override;
+    std::array<std::byte, 16> get_uuid(int32_t const index) override;
 
     /// @brief Converts sqlite3 specific error codes to library specific error codes.
     ///

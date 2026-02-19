@@ -33,6 +33,18 @@ PreparedStmt::ReturnCode PreparedStmt::execute()
     return impl_->execute();
 }
 
+PreparedStmt::ReturnCode PreparedStmt::reset()
+{
+    assert(impl_);
+    return impl_->reset();
+}
+
+bool PreparedStmt::is_null(int32_t const index)
+{
+    assert(impl_);
+    return impl_->is_null(index);
+}
+
 void PreparedStmt::bind_blob(int32_t const index, std::span<std::byte const> const &value)
 {
     assert(impl_);
@@ -141,7 +153,7 @@ std::u16string PreparedStmt::get_text16(int32_t const index)
     return impl_->get_text16(index);
 }
 
-std::array<uint8_t, 16> PreparedStmt::get_uuid(int32_t const index)
+std::array<std::byte, 16> PreparedStmt::get_uuid(int32_t const index)
 {
     assert(impl_);
     return impl_->get_uuid(index);

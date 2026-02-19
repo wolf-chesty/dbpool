@@ -5,7 +5,6 @@
 
 #include "dbpool/PreparedStmt.hpp"
 #include "dbpool/sqlite/ConnectionPool.hpp"
-#include <chrono>
 #include <cstdlib>
 #include <uuid/uuid.h>
 
@@ -15,7 +14,8 @@ BOOST_AUTO_TEST_SUITE(sqlite)
 
 BOOST_AUTO_TEST_CASE(bad_file)
 {
-    BOOST_CHECK_THROW(std::make_shared<dbpool::sqlite::ConnectionPool>("/dev/null/test.sqlite3"), std::runtime_error);
+    auto create_conn_pool = []() { dbpool::sqlite::ConnectionPool conn_pool("/dev/null/test.sqlite3"); };
+    BOOST_CHECK_THROW(create_conn_pool(), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(file_type)
@@ -23,6 +23,7 @@ BOOST_AUTO_TEST_CASE(file_type)
     auto db_pool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
     auto db_file = std::dynamic_pointer_cast<dbpool::DatabaseFile>(db_pool);
     BOOST_TEST(db_file != nullptr);
+    BOOST_TEST(db_file->is_open());
 }
 
 BOOST_AUTO_TEST_CASE(file_name)

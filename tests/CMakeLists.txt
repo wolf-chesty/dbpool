@@ -28,5 +28,19 @@ target_link_libraries (dbpool_unit_tests
 target_sources (dbpool_unit_tests
     PRIVATE
     src/main.cpp
-    src/dbpool_tests.cpp
+
+    src/sqlite/file_tests.cpp
+    src/sqlite/schema_tests.cpp
+    src/sqlite/scope_tests.cpp
+    src/sqlite/sqlite_tests.cpp
+    src/sqlite/stmt_blob_tests.cpp
+    src/sqlite/stmt_bool_tests.cpp
+    src/sqlite/stmt_date_tests.cpp
+    src/sqlite/stmt_double_tests.cpp
+    src/sqlite/stmt_int32_tests.cpp
+    src/sqlite/stmt_int64_tests.cpp
+    src/sqlite/stmt_null_tests.cpp
+    src/sqlite/stmt_text16_tests.cpp
+    src/sqlite/stmt_text_tests.cpp
+    src/sqlite/stmt_uuid_tests.cpp
 )

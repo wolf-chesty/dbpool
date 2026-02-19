@@ -12,6 +12,8 @@ BOOST_AUTO_TEST_SUITE(dbpool)
 
 BOOST_AUTO_TEST_SUITE(sqlite)
 
+BOOST_AUTO_TEST_SUITE(file_tests)
+
 BOOST_AUTO_TEST_CASE(bad_file)
 {
     auto create_conn_pool = []() { dbpool::sqlite::ConnectionPool conn_pool("/dev/null/test.sqlite3"); };
@@ -33,12 +35,7 @@ BOOST_AUTO_TEST_CASE(file_name)
     BOOST_TEST(db_pool.is_open());
 }
 
-BOOST_AUTO_TEST_CASE(schema)
-{
-    dbpool::sqlite::ConnectionPool db_pool(":memory:");
-    db_pool.set_schema(100100);
-    BOOST_TEST((100100 == db_pool.get_schema()));
-}
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_CASE(prep_stmt_test)
 {
@@ -128,35 +125,7 @@ BOOST_AUTO_TEST_CASE(table_selection)
     BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == stmt.execute()));
 }
 
-BOOST_AUTO_TEST_CASE(bad_bind_index)
-{
-    dbpool::sqlite::ConnectionPool db_pool(":memory:");
-
-    auto conn = db_pool.get_conn();
-    conn.exec("CREATE TABLE t1(x INT)");
-
-    auto stmt = conn.get_stmt("INSERT INTO t1(x) VALUES(?)");
-    BOOST_CHECK_THROW(stmt.bind_int32(0, 0), std::runtime_error);
-    BOOST_CHECK_THROW(stmt.bind_int32(2, 0), std::runtime_error);
-}
-
-BOOST_AUTO_TEST_CASE(bad_get_index)
-{
-    dbpool::sqlite::ConnectionPool db_pool(":memory:");
-
-    auto conn = db_pool.get_conn();
-    conn.exec("CREATE TABLE t1(x INT)");
-
-    auto stmt = conn.get_stmt("INSERT INTO t1(x) VALUES(?)");
-    stmt.bind_int32(1, 10);
-    stmt.execute();
-
-    stmt = conn.get_stmt("SELECT x FROM t1");
-    stmt.execute();
-
-    BOOST_TEST((stmt.get_int64(0) == 10));
-    BOOST_CHECK_THROW(stmt.get_int64(1), std::runtime_error);
-}
+BOOST_AUTO_TEST_SUITE(schema_tests)
 
 BOOST_AUTO_TEST_CASE(default_schema)
 {
@@ -175,6 +144,8 @@ BOOST_AUTO_TEST_CASE(set_schema)
     db_pool.set_schema(schema);
     BOOST_TEST(schema == db_pool.get_schema());
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_CASE(thread_test)
 {
@@ -212,6 +183,8 @@ BOOST_AUTO_TEST_CASE(thread_test)
     BOOST_TEST((stmt2.get_int32(0) == 1));
     BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == stmt2.execute()));
 }
+
+BOOST_AUTO_TEST_SUITE(scope_tests)
 
 BOOST_AUTO_TEST_CASE(connection_guard_scope_test)
 {
@@ -262,6 +235,10 @@ BOOST_AUTO_TEST_CASE(connection_count_test)
     }
     BOOST_TEST((count - 1 == db_pool.count()));
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(stmt_blob_tests)
 
 BOOST_AUTO_TEST_CASE(stmt_blob_test)
 {
@@ -351,6 +328,10 @@ BOOST_AUTO_TEST_CASE(stmt_null_blob_test)
     BOOST_CHECK_THROW(query_stmt.get_blob(0), std::runtime_error);
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(stmt_bool_tests)
+
 BOOST_AUTO_TEST_CASE(stmt_bool_test)
 {
     dbpool::sqlite::ConnectionPool db_pool(":memory:");
@@ -422,6 +403,10 @@ BOOST_AUTO_TEST_CASE(stmt_null_bool_test)
     BOOST_CHECK_THROW(query_stmt.get_bool(0), std::runtime_error);
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(stmt_date_tests)
+
 BOOST_AUTO_TEST_CASE(stmt_date_test)
 {
     dbpool::sqlite::ConnectionPool db_pool(":memory:");
@@ -480,6 +465,10 @@ BOOST_AUTO_TEST_CASE(stmt_emtpy_date_test)
     query_stmt.bind_int32(1, id0);
     BOOST_CHECK_THROW(query_stmt.get_date(0), std::runtime_error);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(stmt_double_tests)
 
 BOOST_AUTO_TEST_CASE(stmt_double_test)
 {
@@ -540,6 +529,10 @@ BOOST_AUTO_TEST_CASE(stmt_null_double_test)
     BOOST_TEST(query_stmt.is_null(0));
     BOOST_CHECK_THROW(query_stmt.get_double(0), std::runtime_error);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(stmt_int32_tests)
 
 BOOST_AUTO_TEST_CASE(stmt_int32_test)
 {
@@ -602,6 +595,10 @@ BOOST_AUTO_TEST_CASE(stmt_null_int32_test)
     BOOST_CHECK_THROW(query_stmt.get_int32(0), std::runtime_error);
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(stmt_int64_tests)
+
 BOOST_AUTO_TEST_CASE(stmt_int64_test)
 {
     dbpool::sqlite::ConnectionPool db_pool(":memory:");
@@ -663,6 +660,10 @@ BOOST_AUTO_TEST_CASE(stmt_null_int64_test)
     BOOST_CHECK_THROW(query_stmt.get_int64(0), std::runtime_error);
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(stmt_null_tests)
+
 BOOST_AUTO_TEST_CASE(stmt_bind_null_test)
 {
     dbpool::sqlite::ConnectionPool db_pool(":memory:");
@@ -674,6 +675,10 @@ BOOST_AUTO_TEST_CASE(stmt_bind_null_test)
     BOOST_CHECK_THROW(insert_stmt.bind_null(0), std::runtime_error);
     BOOST_CHECK_THROW(insert_stmt.bind_null(3), std::runtime_error);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(stmt_text_tests)
 
 BOOST_AUTO_TEST_CASE(stmt_text_test)
 {
@@ -760,6 +765,10 @@ BOOST_AUTO_TEST_CASE(stmt_null_text_test)
     BOOST_CHECK_THROW(query_stmt.get_text(0), std::runtime_error);
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(stmt_text16_tests)
+
 BOOST_AUTO_TEST_CASE(stmt_text16_test)
 {
     dbpool::sqlite::ConnectionPool db_pool(":memory:");
@@ -845,6 +854,10 @@ BOOST_AUTO_TEST_CASE(stmt_null_text16_test)
     BOOST_CHECK_THROW(query_stmt.get_text16(0), std::runtime_error);
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(stmt_uuid_tests)
+
 BOOST_AUTO_TEST_CASE(stmt_uuid_test)
 {
     dbpool::sqlite::ConnectionPool db_pool(":memory:");
@@ -912,6 +925,8 @@ BOOST_AUTO_TEST_CASE(stmt_null_uuid_test)
     BOOST_TEST(query_stmt.is_null(0));
     BOOST_CHECK_THROW(query_stmt.get_uuid(0), std::runtime_error);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
 

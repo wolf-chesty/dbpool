@@ -5,6 +5,7 @@
 
 #include "dbpool/impl/ConnectionImpl.hpp"
 #include <cassert>
+#include <iterator>
 
 using namespace dbpool;
 
@@ -44,6 +45,12 @@ void ConnectionPoolImpl::push_conn(std::unique_ptr<ConnectionImpl> conn)
 
     // notify threads that a connection has been returned to the pool
     conn_cv_.notify_all();
+}
+
+size_t ConnectionPoolImpl::count()
+{
+    std::unique_lock<std::mutex> lk(conn_mutex_);
+    return std::distance(available_conns_.begin(), available_conns_.end());
 }
 
 void ConnectionPoolImpl::set_prep_sql(std::string_view sql)

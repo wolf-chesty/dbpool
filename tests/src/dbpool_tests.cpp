@@ -40,6 +40,20 @@ BOOST_AUTO_TEST_CASE(schema)
     BOOST_TEST((100100 == db_pool.get_schema()));
 }
 
+BOOST_AUTO_TEST_CASE(prep_stmt_test)
+{
+    dbpool::sqlite::ConnectionPool db_pool(":memory:");
+    db_pool.set_prep_sql("CREATE TABLE IF NOT EXISTS t1 (x INT)");
+
+    // Checking a connection out will create table t1
+    auto conn = db_pool.get_conn();
+
+    // Check if the table exists
+    auto stmt = conn.get_stmt("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='t1'");
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::row == stmt.execute()));
+    BOOST_TEST((1 == stmt.get_int32(0)));
+}
+
 BOOST_AUTO_TEST_CASE(table_creation)
 {
     dbpool::sqlite::ConnectionPool db_pool(":memory:");
@@ -232,6 +246,21 @@ BOOST_AUTO_TEST_CASE(statement_scope_test)
     BOOST_TEST((dbpool::PreparedStmt::ReturnCode::row == stmt.execute()));
     BOOST_TEST((stmt.get_int32(0) == 5));
     BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == stmt.execute()));
+}
+
+BOOST_AUTO_TEST_CASE(connection_count_test)
+{
+    dbpool::sqlite::ConnectionPool db_pool(":memory:");
+    auto const count = db_pool.count();
+
+    auto conn = db_pool.get_conn();
+    BOOST_TEST((count - 1 == db_pool.count()));
+
+    {
+        auto another_conn = db_pool.get_conn();
+        BOOST_TEST((count - 2 == db_pool.count()));
+    }
+    BOOST_TEST((count - 1 == db_pool.count()));
 }
 
 BOOST_AUTO_TEST_CASE(stmt_blob_test)
@@ -632,6 +661,18 @@ BOOST_AUTO_TEST_CASE(stmt_null_int64_test)
     BOOST_TEST((dbpool::PreparedStmt::ReturnCode::row == query_stmt.execute()));
     BOOST_TEST(query_stmt.is_null(0));
     BOOST_CHECK_THROW(query_stmt.get_int64(0), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(stmt_bind_null_test)
+{
+    dbpool::sqlite::ConnectionPool db_pool(":memory:");
+
+    auto conn = db_pool.get_conn();
+    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::ok == conn.exec("CREATE TABLE t1(id INTEGER, test_val INTEGER)")));
+
+    auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
+    BOOST_CHECK_THROW(insert_stmt.bind_null(0), std::runtime_error);
+    BOOST_CHECK_THROW(insert_stmt.bind_null(3), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(stmt_text_test)

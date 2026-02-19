@@ -64,6 +64,11 @@ public:
     /// created database connections that get created by this connection pool.
     void set_prep_sql(std::string_view sql);
 
+    /// @brief Returns number of connections available.
+    ///
+    /// @return Number of available connections.
+    size_t count();
+
 protected:
     /// @brief Function to create a new database connection object to keep in the connection pool.
     ///

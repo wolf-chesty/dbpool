@@ -85,6 +85,15 @@ public:
         conn_pool_->set_prep_sql(sql);
     }
 
+    /// @brief Returns number of connections available in pool.
+    ///
+    /// @return Number of connections available in pool.
+    size_t count()
+    {
+        assert(conn_pool_);
+        return conn_pool_->count();
+    }
+
 protected:
     /// @brief Returns pointer to the connection pool implementation.
     ///

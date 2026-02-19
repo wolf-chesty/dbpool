@@ -77,7 +77,7 @@ void ConnectionPoolImpl::initialize_sqlite()
     std::unique_lock const lock(sqlite_init_mutex_);
     if (sqlite_use_count_++ == 0) {
         if (auto const ret = sqlite3_config(SQLITE_CONFIG_MULTITHREAD, nullptr); SQLITE_OK != ret) {
-            throw std::runtime_error(fmt::format("Uanble to configure sqlite3; got return code {}", ret));
+            throw std::runtime_error(fmt::format("Unable to configure sqlite3; got return code {}", ret));
         }
         if (auto const ret = sqlite3_initialize(); SQLITE_OK != ret) {
             throw std::runtime_error(fmt::format("Unable to initialize sqlite3; got return code {}", ret));

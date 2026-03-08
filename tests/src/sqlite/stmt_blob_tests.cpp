@@ -39,7 +39,7 @@ TEST(SQLite3Test, blob_bind_test)
 	EXPECT_THROW(query_stmt.get_blob(1), std::runtime_error);
 }
 
-TEST(SQLite3Test, invalid_blob_bind_test)
+TEST(SQLite3Test, blob_invalid_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
@@ -54,7 +54,7 @@ TEST(SQLite3Test, invalid_blob_bind_test)
 	EXPECT_THROW(insert_stmt.bind_blob(3, blob), std::runtime_error);
 }
 
-TEST(SQLite3Test, empty_blob_bind_test)
+TEST(SQLite3Test, blob_empty_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
@@ -76,7 +76,7 @@ TEST(SQLite3Test, empty_blob_bind_test)
 	EXPECT_THROW(query_stmt.get_blob(0), std::runtime_error);
 }
 
-TEST(SQLite3Test, null_blob_bind_test)
+TEST(SQLite3Test, blob_null_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 

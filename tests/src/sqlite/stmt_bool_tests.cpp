@@ -43,7 +43,7 @@ TEST(SQLite3Test, bool_bind_test)
 	EXPECT_THROW(query_stmt.get_bool(1), std::runtime_error);
 }
 
-TEST(SQLite3Test, invalid_bool_bind_test)
+TEST(SQLite3Test, bool_invalid_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
@@ -56,7 +56,7 @@ TEST(SQLite3Test, invalid_bool_bind_test)
 	EXPECT_THROW(insert_stmt.bind_bool(3, true), std::runtime_error);
 }
 
-TEST(SQLite3Test, null_bool_bind_test)
+TEST(SQLite3Test, bool_null_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 

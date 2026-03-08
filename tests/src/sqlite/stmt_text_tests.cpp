@@ -32,7 +32,7 @@ TEST(SQLite3Test, text_bind_test)
 	EXPECT_THROW(query_stmt.get_text(1), std::runtime_error);
 }
 
-TEST(SQLite3Test, invlid_text_bind_test)
+TEST(SQLite3Test, text_invlid_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
@@ -45,7 +45,7 @@ TEST(SQLite3Test, invlid_text_bind_test)
 	EXPECT_THROW(insert_stmt.bind_text(3, "Test"), std::runtime_error);
 }
 
-TEST(SQLite3Test, empty_text_bind_test)
+TEST(SQLite3Test, text_empty_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
@@ -68,7 +68,7 @@ TEST(SQLite3Test, empty_text_bind_test)
 	EXPECT_THROW(query_stmt.get_text(0), std::runtime_error);
 }
 
-TEST(SQLite3Test, null_text_bind_test)
+TEST(SQLite3Test, text_null_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 

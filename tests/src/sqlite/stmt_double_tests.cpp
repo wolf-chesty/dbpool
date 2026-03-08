@@ -31,7 +31,7 @@ TEST(SQLite3Test, double_bind_test)
 	EXPECT_THROW(query_stmt.get_double(1), std::runtime_error);
 }
 
-TEST(SQLite3Test, invalid_double_bind_test)
+TEST(SQLite3Test, double_invalid_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
@@ -44,7 +44,7 @@ TEST(SQLite3Test, invalid_double_bind_test)
 	EXPECT_THROW(insert_stmt.bind_double(3, 1.0), std::runtime_error);
 }
 
-TEST(SQLite3Test, null_double_bind_test)
+TEST(SQLite3Test, double_null_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 

@@ -39,7 +39,7 @@ TEST(SQLite3Test, uuid_bind_test)
 	EXPECT_THROW(query_stmt.get_uuid(1), std::runtime_error);
 }
 
-TEST(SQLite3Test, invalid_uuid_bind_test)
+TEST(SQLite3Test, uuid_invalid_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
@@ -54,7 +54,7 @@ TEST(SQLite3Test, invalid_uuid_bind_test)
 	EXPECT_THROW(insert_stmt.bind_uuid(3, val), std::runtime_error);
 }
 
-TEST(SQLite3Test, null_uuid_bind_test)
+TEST(SQLite3Test, uuid_null_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 

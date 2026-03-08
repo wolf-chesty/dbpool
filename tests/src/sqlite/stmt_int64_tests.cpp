@@ -32,7 +32,7 @@ TEST(SQLite3Test, int64_bind_test)
 	EXPECT_THROW(query_stmt.get_int64(1), std::runtime_error);
 }
 
-TEST(SQLite3Test, invalid_int64_bind_test)
+TEST(SQLite3Test, int64_invalid_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
@@ -45,7 +45,7 @@ TEST(SQLite3Test, invalid_int64_bind_test)
 	EXPECT_THROW(insert_stmt.bind_int64(3, 0), std::runtime_error);
 }
 
-TEST(SQLite3Test, null_int64_bind_test)
+TEST(SQLite3Test, int64_null_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 

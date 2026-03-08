@@ -30,7 +30,7 @@ TEST(SQLite3Test, date_bind_test)
 	EXPECT_THROW(query_stmt.get_date(1), std::runtime_error);
 }
 
-TEST(SQLite3Test, invalid_date_test)
+TEST(SQLite3Test, date_invalid_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
@@ -45,7 +45,7 @@ TEST(SQLite3Test, invalid_date_test)
 	EXPECT_THROW(insert_stmt.bind_date(2, date), std::runtime_error);
 }
 
-TEST(SQLite3Test, emtpy_date_bind_test)
+TEST(SQLite3Test, date_emtpy_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
@@ -65,7 +65,7 @@ TEST(SQLite3Test, emtpy_date_bind_test)
 	EXPECT_THROW(query_stmt.get_date(0), std::runtime_error);
 }
 
-TEST(SQLite3Test, null_date_bind_test)
+TEST(SQLite3Test, date_null_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 

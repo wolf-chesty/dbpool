@@ -30,8 +30,7 @@ namespace dbpool::sqlite {
 ///
 class ConnectionPoolImpl
     : public dbpool::ConnectionPoolImpl
-    , public dbpool::DatabaseFile
-    , public std::enable_shared_from_this<ConnectionPoolImpl> {
+    , public dbpool::DatabaseFile {
 public:
     using optimization_period_t = std::chrono::minutes;
 

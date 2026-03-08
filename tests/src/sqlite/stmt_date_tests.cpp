@@ -1,98 +1,86 @@
 // Copyright (c) 2026 Christopher L Walker
 // SPDX-License-Identifier: MIT
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "dbpool/PreparedStmt.hpp"
 #include "dbpool/sqlite/ConnectionPool.hpp"
 
-BOOST_AUTO_TEST_SUITE(dbpool)
-
-BOOST_AUTO_TEST_SUITE(sqlite)
-
-BOOST_AUTO_TEST_SUITE(stmt_date_tests)
-
-BOOST_AUTO_TEST_CASE(bind_test)
+TEST(SQLite3Test, date_bind_test)
 {
-    dbpool::sqlite::ConnectionPool db_pool(":memory:");
+	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
-    auto conn = db_pool.get_conn();
-    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::ok == conn.exec("CREATE TABLE t1(id INTEGER, test_val INTEGER)")));
+	auto conn = db_pool.get_conn();
+	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::ok, conn.exec("CREATE TABLE t1(id INTEGER, test_val INTEGER)"));
 
-    int const id0{0};
-    std::string_view date{"2026-02-18T14:30:05.000Z"};
+	int const id0{0};
+	std::string_view date{"2026-02-18T14:30:05.000Z"};
 
-    auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
-    insert_stmt.bind_int32(1, id0);
-    insert_stmt.bind_date(2, date);
-    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == insert_stmt.execute()));
+	auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
+	insert_stmt.bind_int32(1, id0);
+	insert_stmt.bind_date(2, date);
+	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::done, insert_stmt.execute());
 
-    auto query_stmt = conn.get_stmt("SELECT test_val FROM t1 WHERE id = ?");
-    query_stmt.bind_int32(1, id0);
-    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::row == query_stmt.execute()));
-    BOOST_TEST((date == query_stmt.get_date(0)));
+	auto query_stmt = conn.get_stmt("SELECT test_val FROM t1 WHERE id = ?");
+	query_stmt.bind_int32(1, id0);
+	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::row, query_stmt.execute());
+	EXPECT_EQ(date, query_stmt.get_date(0));
 
-    BOOST_CHECK_THROW(query_stmt.get_date(-1), std::runtime_error);
-    BOOST_CHECK_THROW(query_stmt.get_date(1), std::runtime_error);
+	EXPECT_THROW(query_stmt.get_date(-1), std::runtime_error);
+	EXPECT_THROW(query_stmt.get_date(1), std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(invalid_date_test)
+TEST(SQLite3Test, invalid_date_test)
 {
-    dbpool::sqlite::ConnectionPool db_pool(":memory:");
+	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
-    auto conn = db_pool.get_conn();
-    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::ok == conn.exec("CREATE TABLE t1(id INTEGER, test_val INTEGER)")));
+	auto conn = db_pool.get_conn();
+	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::ok, conn.exec("CREATE TABLE t1(id INTEGER, test_val INTEGER)"));
 
-    int const id0{0};
-    std::string_view date{"meh"};
+	int const id0{0};
+	std::string_view date{"meh"};
 
-    auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
-    insert_stmt.bind_int32(1, id0);
-    BOOST_CHECK_THROW(insert_stmt.bind_date(2, date), std::runtime_error);
+	auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
+	insert_stmt.bind_int32(1, id0);
+	EXPECT_THROW(insert_stmt.bind_date(2, date), std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(emtpy_bind_test)
+TEST(SQLite3Test, emtpy_date_bind_test)
 {
-    dbpool::sqlite::ConnectionPool db_pool(":memory:");
+	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
-    auto conn = db_pool.get_conn();
-    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::ok == conn.exec("CREATE TABLE t1(id INTEGER, test_val INTEGER)")));
+	auto conn = db_pool.get_conn();
+	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::ok, conn.exec("CREATE TABLE t1(id INTEGER, test_val INTEGER)"));
 
-    int const id0{0};
-    std::string_view date;
+	int const id0{0};
+	std::string_view date;
 
-    auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
-    insert_stmt.bind_int32(1, id0);
-    insert_stmt.bind_date(2, date);
-    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == insert_stmt.execute()));
+	auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
+	insert_stmt.bind_int32(1, id0);
+	insert_stmt.bind_date(2, date);
+	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::done, insert_stmt.execute());
 
-    auto query_stmt = conn.get_stmt("SELECT test_val FROM t1 WHERE id = ?");
-    query_stmt.bind_int32(1, id0);
-    BOOST_CHECK_THROW(query_stmt.get_date(0), std::runtime_error);
+	auto query_stmt = conn.get_stmt("SELECT test_val FROM t1 WHERE id = ?");
+	query_stmt.bind_int32(1, id0);
+	EXPECT_THROW(query_stmt.get_date(0), std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(null_bind_test)
+TEST(SQLite3Test, null_date_bind_test)
 {
-    dbpool::sqlite::ConnectionPool db_pool(":memory:");
+	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
-    auto conn = db_pool.get_conn();
-    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::ok == conn.exec("CREATE TABLE t1(id INTEGER, test_val INTEGER)")));
+	auto conn = db_pool.get_conn();
+	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::ok, conn.exec("CREATE TABLE t1(id INTEGER, test_val INTEGER)"));
 
-    auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
+	auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
 
-    int const id0{0};
-    insert_stmt.bind_int32(1, id0);
-    insert_stmt.bind_null(2);
-    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::done == insert_stmt.execute()));
-    auto query_stmt = conn.get_stmt("SELECT test_val FROM t1 WHERE id = ?");
-    query_stmt.bind_int32(1, id0);
-    BOOST_TEST((dbpool::PreparedStmt::ReturnCode::row == query_stmt.execute()));
-    BOOST_TEST(query_stmt.is_null(0));
-    BOOST_CHECK_THROW(query_stmt.get_date(0), std::runtime_error);
+	int const id0{0};
+	insert_stmt.bind_int32(1, id0);
+	insert_stmt.bind_null(2);
+	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::done, insert_stmt.execute());
+	auto query_stmt = conn.get_stmt("SELECT test_val FROM t1 WHERE id = ?");
+	query_stmt.bind_int32(1, id0);
+	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::row, query_stmt.execute());
+	EXPECT_TRUE(query_stmt.is_null(0));
+	EXPECT_THROW(query_stmt.get_date(0), std::runtime_error);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE_END()

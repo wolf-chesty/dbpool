@@ -69,7 +69,10 @@ public:
     /// @brief Binds a date value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
-    /// @param value Data to bind to the prepared statement field.
+    /// @param value Formatted date string to bind to the prepared statement field.
+    ///
+    /// @note sqlite3 doesn't have a native DATE type. Because of this, the library will store date/time in a INTEGER64
+    ///       type.
     void bind_date(int32_t const index, std::string_view value) override;
 
     /// @brief Binds a double value to a prepared statement field.
@@ -129,9 +132,12 @@ public:
 
     /// @brief Returns a date value from a prepared statement result.
     ///
-    /// @return Date value from the prepared statement result.
+    /// @return String containing a formatted date.
     ///
     /// @param index Index of the column to return the data for.
+    ///
+    /// @note sqlite3 doesn't have a native DATE type. Because of this, the library will store date/time in a INTEGER64
+    ///       type.
     std::string get_date(int32_t const index) override;
 
     /// @brief Returns a \c double value from a prepared statement result.

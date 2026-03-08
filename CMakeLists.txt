@@ -9,6 +9,7 @@ add_library (dbpool OBJECT "")
 
 option (DBPOOL_ENABLE_SQLITE3 "Enable SQLite3 support" ON)
 option (DBPOOL_BUILD_TESTS "Build tests" ON)
+option (DBPOOL_COVERAGE "Enable GCC Coverage" OFF)
 option (DBPOOL_SANITIZE_ADDRESS "Enable GCC Address Sanitizer (ASan)" OFF)
 option (DBPOOL_SANITIZE_THREAD "Enable GCC Thread Sanitizer (TSan)" OFF)
 
@@ -40,10 +41,7 @@ target_sources (dbpool
 if (DBPOOL_ENABLE_SQLITE3)
     find_package (SQLite3 REQUIRED)
 
-    target_link_libraries (dbpool
-        PRIVATE
-        ${SQLite3_LIBRARIES}
-    )
+    target_link_libraries (dbpool PRIVATE ${SQLite3_LIBRARIES})
 
     target_sources (dbpool
         PRIVATE
@@ -52,6 +50,16 @@ if (DBPOOL_ENABLE_SQLITE3)
         src/sqlite/ConnectionPoolImpl.cpp
         src/sqlite/PreparedStmtImpl.cpp
     )
+endif ()
+
+if (DBPOOL_ENABLE_MARIADB)
+    pkg_check_modules (mariadb REQUIRED IMPORTED_TARGET "mysqlclient")
+
+    target_link_libraries (dbpool PRIVATE PkgConfig::mariadb)
+endif ()
+
+if (DBPOOL_COVERAGE)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 --coverage -g")
 endif ()
 
 if (DBPOOL_SANITIZE_ADDRESS)
@@ -63,5 +71,19 @@ if (DBPOOL_SANITIZE_THREAD)
 endif ()
 
 if (DBPOOL_BUILD_TESTS)
+    include (cmake/googletest.cmake)
+
+    if (DBPOOL_COVERAGE)
+        set (DBPOOL_TEST_COVERAGE ON CACHE BOOL "Enable coverage for tests")
+    endif ()
+
+    if (DBPOOL_SANITIZE_ADDRESS)
+        set (DBPOOL_TEST_SANITIZE_ADDRESS ON CACHE BOOL "Enable ASan for tests")
+    endif ()
+
+    if (DBPOOL_SANITIZE_THREAD)
+        set (DBPOOL_TEST_SANITIZE_THREAD ON CACHE BOOL "Enable TSan for tests")
+    endif ()
+
     add_subdirectory (tests)
 endif ()

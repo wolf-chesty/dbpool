@@ -66,8 +66,8 @@ public:
     /// @brief Binds a date value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
-    /// @param value Data to bind to the prepared statement field.
-    virtual void bind_date(int32_t const index, std::string_view date) = 0;
+    /// @param value Date string to bind to the prepared statement field.
+    virtual void bind_date(int32_t const index, std::string_view value) = 0;
 
     /// @brief Binds a double value to a prepared statement field.
     ///
@@ -126,7 +126,7 @@ public:
 
     /// @brief Returns a date value from a prepared statement result.
     ///
-    /// @return Date value from the prepared statement result.
+    /// @return String containing a formatted date.
     ///
     /// @param index Index of the column to return the data for.
     virtual std::string get_date(int32_t const index) = 0;

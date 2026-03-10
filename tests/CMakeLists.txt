@@ -6,10 +6,6 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.30.0")
     cmake_policy (SET CMP0167 NEW)
 endif ()
 
-option (DBPOOL_TEST_COVERAGE "Enable GCC Coverage" OFF)
-option (DBPOOL_TEST_SANITIZE_ADDRESS "Enable GCC Address Sanitizer (ASan)" OFF)
-option (DBPOOL_TESt_SANITIZE_THREAD "Enable GCC Thread Sanitizer (TSan)" OFF)
-
 find_package (Boost
     COMPONENTS
     filesystem
@@ -47,14 +43,11 @@ if (DBPOOL_ENABLE_SQLITE3)
     )
 endif ()
 
-if (DBPOOL_TEST_COVERAGE)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 --coverage -g")
-endif ()
-
-if (DBPOOL_TEST_SANITIZE_ADDRESS)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined -fno-omit-frame-pointer -g")
-endif ()
-
-if (DBPOOL_TEST_SANITIZE_THREAD)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -fno-omit-frame-pointer -g")
+if (DBPOOL_COVERAGE)
+    target_link_options (dbpool_unit_tests PRIVATE --coverage)
+    target_link_libraries (dbpool_unit_tests PRIVATE gcov)
+elseif (DBPOOL_SANITIZE_ADDRESS)
+    target_link_options (dbpool_unit_tests PRIVATE -fsanitize=address,undefined)
+elseif (DBPOOL_SANITIZE_THREAD)
+    target_link_options (dbpool_unit_tests PRIVATE -fsanitize=thread)
 endif ()

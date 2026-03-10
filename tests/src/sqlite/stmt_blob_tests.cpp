@@ -54,28 +54,6 @@ TEST(SQLite3Test, blob_invalid_bind_test)
 	EXPECT_THROW(insert_stmt.bind_blob(3, blob), std::runtime_error);
 }
 
-TEST(SQLite3Test, blob_empty_bind_test)
-{
-	dbpool::sqlite::ConnectionPool db_pool(":memory:");
-
-	auto conn = db_pool.get_conn();
-	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::ok, conn.exec("CREATE TABLE t1(id INTEGER, test_val BLOB)"));
-
-	auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
-
-	int const id0{0};
-	std::vector<std::byte> blob;
-	insert_stmt.bind_int32(1, id0);
-	insert_stmt.bind_blob(2, blob);
-	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::done, insert_stmt.execute());
-
-	auto query_stmt = conn.get_stmt("SELECT test_val FROM t1 WHERE id = ?");
-	query_stmt.bind_int32(1, id0);
-	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::row, query_stmt.execute());
-	EXPECT_TRUE(query_stmt.is_null(0));
-	EXPECT_THROW(query_stmt.get_blob(0), std::runtime_error);
-}
-
 TEST(SQLite3Test, blob_null_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");

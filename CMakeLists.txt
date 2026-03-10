@@ -59,31 +59,18 @@ if (DBPOOL_ENABLE_MARIADB)
 endif ()
 
 if (DBPOOL_COVERAGE)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 --coverage -g")
-endif ()
-
-if (DBPOOL_SANITIZE_ADDRESS)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined -fno-omit-frame-pointer -g")
-endif ()
-
-if (DBPOOL_SANITIZE_THREAD)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -fno-omit-frame-pointer -g")
+    target_compile_options (dbpool PRIVATE -O0 --coverage -g)
+    target_link_options (dbpool PRIVATE --coverage)
+    target_link_libraries (dbpool PRIVATE gcov)
+elseif (DBPOOL_SANITIZE_ADDRESS)
+    target_compile_options (dbpool PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -g)
+    target_link_options (dbpool PRIVATE -fsanitize=address,undefined)
+elseif (DBPOOL_SANITIZE_THREAD)
+    target_compile_options (dbpool PRIVATE -fsanitize=thread -fno-omit-frame-pointer -g)
+    target_link_options (dbpool PRIVATE -fsanitize=thread)
 endif ()
 
 if (DBPOOL_BUILD_TESTS)
     include (cmake/googletest.cmake)
-
-    if (DBPOOL_COVERAGE)
-        set (DBPOOL_TEST_COVERAGE ON CACHE BOOL "Enable coverage for tests")
-    endif ()
-
-    if (DBPOOL_SANITIZE_ADDRESS)
-        set (DBPOOL_TEST_SANITIZE_ADDRESS ON CACHE BOOL "Enable ASan for tests")
-    endif ()
-
-    if (DBPOOL_SANITIZE_THREAD)
-        set (DBPOOL_TEST_SANITIZE_THREAD ON CACHE BOOL "Enable TSan for tests")
-    endif ()
-
     add_subdirectory (tests)
 endif ()

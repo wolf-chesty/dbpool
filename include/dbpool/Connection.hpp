@@ -8,7 +8,6 @@
 #include <memory>
 
 namespace dbpool {
-
 class PooledConnection;
 
 ///
@@ -23,38 +22,37 @@ class PooledConnection;
 ///
 class Connection {
 public:
-    Connection() = default;
-    Connection(Connection const &) = delete;
-    Connection(Connection &&) noexcept = default;
+	Connection() = default;
+	Connection(Connection const&) = delete;
+	Connection(Connection&&) noexcept = default;
 
-    /// @brief ctor for the object.
-    ///
-    /// @param pooled_conn Object holding the connection implementation and connection pool.
-    explicit Connection(std::shared_ptr<PooledConnection> pooled_conn);
+	/// @brief ctor for the object.
+	///
+	/// @param pooled_conn Object holding the connection implementation and connection pool.
+	explicit Connection(std::shared_ptr<PooledConnection> pooled_conn);
 
-    virtual ~Connection() = default;
+	virtual ~Connection() = default;
 
-    Connection &operator=(Connection const &) = delete;
-    Connection &operator=(Connection &&) noexcept = default;
+	Connection& operator=(Connection const&) = delete;
+	Connection& operator=(Connection&&) noexcept = default;
 
-    /// @brief Executes an SQL statements on the managed database connection.
-    ///
-    /// @return Error code.
-    ///
-    /// @param sql SQL statement to execute.
-    PreparedStmt::ReturnCode exec(std::string_view sql);
+	/// @brief Executes an SQL statements on the managed database connection.
+	///
+	/// @return Error code.
+	///
+	/// @param sql SQL statement to execute.
+	PreparedStmt::ReturnCode exec(std::string_view sql);
 
-    /// @brief Get a prepared statement for this database connection.
-    ///
-    /// @return Pointer to a prepared statement.
-    ///
-    /// \param sql SQL statement to create the prepared statement from.
-    PreparedStmt get_stmt(std::string const &sql);
+	/// @brief Get a prepared statement for this database connection.
+	///
+	/// @return Pointer to a prepared statement.
+	///
+	/// \param sql SQL statement to create the prepared statement from.
+	PreparedStmt getStmt(std::string const& sql);
 
 private:
-    std::shared_ptr<PooledConnection> pooled_conn_; ///< Pooled connection manager.
+	std::shared_ptr<PooledConnection> pooled_conn_; ///< Pooled connection manager.
 };
-
 } // namespace dbpool
 
 #endif

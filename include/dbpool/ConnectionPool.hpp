@@ -49,29 +49,29 @@ public:
 	/// @brief Returns the schema number of the database.
 	///
 	/// @return Database schema number.
-	int64_t get_schema()
+	int64_t getSchema()
 	{
 		assert(conn_pool_);
-		return conn_pool_->get_schema();
+		return conn_pool_->getSchema();
 	}
 
 	/// @brief Sets the schema number for the database.
 	///
 	/// @param schema Database schema number.
-	void set_schema(int64_t schema)
+	void setSchema(int64_t schema)
 	{
 		assert(conn_pool_);
-		conn_pool_->set_schema(schema);
+		conn_pool_->setSchema(schema);
 	}
 
 	/// @brief Returns a pointer to a new \c Connection object that can be used to execute statements against the
 	///        database.
 	///
 	/// @return Pointer to a new \c Connection object.
-	Connection get_conn()
+	Connection getConnection()
 	{
 		assert(conn_pool_);
-		return Connection(std::make_shared<PooledConnection>(conn_pool_, conn_pool_->pop_conn()));
+		return Connection(std::make_shared<PooledConnection>(conn_pool_, conn_pool_->popConnection()));
 	}
 
 	/// @brief Stores the SQL statement, \c sql, for use when preparing new database connections.
@@ -82,10 +82,10 @@ public:
 	/// be executed on each database connection that is opened in order for each database connection to have a
 	/// consistent view of the database. This function sets the statement that you want to have executed on any newly
 	/// created database connections that get created by this connection pool.
-	void set_prep_sql(std::string_view sql)
+	void setPrepSql(std::string_view sql)
 	{
 		assert(conn_pool_);
-		conn_pool_->set_prep_sql(sql);
+		conn_pool_->setPrepSql(sql);
 	}
 
 	/// @brief Returns number of connections available in pool.
@@ -101,7 +101,7 @@ protected:
 	/// @brief Returns pointer to the connection pool implementation.
 	///
 	/// @return Pointer to connection pool implementation.
-	connection_pool_t* get_conn_pool() const
+	connection_pool_t* getConnectionPool() const
 	{
 		return conn_pool_.get();
 	}

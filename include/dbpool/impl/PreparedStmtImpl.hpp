@@ -12,7 +12,6 @@
 #include <vector>
 
 namespace dbpool {
-
 ///
 /// @class PreparedStmtImpl
 ///
@@ -23,157 +22,156 @@ namespace dbpool {
 ///
 class PreparedStmtImpl {
 public:
-    enum class ReturnCode { ok, error, row, done };
+	enum class ReturnCode { ok, error, row, done };
 
 public:
-    PreparedStmtImpl() = default;
-    PreparedStmtImpl(PreparedStmtImpl const &) = delete;
-    PreparedStmtImpl(PreparedStmtImpl &&) noexcept = default;
-    virtual ~PreparedStmtImpl() = default;
+	PreparedStmtImpl() = default;
+	PreparedStmtImpl(PreparedStmtImpl const&) = delete;
+	PreparedStmtImpl(PreparedStmtImpl&&) noexcept = default;
+	virtual ~PreparedStmtImpl() = default;
 
-    PreparedStmtImpl &operator=(PreparedStmtImpl const &) = delete;
-    PreparedStmtImpl &operator=(PreparedStmtImpl &&) noexcept = default;
+	PreparedStmtImpl& operator=(PreparedStmtImpl const&) = delete;
+	PreparedStmtImpl& operator=(PreparedStmtImpl&&) noexcept = default;
 
-    /// @brief Executes the prepared statement.
+	/// @brief Executes the prepared statement.
     ///
     /// @return \c return_code for the statement execution.
-    virtual ReturnCode execute() = 0;
+	virtual ReturnCode execute() = 0;
 
-    /// @brief Resets the prepared statement for reuse.
+	/// @brief Resets the prepared statement for reuse.
     ///
     /// @return Return code for reset function.
-    virtual ReturnCode reset() = 0;
+	virtual ReturnCode reset() = 0;
 
-    /// @brief Returns \c true if the column is null.
+	/// @brief Returns \c true if the column is null.
     ///
     /// @param index Index of the column to bind \c value to.
     ///
     /// @return \c true if the column is null.
-    virtual bool is_null(int32_t const index) = 0;
+	virtual bool isNull(int32_t const index) = 0;
 
-    /// @brief Binds memory to a prepared statement field.
+	/// @brief Binds memory to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-    virtual void bind_blob(int32_t const index, std::span<std::byte const> const &value) = 0;
+	virtual void bindBlob(int32_t const index, std::span<std::byte const> const& value) = 0;
 
-    /// @brief Binds a boolean value to a prepared statement field.
+	/// @brief Binds a boolean value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-    virtual void bind_bool(int32_t const index, bool const value) = 0;
+	virtual void bindBool(int32_t const index, bool const value) = 0;
 
-    /// @brief Binds a date value to a prepared statement field.
+	/// @brief Binds a date value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Date string to bind to the prepared statement field.
-    virtual void bind_date(int32_t const index, std::string_view value) = 0;
+	virtual void bindDate(int32_t const index, std::string_view value) = 0;
 
-    /// @brief Binds a double value to a prepared statement field.
+	/// @brief Binds a double value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-    virtual void bind_double(int32_t const index, double const value) = 0;
+	virtual void bindDouble(int32_t const index, double const value) = 0;
 
-    /// @brief Binds an in32_t value to a prepared statement field.
+	/// @brief Binds an in32_t value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-    virtual void bind_int32(int32_t const index, int32_t const value) = 0;
+	virtual void bindInt32(int32_t const index, int32_t const value) = 0;
 
-    /// @brief Binds an in64_t value to a prepared statement field.
+	/// @brief Binds an in64_t value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-    virtual void bind_int64(int32_t const index, int64_t const value) = 0;
+	virtual void bindInt64(int32_t const index, int64_t const value) = 0;
 
-    /// @brief Sets a prepared statement field to NULL.
+	/// @brief Sets a prepared statement field to NULL.
     ///
     /// @param index Index of the column to bind \c value to.
-    virtual void bind_null(int32_t const index) = 0;
+	virtual void bindNull(int32_t const index) = 0;
 
-    /// @brief Binds a string value to a prepared statement field.
-    ///
-    /// @param index Index of the column to bind \c value to.
-    /// @param value Data to bind to the prepared statement field.
-    virtual void bind_text(int32_t const index, std::string_view text) = 0;
-
-    /// @brief Binds a UTF-16 string value to a prepared statement field.
+	/// @brief Binds a string value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-    virtual void bind_text16(int32_t const index, std::u16string_view text) = 0;
+	virtual void bindText(int32_t const index, std::string_view text) = 0;
 
-    /// @brief Binds a UUID value to a prepared statement field.
+	/// @brief Binds a UTF-16 string value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-    virtual void bind_uuid(int32_t const index, std::span<std::byte const> const &value) = 0;
+	virtual void bindText16(int32_t const index, std::u16string_view text) = 0;
 
-    /// @brief Returns binary data from a prepared statement result.
+	/// @brief Binds a UUID value to a prepared statement field.
+    ///
+    /// @param index Index of the column to bind \c value to.
+    /// @param value Data to bind to the prepared statement field.
+	virtual void bindUuid(int32_t const index, std::span<std::byte const> const& value) = 0;
+
+	/// @brief Returns binary data from a prepared statement result.
     ///
     /// @return Binary data from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-    virtual std::vector<std::byte> get_blob(int32_t const index) = 0;
+	virtual std::vector<std::byte> getBlob(int32_t const index) = 0;
 
-    /// @brief Returns a \c bool value from a prepared statement result.
+	/// @brief Returns a \c bool value from a prepared statement result.
     ///
     /// @return \c bool value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-    virtual bool get_bool(int32_t const index) = 0;
+	virtual bool getBool(int32_t const index) = 0;
 
-    /// @brief Returns a date value from a prepared statement result.
+	/// @brief Returns a date value from a prepared statement result.
     ///
     /// @return String containing a formatted date.
     ///
     /// @param index Index of the column to return the data for.
-    virtual std::string get_date(int32_t const index) = 0;
+	virtual std::string getDate(int32_t const index) = 0;
 
-    /// @brief Returns a \c double value from a prepared statement result.
+	/// @brief Returns a \c double value from a prepared statement result.
     ///
     /// @return \c double value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-    virtual double get_double(int32_t const index) = 0;
+	virtual double getDouble(int32_t const index) = 0;
 
-    /// @brief Returns an \c int32_t value from a prepared statement result.
+	/// @brief Returns an \c int32_t value from a prepared statement result.
     ///
     /// @return \c int32_t value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-    virtual int32_t get_int32(int32_t const index) = 0;
+	virtual int32_t getInt32(int32_t const index) = 0;
 
-    /// @brief Returns an \c int64_t value from a prepared statement result.
+	/// @brief Returns an \c int64_t value from a prepared statement result.
     ///
     /// @return \c int64_t value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-    virtual int64_t get_int64(int32_t const index) = 0;
+	virtual int64_t getInt64(int32_t const index) = 0;
 
-    /// @brief Returns a text value from a prepared statement result.
+	/// @brief Returns a text value from a prepared statement result.
     ///
     /// @return Text value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-    virtual std::string get_text(int32_t const index) = 0;
+	virtual std::string getText(int32_t const index) = 0;
 
-    /// @brief Returns a UTF-16 text value from a prepared statement result.
+	/// @brief Returns a UTF-16 text value from a prepared statement result.
     ///
     /// @return UTF-16 text value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-    virtual std::u16string get_text16(int32_t const index) = 0;
+	virtual std::u16string getText16(int32_t const index) = 0;
 
-    /// @brief Returns a UUID value from a prepared statement result.
+	/// @brief Returns a UUID value from a prepared statement result.
     ///
     /// @return UUID value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-    virtual std::array<std::byte, 16> get_uuid(int32_t const index) = 0;
+	virtual std::array<std::byte, 16> getUuid(int32_t const index) = 0;
 };
-
 } // namespace dbpool
 
 #endif

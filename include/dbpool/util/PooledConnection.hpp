@@ -36,7 +36,7 @@ public:
 	/// @brief Returns pointer to database connection.
 	///
 	/// @return Pointer to database connection.
-	ConnectionImpl& get_conn();
+	ConnectionImpl& getConnection();
 
 private:
 	std::shared_ptr<ConnectionPoolImpl> conn_pool_; ///< Connection pool to return connection to.

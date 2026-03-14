@@ -10,151 +10,151 @@
 using namespace dbpool;
 
 PreparedStmt::PreparedStmt(std::shared_ptr<PooledConnection> pooled_conn,
-                           std::unique_ptr<PreparedStmtImpl> impl) noexcept
-    : pooled_conn_(std::move(pooled_conn))
-    , impl_(std::move(impl))
+	std::unique_ptr<PreparedStmtImpl> impl) noexcept
+	: pooled_conn_(std::move(pooled_conn))
+	  , impl_(std::move(impl))
 {
-    assert(pooled_conn_);
-    assert(impl_);
+	assert(pooled_conn_);
+	assert(impl_);
 }
 
 PreparedStmt::~PreparedStmt()
 {
-    // Make sure members are destructed in the correct order. connection_ is a dependency of impl_ so make sure impl_
-    // is destructed before connection_. We could rely on member ordering here but that would lead to fragile code and
-    // things will break if someone reorders the members of this object.
-    impl_.reset();
-    pooled_conn_.reset();
+	// Make sure members are destructed in the correct order. connection_ is a dependency of impl_ so make sure impl_
+	// is destructed before connection_. We could rely on member ordering here but that would lead to fragile code and
+	// things will break if someone reorders the members of this object.
+	impl_.reset();
+	pooled_conn_.reset();
 }
 
 PreparedStmt::ReturnCode PreparedStmt::execute()
 {
-    assert(impl_);
-    return impl_->execute();
+	assert(impl_);
+	return impl_->execute();
 }
 
 PreparedStmt::ReturnCode PreparedStmt::reset()
 {
-    assert(impl_);
-    return impl_->reset();
+	assert(impl_);
+	return impl_->reset();
 }
 
-bool PreparedStmt::is_null(int32_t const index)
+bool PreparedStmt::isNull(int32_t const index)
 {
-    assert(impl_);
-    return impl_->is_null(index);
+	assert(impl_);
+	return impl_->isNull(index);
 }
 
-void PreparedStmt::bind_blob(int32_t const index, std::span<std::byte const> const &value)
+void PreparedStmt::bindBlob(int32_t const index, std::span<std::byte const> const& value)
 {
-    assert(impl_);
-    impl_->bind_blob(index, value);
+	assert(impl_);
+	impl_->bindBlob(index, value);
 }
 
-void PreparedStmt::bind_bool(int32_t const index, bool const value)
+void PreparedStmt::bindBool(int32_t const index, bool const value)
 {
-    assert(impl_);
-    impl_->bind_bool(index, value);
+	assert(impl_);
+	impl_->bindBool(index, value);
 }
 
-void PreparedStmt::bind_date(int32_t const index, std::string_view value)
+void PreparedStmt::bindDate(int32_t const index, std::string_view value)
 {
-    assert(impl_);
-    impl_->bind_date(index, value);
+	assert(impl_);
+	impl_->bindDate(index, value);
 }
 
-void PreparedStmt::bind_double(int32_t const index, double const value)
+void PreparedStmt::bindDouble(int32_t const index, double const value)
 {
-    assert(impl_);
-    impl_->bind_double(index, value);
+	assert(impl_);
+	impl_->bindDouble(index, value);
 }
 
-void PreparedStmt::bind_int32(int32_t const index, int32_t const value)
+void PreparedStmt::bindInt32(int32_t const index, int32_t const value)
 {
-    assert(impl_);
-    impl_->bind_int32(index, value);
+	assert(impl_);
+	impl_->bindInt32(index, value);
 }
 
-void PreparedStmt::bind_int64(int32_t const index, int64_t const value)
+void PreparedStmt::bindInt64(int32_t const index, int64_t const value)
 {
-    assert(impl_);
-    impl_->bind_int64(index, value);
+	assert(impl_);
+	impl_->bindInt64(index, value);
 }
 
-void PreparedStmt::bind_null(int32_t const index)
+void PreparedStmt::bindNull(int32_t const index)
 {
-    assert(impl_);
-    impl_->bind_null(index);
+	assert(impl_);
+	impl_->bindNull(index);
 }
 
-void PreparedStmt::bind_text(int32_t const index, std::string_view value)
+void PreparedStmt::bindText(int32_t const index, std::string_view value)
 {
-    assert(impl_);
-    impl_->bind_text(index, value);
+	assert(impl_);
+	impl_->bindText(index, value);
 }
 
-void PreparedStmt::bind_text16(int32_t const index, std::u16string_view value)
+void PreparedStmt::bindText16(int32_t const index, std::u16string_view value)
 {
-    assert(impl_);
-    impl_->bind_text16(index, value);
+	assert(impl_);
+	impl_->bindText16(index, value);
 }
 
-void PreparedStmt::bind_uuid(int32_t const index, std::span<std::byte const> const &value)
+void PreparedStmt::bindUuid(int32_t const index, std::span<std::byte const> const& value)
 {
-    assert(impl_);
-    impl_->bind_uuid(index, value);
+	assert(impl_);
+	impl_->bindUuid(index, value);
 }
 
-std::vector<std::byte> PreparedStmt::get_blob(int32_t const index)
+std::vector<std::byte> PreparedStmt::getBlob(int32_t const index)
 {
-    assert(impl_);
-    return impl_->get_blob(index);
+	assert(impl_);
+	return impl_->getBlob(index);
 }
 
-bool PreparedStmt::get_bool(int32_t const index)
+bool PreparedStmt::getBool(int32_t const index)
 {
-    assert(impl_);
-    return impl_->get_bool(index);
+	assert(impl_);
+	return impl_->getBool(index);
 }
 
-std::string PreparedStmt::get_date(int32_t const index)
+std::string PreparedStmt::getDate(int32_t const index)
 {
-    assert(impl_);
-    return impl_->get_date(index);
+	assert(impl_);
+	return impl_->getDate(index);
 }
 
-double PreparedStmt::get_double(int32_t const index)
+double PreparedStmt::getDouble(int32_t const index)
 {
-    assert(impl_);
-    return impl_->get_double(index);
+	assert(impl_);
+	return impl_->getDouble(index);
 }
 
-int32_t PreparedStmt::get_int32(int32_t const index)
+int32_t PreparedStmt::getInt32(int32_t const index)
 {
-    assert(impl_);
-    return impl_->get_int32(index);
+	assert(impl_);
+	return impl_->getInt32(index);
 }
 
-int64_t PreparedStmt::get_int64(int32_t const index)
+int64_t PreparedStmt::getInt64(int32_t const index)
 {
-    assert(impl_);
-    return impl_->get_int64(index);
+	assert(impl_);
+	return impl_->getInt64(index);
 }
 
-std::string PreparedStmt::get_text(int32_t const index)
+std::string PreparedStmt::getText(int32_t const index)
 {
-    assert(impl_);
-    return impl_->get_text(index);
+	assert(impl_);
+	return impl_->getText(index);
 }
 
-std::u16string PreparedStmt::get_text16(int32_t const index)
+std::u16string PreparedStmt::getText16(int32_t const index)
 {
-    assert(impl_);
-    return impl_->get_text16(index);
+	assert(impl_);
+	return impl_->getText16(index);
 }
 
-std::array<std::byte, 16> PreparedStmt::get_uuid(int32_t const index)
+std::array<std::byte, 16> PreparedStmt::getUuid(int32_t const index)
 {
-    assert(impl_);
-    return impl_->get_uuid(index);
+	assert(impl_);
+	return impl_->getUuid(index);
 }

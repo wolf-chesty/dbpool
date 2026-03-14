@@ -51,30 +51,30 @@ ConnectionPoolImpl::ConnectionPoolImpl(std::string_view filename, size_t pool_si
 	optimization_period_t optimization_period, size_t analysis_limit)
 	: dbpool::ConnectionPoolImpl(pool_size)
 {
-	initialize_sqlite();
+	initializeSqlite();
 
 	// Open handle to database for connection pool related stuff
 	if (SQLITE_OK != sqlite3_open(filename.data(), &db_)) {
 		sqlite3_close(db_);
-		shutdown_sqlite();
+		shutdownSqlite();
 		throw std::runtime_error(fmt::format("Unable to open file '{}'", filename));
 	}
 
-	start_optimization_thread(optimization_period, analysis_limit);
+	startOptimizationThread(optimization_period, analysis_limit);
 }
 
 ConnectionPoolImpl::~ConnectionPoolImpl()
 {
 	assert(db_);
 
-	stop_optimization_thread();
+	stopOptimizationThread();
 	ConnectionPoolImpl::commit();
 	sqlite3_close(db_);
 
-	shutdown_sqlite();
+	shutdownSqlite();
 }
 
-void ConnectionPoolImpl::initialize_sqlite()
+void ConnectionPoolImpl::initializeSqlite()
 {
 	std::unique_lock const lock(sqlite_init_mutex_);
 	if (sqlite_use_count_++ == 0) {
@@ -87,7 +87,7 @@ void ConnectionPoolImpl::initialize_sqlite()
 	}
 }
 
-void ConnectionPoolImpl::shutdown_sqlite()
+void ConnectionPoolImpl::shutdownSqlite()
 {
 	std::unique_lock const lock(sqlite_init_mutex_);
 	if (--sqlite_use_count_ == 0) {
@@ -99,7 +99,7 @@ void ConnectionPoolImpl::shutdown_sqlite()
 	}
 }
 
-int64_t ConnectionPoolImpl::get_schema()
+int64_t ConnectionPoolImpl::getSchema()
 {
 	assert(db_);
 
@@ -109,7 +109,7 @@ int64_t ConnectionPoolImpl::get_schema()
 	std::string_view sql{"PRAGMA user_version"};
 	sqlite3_stmt* stmt{};
 	if (sqlite3_prepare_v2(db_, sql.data(), sql.length() + 1, &stmt, nullptr)) {
-		throw std::runtime_error(fmt::format("sqlite_conn_pool::get_schema: {}", sqlite3_errmsg(db_)));
+		throw std::runtime_error(fmt::format("sqlite_conn_pool::getSchema: {}", sqlite3_errmsg(db_)));
 	}
 
 	// Execute the prepared statement
@@ -125,27 +125,27 @@ int64_t ConnectionPoolImpl::get_schema()
 	return schema;
 }
 
-void ConnectionPoolImpl::set_schema(int64_t schema)
+void ConnectionPoolImpl::setSchema(int64_t schema)
 {
 	assert(db_);
 	auto const sqlStmt = fmt::format("PRAGMA user_version = {}", schema);
 	std::unique_lock const lock(db_mutex_);
 	if (sqlite3_exec(db_, sqlStmt.data(), nullptr, nullptr, nullptr)) {
-		throw std::runtime_error(fmt::format("sqlite_conn_pool::set_schema: {}", sqlite3_errmsg(db_)));
+		throw std::runtime_error(fmt::format("sqlite_conn_pool::setSchema: {}", sqlite3_errmsg(db_)));
 	}
 }
 
-std::unique_ptr<dbpool::ConnectionImpl> ConnectionPoolImpl::new_conn()
+std::unique_ptr<dbpool::ConnectionImpl> ConnectionPoolImpl::createConnection()
 {
 	sqlite3* db{};
-	auto filename = get_filename();
+	auto filename = getFilename();
 	if (sqlite3_open(filename.c_str(), &db)) {
-		throw std::runtime_error(fmt::format("sqlite_conn_pool::new_conn: Unable to open file '{}'", filename));
+		throw std::runtime_error(fmt::format("sqlite_conn_pool::createConnection: Unable to open file '{}'", filename));
 	}
 	return std::make_unique<ConnectionImpl>(db);
 }
 
-void ConnectionPoolImpl::optimization_thread(optimization_period_t period, [[maybe_unused]] size_t threshold)
+void ConnectionPoolImpl::optimizationThread(optimization_period_t period, [[maybe_unused]] size_t threshold)
 {
 	assert(db_);
 	assert(period.count() > 0);
@@ -172,11 +172,11 @@ void ConnectionPoolImpl::optimization_thread(optimization_period_t period, [[may
 	}
 }
 
-void ConnectionPoolImpl::start_optimization_thread(optimization_period_t period, size_t threshold)
+void ConnectionPoolImpl::startOptimizationThread(optimization_period_t period, size_t threshold)
 {
 	if (period.count() > 0 && !run_optimization_thread_.exchange(true)) {
 		optimization_thread_ =
-				std::thread(&ConnectionPoolImpl::optimization_thread, this, std::move(period), threshold);
+				std::thread(&ConnectionPoolImpl::optimizationThread, this, std::move(period), threshold);
 
 		std::string_view thread_name("sqlite_opt");
 		assert(thread_name.length() <= 16);
@@ -184,7 +184,7 @@ void ConnectionPoolImpl::start_optimization_thread(optimization_period_t period,
 	}
 }
 
-void ConnectionPoolImpl::stop_optimization_thread()
+void ConnectionPoolImpl::stopOptimizationThread()
 {
 	if (run_optimization_thread_.exchange(false)) {
 		optimization_cv_.notify_one();
@@ -201,14 +201,14 @@ void ConnectionPoolImpl::commit()
 	}
 }
 
-std::string ConnectionPoolImpl::get_filename() const
+std::string ConnectionPoolImpl::getFilename() const
 {
 	assert(db_);
 	auto f = sqlite3_db_filename(db_, nullptr);
 	return std::string{!f || strlen(f) == 0 ? ":memory:" : f};
 }
 
-bool ConnectionPoolImpl::is_open() const
+bool ConnectionPoolImpl::isOpen() const
 {
 	return db_ != nullptr;
 }

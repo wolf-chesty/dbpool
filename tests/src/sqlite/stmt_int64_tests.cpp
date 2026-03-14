@@ -10,59 +10,59 @@ TEST(SQLite3Test, int64_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
-	auto conn = db_pool.get_conn();
+	auto conn = db_pool.getConnection();
 	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::ok, conn.exec("CREATE TABLE t1(id INTEGER, test_val INTEGER)"));
 
-	auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
+	auto insert_stmt = conn.getStmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
 
 	int const id0{0};
 	int64_t const val{32};
-	insert_stmt.bind_int32(1, id0);
-	insert_stmt.bind_int64(2, val);
+	insert_stmt.bindInt32(1, id0);
+	insert_stmt.bindInt64(2, val);
 	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::done, insert_stmt.execute());
 
-	auto query_stmt = conn.get_stmt("SELECT test_val FROM t1 WHERE id = ?");
+	auto query_stmt = conn.getStmt("SELECT test_val FROM t1 WHERE id = ?");
 
-	query_stmt.bind_int32(1, id0);
+	query_stmt.bindInt32(1, id0);
 	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::row, query_stmt.execute());
-	EXPECT_EQ(val, query_stmt.get_int64(0));
+	EXPECT_EQ(val, query_stmt.getInt64(0));
 	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::done, query_stmt.execute());
 
-	EXPECT_THROW(query_stmt.get_int64(-1), std::runtime_error);
-	EXPECT_THROW(query_stmt.get_int64(1), std::runtime_error);
+	EXPECT_THROW(query_stmt.getInt64(-1), std::runtime_error);
+	EXPECT_THROW(query_stmt.getInt64(1), std::runtime_error);
 }
 
 TEST(SQLite3Test, int64_invalid_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
-	auto conn = db_pool.get_conn();
+	auto conn = db_pool.getConnection();
 	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::ok, conn.exec("CREATE TABLE t1(id INTEGER, test_val INTEGER)"));
 
-	auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
-	EXPECT_THROW(insert_stmt.bind_int64(0, 0), std::runtime_error);
+	auto insert_stmt = conn.getStmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
+	EXPECT_THROW(insert_stmt.bindInt64(0, 0), std::runtime_error);
 	insert_stmt.reset();
-	EXPECT_THROW(insert_stmt.bind_int64(3, 0), std::runtime_error);
+	EXPECT_THROW(insert_stmt.bindInt64(3, 0), std::runtime_error);
 }
 
 TEST(SQLite3Test, int64_null_bind_test)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
-	auto conn = db_pool.get_conn();
+	auto conn = db_pool.getConnection();
 	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::ok, conn.exec("CREATE TABLE t1(id INTEGER, test_val INTEGER)"));
 
-	auto insert_stmt = conn.get_stmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
+	auto insert_stmt = conn.getStmt("INSERT INTO t1 (id, test_val) VALUES (?, ?)");
 
 	int const id0{0};
-	insert_stmt.bind_int32(1, id0);
-	insert_stmt.bind_null(2);
+	insert_stmt.bindInt32(1, id0);
+	insert_stmt.bindNull(2);
 	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::done, insert_stmt.execute());
 
-	auto query_stmt = conn.get_stmt("SELECT test_val FROM t1 WHERE id = ?");
+	auto query_stmt = conn.getStmt("SELECT test_val FROM t1 WHERE id = ?");
 
-	query_stmt.bind_int32(1, id0);
+	query_stmt.bindInt32(1, id0);
 	EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::row, query_stmt.execute());
-	EXPECT_TRUE(query_stmt.is_null(0));
-	EXPECT_THROW(query_stmt.get_int64(0), std::runtime_error);
+	EXPECT_TRUE(query_stmt.isNull(0));
+	EXPECT_THROW(query_stmt.getInt64(0), std::runtime_error);
 }

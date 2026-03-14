@@ -18,7 +18,7 @@ int main() {
     dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
     // Get a connection from the pool
-    auto conn = db_pool.get_conn();
+    auto conn = db_pool.getConnection();
     
     // Execute an SQL statement against the connection
     auto ret = conn.exec("CREATE TABLE t1(x INT)");
@@ -47,7 +47,7 @@ int main() {
     dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
     // Get a connection from the pool
-    auto conn = db_pool.get_conn();
+    auto conn = db_pool.getConnection();
 
     // Notice that we are sharing conn with the thread; this will cause issues
     std::thread worker(worker_thread, conn);
@@ -77,10 +77,10 @@ int main() {
     dbpool::sqlite::ConnectionPool db_pool(":memory:");
 
     // Get a connection from the pool
-    auto conn = db_pool.get_conn();
+    auto conn = db_pool.getConnection();
 
     // Give the thread its own connection to work with
-    std::thread worker(worker_thread, db_pool.get_conn());
+    std::thread worker(worker_thread, db_pool.getConnection());
 
     conn.exec("SELECT * FROM table2;");
     

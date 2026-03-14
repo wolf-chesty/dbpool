@@ -20,13 +20,13 @@ Connection::Connection(std::shared_ptr<PooledConnection> pooled_conn)
 PreparedStmt::ReturnCode Connection::exec(std::string_view sql)
 {
 	assert(pooled_conn_);
-	auto& conn = pooled_conn_->get_conn();
+	auto& conn = pooled_conn_->getConnection();
 	return conn.exec(sql);
 }
 
-PreparedStmt Connection::get_stmt(std::string const& sql)
+PreparedStmt Connection::getStmt(std::string const& sql)
 {
 	assert(pooled_conn_);
-	auto& conn = pooled_conn_->get_conn();
-	return PreparedStmt(pooled_conn_, conn.get_stmt(sql));
+	auto& conn = pooled_conn_->getConnection();
+	return PreparedStmt(pooled_conn_, conn.getStmt(sql));
 }

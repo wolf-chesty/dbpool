@@ -16,12 +16,12 @@ TEST(SQLite3Test, file_type)
 	auto db_pool = std::make_shared<dbpool::sqlite::ConnectionPool>(":memory:");
 	auto db_file = std::dynamic_pointer_cast<dbpool::DatabaseFile>(db_pool);
 	EXPECT_NE(db_file, nullptr);
-	EXPECT_TRUE(db_file->is_open());
+	EXPECT_TRUE(db_file->isOpen());
 }
 
 TEST(SQLite3Test, file_name)
 {
 	dbpool::sqlite::ConnectionPool db_pool(":memory:");
-	EXPECT_EQ(db_pool.get_filename(), ":memory:");
-	EXPECT_TRUE(db_pool.is_open());
+	EXPECT_EQ(db_pool.getFilename(), ":memory:");
+	EXPECT_TRUE(db_pool.isOpen());
 }

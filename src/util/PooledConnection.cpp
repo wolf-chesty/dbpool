@@ -21,10 +21,10 @@ PooledConnection::~PooledConnection()
 {
 	assert(conn_pool_);
 	assert(conn_);
-	conn_pool_->push_conn(std::move(conn_));
+	conn_pool_->pushConnection(std::move(conn_));
 }
 
-ConnectionImpl& PooledConnection::get_conn()
+ConnectionImpl& PooledConnection::getConnection()
 {
 	assert(conn_);
 	return *conn_;

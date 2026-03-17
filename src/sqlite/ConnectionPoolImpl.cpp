@@ -76,7 +76,7 @@ ConnectionPoolImpl::~ConnectionPoolImpl()
 
 void ConnectionPoolImpl::initializeSqlite()
 {
-	std::unique_lock const lock(sqlite_init_mutex_);
+	std::lock_guard const lock(sqlite_init_mutex_);
 	if (sqlite_use_count_++ == 0) {
 		if (auto const ret = sqlite3_config(SQLITE_CONFIG_MULTITHREAD, nullptr); SQLITE_OK != ret) {
 			throw std::runtime_error(fmt::format("Unable to configure sqlite3; got return code {}", ret));
@@ -89,7 +89,7 @@ void ConnectionPoolImpl::initializeSqlite()
 
 void ConnectionPoolImpl::shutdownSqlite()
 {
-	std::unique_lock const lock(sqlite_init_mutex_);
+	std::lock_guard const lock(sqlite_init_mutex_);
 	if (--sqlite_use_count_ == 0) {
 #ifdef NDEBUG
 		sqlite3_shutdown();
@@ -103,7 +103,7 @@ int64_t ConnectionPoolImpl::getSchema()
 {
 	assert(db_);
 
-	std::unique_lock const lock(db_mutex_);
+	std::lock_guard const lock(db_mutex_);
 
 	// Compile prepared statement
 	std::string_view sql{"PRAGMA user_version"};
@@ -129,7 +129,7 @@ void ConnectionPoolImpl::setSchema(int64_t schema)
 {
 	assert(db_);
 	auto const sqlStmt = fmt::format("PRAGMA user_version = {}", schema);
-	std::unique_lock const lock(db_mutex_);
+	std::lock_guard const lock(db_mutex_);
 	if (sqlite3_exec(db_, sqlStmt.data(), nullptr, nullptr, nullptr)) {
 		throw std::runtime_error(fmt::format("sqlite_conn_pool::setSchema: {}", sqlite3_errmsg(db_)));
 	}
@@ -195,7 +195,7 @@ void ConnectionPoolImpl::stopOptimizationThread()
 void ConnectionPoolImpl::commit()
 {
 	assert(db_);
-	std::unique_lock const lock(db_mutex_);
+	std::lock_guard const lock(db_mutex_);
 	if (sqlite3_exec(db_, "VACUUM", nullptr, nullptr, nullptr)) {
 		throw std::runtime_error(fmt::format("sqlite_conn_pool::commit: {}", sqlite3_errmsg(db_)));
 	}

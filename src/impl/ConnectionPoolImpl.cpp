@@ -18,8 +18,8 @@ std::unique_ptr<ConnectionImpl> ConnectionPoolImpl::popConnection()
 {
 	// If there are available connections then remove the connection from the pool and return it; otherwise wait for a
 	// connection to become available
-	std::unique_lock<std::mutex> lk(conn_mutex_);
-	conn_cv_.wait(lk, [this]() -> bool { return !available_conns_.empty(); });
+	std::unique_lock lock(conn_mutex_);
+	conn_cv_.wait(lock, [this]() -> bool { return !available_conns_.empty(); });
 
 	// Grab connection from available pool
 	auto conn = std::move(available_conns_.front());
@@ -39,9 +39,8 @@ void ConnectionPoolImpl::pushConnection(std::unique_ptr<ConnectionImpl> conn)
 	assert(conn);
 
 	// add database connection back to pool
-	std::unique_lock<std::mutex> lk(conn_mutex_);
+	std::lock_guard const lock(conn_mutex_);
 	available_conns_.emplace_front(std::move(conn));
-	lk.unlock();
 
 	// notify threads that a connection has been returned to the pool
 	conn_cv_.notify_all();
@@ -49,7 +48,7 @@ void ConnectionPoolImpl::pushConnection(std::unique_ptr<ConnectionImpl> conn)
 
 size_t ConnectionPoolImpl::count()
 {
-	std::unique_lock<std::mutex> lk(conn_mutex_);
+	std::lock_guard const lock(conn_mutex_);
 	return std::distance(available_conns_.begin(), available_conns_.end());
 }
 

@@ -10,7 +10,6 @@
 #include <sqlite3.h>
 
 namespace dbpool::sqlite {
-///
 /// @class ConnectionImpl
 ///
 /// @brief Class that implements a connection to an SQLite3 database.

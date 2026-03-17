@@ -10,7 +10,6 @@
 namespace dbpool {
 class PooledConnection;
 
-///
 /// @class Connection
 ///
 /// @brief This class wraps the concrete implementations of \c ConnectionImpl and will return the implementation back to
@@ -19,7 +18,6 @@ class PooledConnection;
 /// This object manages the concrete database connection implementations and is responsible for returning unused
 /// database connections to the connection pool object that created them. This object delegates all database
 /// functionality to the underlying concrete \c ConnectionImpl class which implements any API specific database code.
-///
 class Connection {
 public:
 	Connection() = default;

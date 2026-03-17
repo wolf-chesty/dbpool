@@ -17,7 +17,6 @@ class ConnectionImpl;
 template<class T>
 concept ConnectionPoolImplT = std::derived_from<T, ConnectionPoolImpl>;
 
-///
 /// @class ConnectionPool
 ///
 /// @brief A database connection pool class.
@@ -28,7 +27,6 @@ concept ConnectionPoolImplT = std::derived_from<T, ConnectionPoolImpl>;
 ///
 /// Classes that derive from this will need to implement the API specific code required to return a \c db_conn object
 /// that wraps a API specific database handle.
-///
 template<ConnectionPoolImplT connection_pool_t>
 class ConnectionPool {
 public:

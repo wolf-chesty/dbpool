@@ -14,7 +14,6 @@
 #include <thread>
 
 namespace dbpool::sqlite {
-///
 /// @class ConnectionPoolImpl
 ///
 /// @brief Implements the \c ConnectionPool interface for an SQLite database connection pool.
@@ -26,7 +25,6 @@ namespace dbpool::sqlite {
 /// isn't counted in the total number of connections for the pool and is used to performs housekeeping on the underlying
 /// database backend such as: vacuuming (defragmentation) upon database close and periodic database optimization. Keep
 /// this in mind as there will be one more connection than specified for this connection pool.
-///
 class ConnectionPoolImpl
 		: public dbpool::ConnectionPoolImpl
 		  , public dbpool::DatabaseFile {

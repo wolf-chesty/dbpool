@@ -7,11 +7,9 @@
 #include <string>
 
 namespace dbpool {
-///
 /// @class DatabaseFile
 ///
 /// @brief Provides an interface for databases that are file backed (i.e., SQLite3).
-///
 class DatabaseFile {
 public:
 	virtual ~DatabaseFile() = default;

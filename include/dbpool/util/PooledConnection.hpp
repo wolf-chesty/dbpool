@@ -10,11 +10,9 @@ namespace dbpool {
 class ConnectionImpl;
 class ConnectionPoolImpl;
 
-///
 /// @class PooledConnection
 ///
 /// @brief Object is responsible for returning a checked out database connection to the connection pool that created it.
-///
 class PooledConnection {
 public:
 	PooledConnection() = delete;

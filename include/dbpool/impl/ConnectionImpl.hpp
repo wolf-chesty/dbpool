@@ -9,14 +9,12 @@
 #include <string>
 
 namespace dbpool {
-///
 /// @class ConnectionImpl
 ///
 /// @brief Database connection class.
 ///
 /// This class abstracts away the nuances of the various database connection API's so that the dependent application can
 /// use a single interface when executing SQL statements.
-///
 class ConnectionImpl {
 public:
 	ConnectionImpl() = default;

@@ -11,11 +11,9 @@
 #include <string_view>
 
 namespace dbpool::sqlite {
-///
 /// @class PreparedStmtImpl
 ///
 /// @brief Implements the \c PreparedStmt interface for an SQL prepared statement.
-///
 class PreparedStmtImpl : public dbpool::PreparedStmtImpl {
 public:
 	PreparedStmtImpl() = delete;

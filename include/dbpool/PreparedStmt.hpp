@@ -14,11 +14,9 @@ namespace dbpool {
 class PooledConnection;
 class PreparedStmtImpl;
 
-///
 /// @class PreparedStmt
 ///
 /// @brief Interface for a database prepared statement.
-///
 class PreparedStmt {
 public:
 	using ReturnCode = dbpool::PreparedStmtImpl::ReturnCode;

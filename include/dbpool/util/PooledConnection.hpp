@@ -15,30 +15,30 @@ class ConnectionPoolImpl;
 /// @brief Object is responsible for returning a checked out database connection to the connection pool that created it.
 class PooledConnection {
 public:
-	PooledConnection() = delete;
-	PooledConnection(PooledConnection const&) = delete;
-	PooledConnection(PooledConnection&&) noexcept = default;
+    PooledConnection() = delete;
+    PooledConnection(PooledConnection const &) = delete;
+    PooledConnection(PooledConnection &&) noexcept = default;
 
-	/// @brief ctor.
-	///
-	/// @param conn_pool Connection pool that created \c conn.
-	/// @param conn Database connection to be returned to \c conn_pool up destruction.
-	explicit PooledConnection(std::shared_ptr<ConnectionPoolImpl> conn_pool, std::unique_ptr<ConnectionImpl> conn);
+    /// @brief ctor.
+    ///
+    /// @param conn_pool Connection pool that created \c conn.
+    /// @param conn Database connection to be returned to \c conn_pool up destruction.
+    explicit PooledConnection(std::shared_ptr<ConnectionPoolImpl> conn_pool, std::unique_ptr<ConnectionImpl> conn);
 
-	/// @brief Returns database connection to connection pool.
-	~PooledConnection();
+    /// @brief Returns database connection to connection pool.
+    ~PooledConnection();
 
-	PooledConnection& operator=(PooledConnection const&) = delete;
-	PooledConnection& operator=(PooledConnection&&) noexcept = default;
+    PooledConnection &operator=(PooledConnection const &) = delete;
+    PooledConnection &operator=(PooledConnection &&) noexcept = default;
 
-	/// @brief Returns pointer to database connection.
-	///
-	/// @return Pointer to database connection.
-	ConnectionImpl& getConnection();
+    /// @brief Returns pointer to database connection.
+    ///
+    /// @return Pointer to database connection.
+    ConnectionImpl &getConnection();
 
 private:
-	std::shared_ptr<ConnectionPoolImpl> conn_pool_; ///< Connection pool to return connection to.
-	std::unique_ptr<ConnectionImpl> conn_; ///< Database connection to return.
+    std::shared_ptr<ConnectionPoolImpl> conn_pool_; ///< Connection pool to return connection to.
+    std::unique_ptr<ConnectionImpl> conn_;          ///< Database connection to return.
 };
 } // namespace dbpool
 

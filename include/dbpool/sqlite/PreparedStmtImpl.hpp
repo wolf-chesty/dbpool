@@ -16,118 +16,118 @@ namespace dbpool::sqlite {
 /// @brief Implements the \c PreparedStmt interface for an SQL prepared statement.
 class PreparedStmtImpl : public dbpool::PreparedStmtImpl {
 public:
-	PreparedStmtImpl() = delete;
-	PreparedStmtImpl(PreparedStmtImpl const&) = delete;
-	PreparedStmtImpl(PreparedStmtImpl&&) noexcept = delete;
+    PreparedStmtImpl() = delete;
+    PreparedStmtImpl(PreparedStmtImpl const &) = delete;
+    PreparedStmtImpl(PreparedStmtImpl &&) noexcept = delete;
 
-	/// @brief ctor for the object.
+    /// @brief ctor for the object.
     ///
     /// @param db Pointer to a sqlite3 database pointer that this prepared statement was created against.
     /// @param sql SQL statement.
-	explicit PreparedStmtImpl(sqlite3* db, std::string_view sql);
+    explicit PreparedStmtImpl(sqlite3 *db, std::string_view sql);
 
-	/// @brief dtor for the object.
+    /// @brief dtor for the object.
     ///
     /// Resets the prepared statement (frees any memory being used) for later re-use.
-	~PreparedStmtImpl() override;
+    ~PreparedStmtImpl() override;
 
-	PreparedStmtImpl& operator=(PreparedStmtImpl const&) = delete;
-	PreparedStmtImpl& operator=(PreparedStmtImpl&&) noexcept = delete;
+    PreparedStmtImpl &operator=(PreparedStmtImpl const &) = delete;
+    PreparedStmtImpl &operator=(PreparedStmtImpl &&) noexcept = delete;
 
-	/// @brief Executes the prepared statement.
+    /// @brief Executes the prepared statement.
     ///
     /// @return Return code from executing the prepared statement.
-	ReturnCode execute() override;
+    ReturnCode execute() override;
 
-	/// @brief Resets the prepared statement for reuse.
+    /// @brief Resets the prepared statement for reuse.
     ///
     /// @return Return code from resetting the prepared statement.
-	PreparedStmtImpl::ReturnCode reset() override;
+    PreparedStmtImpl::ReturnCode reset() override;
 
-	/// @brief Returns \c true if the column is null.
+    /// @brief Returns \c true if the column is null.
     ///
     /// @param index Index of the column to bind \c value to.
     ///
     /// @return \c true if the column is null.
-	bool isNull(int32_t const index) override;
+    bool isNull(int32_t const index) override;
 
-	/// @brief Binds memory to a prepared statement field.
+    /// @brief Binds memory to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-	void bindBlob(int32_t const index, std::span<std::byte const> const& value) override;
+    void bindBlob(int32_t const index, std::span<std::byte const> const &value) override;
 
-	/// @brief Binds a boolean value to a prepared statement field.
+    /// @brief Binds a boolean value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-	void bindBool(int32_t const index, bool const value) override;
+    void bindBool(int32_t const index, bool const value) override;
 
-	/// @brief Binds a date value to a prepared statement field.
+    /// @brief Binds a date value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Formatted date string to bind to the prepared statement field.
     ///
     /// @note sqlite3 doesn't have a native DATE type. Because of this, the library will store date/time in a INTEGER64
     ///       type.
-	void bindDate(int32_t const index, std::string_view value) override;
+    void bindDate(int32_t const index, std::string_view value) override;
 
-	/// @brief Binds a double value to a prepared statement field.
+    /// @brief Binds a double value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-	void bindDouble(int32_t const index, double const value) override;
+    void bindDouble(int32_t const index, double const value) override;
 
-	/// @brief Binds an in32_t value to a prepared statement field.
+    /// @brief Binds an in32_t value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-	void bindInt32(int32_t const index, int32_t const value) override;
+    void bindInt32(int32_t const index, int32_t const value) override;
 
-	/// @brief Binds an in64_t value to a prepared statement field.
+    /// @brief Binds an in64_t value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-	void bindInt64(int32_t const index, int64_t const value) override;
+    void bindInt64(int32_t const index, int64_t const value) override;
 
-	/// @brief Sets a prepared statement field to NULL.
+    /// @brief Sets a prepared statement field to NULL.
     ///
     /// @param index Index of the column to bind \c value to.
-	void bindNull(int32_t const index) override;
+    void bindNull(int32_t const index) override;
 
-	/// @brief Binds a string value to a prepared statement field.
-    ///
-    /// @param index Index of the column to bind \c value to.
-    /// @param value Data to bind to the prepared statement field.
-	void bindText(int32_t const index, std::string_view value) override;
-
-	/// @brief Binds a UTF-16 string value to a prepared statement field.
+    /// @brief Binds a string value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-	void bindText16(int32_t const index, std::u16string_view value) override;
+    void bindText(int32_t const index, std::string_view value) override;
 
-	/// @brief Binds a UUID value to a prepared statement field.
+    /// @brief Binds a UTF-16 string value to a prepared statement field.
     ///
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
-	void bindUuid(int32_t const index, std::span<std::byte const> const& value) override;
+    void bindText16(int32_t const index, std::u16string_view value) override;
 
-	/// @brief Returns binary data from a prepared statement result.
+    /// @brief Binds a UUID value to a prepared statement field.
+    ///
+    /// @param index Index of the column to bind \c value to.
+    /// @param value Data to bind to the prepared statement field.
+    void bindUuid(int32_t const index, std::span<std::byte const> const &value) override;
+
+    /// @brief Returns binary data from a prepared statement result.
     ///
     /// @return Binary data from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-	std::vector<std::byte> getBlob(int32_t index) override;
+    std::vector<std::byte> getBlob(int32_t index) override;
 
-	/// @brief Returns a \c bool value from a prepared statement result.
+    /// @brief Returns a \c bool value from a prepared statement result.
     ///
     /// @return \c bool value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-	bool getBool(int32_t const index) override;
+    bool getBool(int32_t const index) override;
 
-	/// @brief Returns a date value from a prepared statement result.
+    /// @brief Returns a date value from a prepared statement result.
     ///
     /// @return String containing a formatted date.
     ///
@@ -135,60 +135,60 @@ public:
     ///
     /// @note sqlite3 doesn't have a native DATE type. Because of this, the library will store date/time in a INTEGER64
     ///       type.
-	std::string getDate(int32_t const index) override;
+    std::string getDate(int32_t const index) override;
 
-	/// @brief Returns a \c double value from a prepared statement result.
+    /// @brief Returns a \c double value from a prepared statement result.
     ///
     /// @return \c double value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-	double getDouble(int32_t const index) override;
+    double getDouble(int32_t const index) override;
 
-	/// @brief Returns an \c int32_t value from a prepared statement result.
+    /// @brief Returns an \c int32_t value from a prepared statement result.
     ///
     /// @return \c int32_t value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-	int32_t getInt32(int32_t const index) override;
+    int32_t getInt32(int32_t const index) override;
 
-	/// @brief Returns an \c int64_t value from a prepared statement result.
+    /// @brief Returns an \c int64_t value from a prepared statement result.
     ///
     /// @return \c int64_t value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-	int64_t getInt64(int32_t const index) override;
+    int64_t getInt64(int32_t const index) override;
 
-	/// @brief Returns a text value from a prepared statement result.
+    /// @brief Returns a text value from a prepared statement result.
     ///
     /// @return Text value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-	std::string getText(int32_t const index) override;
+    std::string getText(int32_t const index) override;
 
-	/// @brief Returns a UTF-16 text value from a prepared statement result.
+    /// @brief Returns a UTF-16 text value from a prepared statement result.
     ///
     /// @return UTF-16 text value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-	std::u16string getText16(int32_t const index) override;
+    std::u16string getText16(int32_t const index) override;
 
-	/// @brief Returns a UUID value from a prepared statement result.
+    /// @brief Returns a UUID value from a prepared statement result.
     ///
     /// @return UUID value from the prepared statement result.
     ///
     /// @param index Index of the column to return the data for.
-	std::array<std::byte, 16> getUuid(int32_t const index) override;
+    std::array<std::byte, 16> getUuid(int32_t const index) override;
 
-	/// @brief Converts sqlite3 specific error codes to library specific error codes.
+    /// @brief Converts sqlite3 specific error codes to library specific error codes.
     ///
     /// @return Library specific error code.
     ///
     /// @param code sqlite3 error code to convert.
-	static ReturnCode toErrorCode(int code);
+    static ReturnCode toErrorCode(int code);
 
 private:
-	sqlite3* db_{}; ///< Pointer to sqlite3 database.
-	sqlite3_stmt* stmt_{}; ///< Pointer to sqlite3 prepared statement.
+    sqlite3 *db_{};        ///< Pointer to sqlite3 database.
+    sqlite3_stmt *stmt_{}; ///< Pointer to sqlite3 prepared statement.
 };
 } // namespace dbpool::sqlite
 

@@ -12,20 +12,20 @@ namespace dbpool {
 /// @brief Provides an interface for databases that are file backed (i.e., SQLite3).
 class DatabaseFile {
 public:
-	virtual ~DatabaseFile() = default;
+    virtual ~DatabaseFile() = default;
 
-	/// @brief Flushes database changes from memory to disk.
-	virtual void commit() = 0;
+    /// @brief Flushes database changes from memory to disk.
+    virtual void commit() = 0;
 
-	/// @brief Returns the database filename.
+    /// @brief Returns the database filename.
     ///
     /// @return Database filename.
-	virtual std::string getFilename() const = 0;
+    virtual std::string getFilename() const = 0;
 
-	/// @brief Returns \c true if the database is open.
+    /// @brief Returns \c true if the database is open.
     ///
     /// @return \c true if the database is open.
-	virtual bool isOpen() const = 0;
+    virtual bool isOpen() const = 0;
 };
 } // namespace dbpool
 

@@ -9,26 +9,26 @@
 
 using namespace dbpool::sqlite;
 
-ConnectionImpl::ConnectionImpl(sqlite3* db)
-	: db_(db)
+ConnectionImpl::ConnectionImpl(sqlite3 *db)
+    : db_(db)
 {
-	assert(db_);
+    assert(db_);
 }
 
 ConnectionImpl::~ConnectionImpl()
 {
-	assert(db_);
-	sqlite3_close(db_);
+    assert(db_);
+    sqlite3_close(db_);
 }
 
 PreparedStmtImpl::ReturnCode ConnectionImpl::exec(std::string_view sql)
 {
-	assert(db_);
-	return PreparedStmtImpl::toErrorCode(sqlite3_exec(db_, sql.data(), nullptr, nullptr, nullptr));
+    assert(db_);
+    return PreparedStmtImpl::toErrorCode(sqlite3_exec(db_, sql.data(), nullptr, nullptr, nullptr));
 }
 
-std::unique_ptr<dbpool::PreparedStmtImpl> ConnectionImpl::getStmt(std::string const& sql)
+std::unique_ptr<dbpool::PreparedStmtImpl> ConnectionImpl::getStmt(std::string const &sql)
 {
-	assert(db_);
-	return std::make_unique<PreparedStmtImpl>(db_, sql);
+    assert(db_);
+    return std::make_unique<PreparedStmtImpl>(db_, sql);
 }

@@ -52,11 +52,11 @@ if (DBPOOL_ENABLE_SQLITE3)
     )
 endif ()
 
-if (DBPOOL_ENABLE_MARIADB)
-    pkg_check_modules (mariadb REQUIRED IMPORTED_TARGET "mysqlclient")
-
-    target_link_libraries (dbpool PRIVATE PkgConfig::mariadb)
-endif ()
+#if (DBPOOL_ENABLE_MARIADB)
+#    pkg_check_modules (mariadb REQUIRED IMPORTED_TARGET "mysqlclient")
+#
+#    target_link_libraries (dbpool PRIVATE PkgConfig::mariadb)
+#endif ()
 
 if (DBPOOL_COVERAGE)
     target_compile_options (dbpool PRIVATE -O0 --coverage -g)

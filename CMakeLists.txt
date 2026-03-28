@@ -8,7 +8,7 @@ set (CMAKE_CXX_STANDARD 20)
 add_library (dbpool OBJECT "")
 
 option (DBPOOL_ENABLE_SQLITE3 "Enable SQLite3 support" ON)
-option (DBPOOL_BUILD_TESTS "Build tests" ON)
+option (DBPOOL_BUILD_TESTS "Build tests" OFF)
 option (DBPOOL_COVERAGE "Enable GCC Coverage" OFF)
 option (DBPOOL_SANITIZE_ADDRESS "Enable GCC Address Sanitizer (ASan)" OFF)
 option (DBPOOL_SANITIZE_THREAD "Enable GCC Thread Sanitizer (TSan)" OFF)

@@ -15,7 +15,7 @@ TEST(SQLite3Test, connection_guard_scope_test)
     }
 
     // make sure that conn is not invalid once the connection pool shared pointer has died
-    EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::ok, conn.exec("CREATE TABLE t1(x INT)"));
+    EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::OK, conn.exec("CREATE TABLE t1(x INT)"));
 }
 
 TEST(SQLite3Test, statement_scope_test)
@@ -34,11 +34,11 @@ TEST(SQLite3Test, statement_scope_test)
     }
 
     // make sure that conn falling out of scope doesn't cause the prepared statement to crash
-    EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::row, stmt.execute());
+    EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::Row, stmt.execute());
     EXPECT_EQ(stmt.getInt32(0), 1);
-    EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::row, stmt.execute());
+    EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::Row, stmt.execute());
     EXPECT_EQ(stmt.getInt32(0), 5);
-    EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::done, stmt.execute());
+    EXPECT_EQ(dbpool::PreparedStmt::ReturnCode::Done, stmt.execute());
 }
 
 TEST(SQLite3Test, connection_count_test)

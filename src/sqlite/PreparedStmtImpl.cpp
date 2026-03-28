@@ -38,15 +38,17 @@ PreparedStmtImpl::ReturnCode PreparedStmtImpl::toErrorCode(int code)
 {
     switch (code) {
     case SQLITE_OK:
-        return ReturnCode::ok;
+        return ReturnCode::OK;
     case SQLITE_ROW:
-        return ReturnCode::row;
+        return ReturnCode::Row;
     case SQLITE_DONE:
-        return ReturnCode::done;
+        return ReturnCode::Done;
+    case SQLITE_CONSTRAINT:
+        return ReturnCode::ConstraintError;
     default:
         assert(false);
     }
-    return ReturnCode::error;
+    return ReturnCode::Error;
 }
 
 PreparedStmtImpl::ReturnCode PreparedStmtImpl::execute()

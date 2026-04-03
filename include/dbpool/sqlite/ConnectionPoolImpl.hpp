@@ -81,28 +81,6 @@ protected:
     std::unique_ptr<dbpool::ConnectionImpl> createConnection() override;
 
 private:
-    /// @brief Starts the optimization thread.
-    ///
-    /// @param period Number of minutes to wait between calls to the optimization thread.
-    /// @param threshold Number of records to optimize at once.
-    void startOptimizationThread(optimization_period_t period, size_t threshold);
-
-    /// @brief Stops the optimization thread.
-    ///
-    /// If the optimization thread was started for this connection pool then this function will stop that thread.
-    /// Otherwise, this function is effectively a no-op and does nothing.
-    void stopOptimizationThread();
-
-    /// @brief Function that implements the thread that periodically optimizes the database.
-    ///
-    /// @param period Number of minutes to wait between optimization calls.
-    /// @param threshold Number of records to examine when performing the optimization.
-    ///
-    /// @note Time taken to optimize the database does not count towards the timeout length.
-    ///
-    /// This function will wake up periodically and perform an optimization on the SQLite database file.
-    void optimizationThread(optimization_period_t period, size_t threshold);
-
     /// @brief Initializes the sqlite3 library for use by the application.
     void initializeSqlite();
 
@@ -111,10 +89,6 @@ private:
 
     std::mutex sqlite_init_mutex_;
     static size_t sqlite_use_count_;
-
-    std::thread optimization_thread_;
-    std::condition_variable optimization_cv_;
-    std::atomic<bool> run_optimization_thread_{false};
 
     sqlite3 *db_{nullptr};
     std::mutex db_mutex_;

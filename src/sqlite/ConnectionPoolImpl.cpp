@@ -59,15 +59,12 @@ ConnectionPoolImpl::ConnectionPoolImpl(std::string_view filename, size_t pool_si
         shutdownSqlite();
         throw std::runtime_error(fmt::format("Unable to open file '{}'", filename));
     }
-
-    startOptimizationThread(optimization_period, analysis_limit);
 }
 
 ConnectionPoolImpl::~ConnectionPoolImpl()
 {
     assert(db_);
 
-    stopOptimizationThread();
     ConnectionPoolImpl::commit();
     sqlite3_close(db_);
 
@@ -143,51 +140,6 @@ std::unique_ptr<dbpool::ConnectionImpl> ConnectionPoolImpl::createConnection()
         throw std::runtime_error(fmt::format("sqlite_conn_pool::createConnection: Unable to open file '{}'", filename));
     }
     return std::make_unique<ConnectionImpl>(db);
-}
-
-void ConnectionPoolImpl::optimizationThread(optimization_period_t period, [[maybe_unused]] size_t threshold)
-{
-    assert(db_);
-    assert(period.count() > 0);
-
-    try {
-        sqlite3_stmt *stmt{};
-        auto const sql = fmt::format("PRAGMA analysis_limit = {}; PRAGMA optimize;", threshold);
-        if (sqlite3_prepare_v2(db_, sql.data(), sql.length() + 1, &stmt, nullptr)) {
-            throw std::runtime_error(fmt::format("sqlite_conn_pool::optimization_thread: {}", sqlite3_errmsg(db_)));
-        }
-
-        do {
-            std::unique_lock lock(db_mutex_);
-            optimization_cv_.wait_for(lock, period, [this]() -> bool { return !run_optimization_thread_; });
-
-            sqlite3_step(stmt);
-            sqlite3_reset(stmt);
-        } while (run_optimization_thread_);
-
-        sqlite3_finalize(stmt);
-    }
-    catch (std::exception const &e) {
-    }
-}
-
-void ConnectionPoolImpl::startOptimizationThread(optimization_period_t period, size_t threshold)
-{
-    if (period.count() > 0 && !run_optimization_thread_.exchange(true)) {
-        optimization_thread_ = std::thread(&ConnectionPoolImpl::optimizationThread, this, std::move(period), threshold);
-
-        std::string_view thread_name("sqlite_opt");
-        assert(thread_name.length() <= 16);
-        pthread_setname_np(optimization_thread_.native_handle(), thread_name.data());
-    }
-}
-
-void ConnectionPoolImpl::stopOptimizationThread()
-{
-    if (run_optimization_thread_.exchange(false)) {
-        optimization_cv_.notify_one();
-    }
-    optimization_thread_.join();
 }
 
 void ConnectionPoolImpl::commit()

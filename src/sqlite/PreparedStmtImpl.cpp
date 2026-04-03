@@ -45,6 +45,8 @@ PreparedStmtImpl::ReturnCode PreparedStmtImpl::toErrorCode(int code)
         return ReturnCode::Done;
     case SQLITE_CONSTRAINT:
         return ReturnCode::ConstraintError;
+    case SQLITE_BUSY:
+        return ReturnCode::Busy;
     default:
         assert(false);
     }

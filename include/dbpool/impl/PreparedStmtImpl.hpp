@@ -20,7 +20,7 @@ namespace dbpool {
 /// \c PreparedStmt object will invoke functions on this object.
 class PreparedStmtImpl {
 public:
-    enum class ReturnCode { OK, Error, Row, Done, ConstraintError };
+    enum class ReturnCode { OK, Error, Row, Done, ConstraintError, Busy };
 
 public:
     PreparedStmtImpl() = default;

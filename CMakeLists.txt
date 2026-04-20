@@ -18,8 +18,8 @@ target_include_directories (dbpool
     ${CMAKE_CURRENT_LIST_DIR}/include
 )
 
-include (cmake/date.cmake)
-include (cmake/fmt.cmake)
+find_package (fmt 12.1.0 REQUIRED)
+find_package (date 3.0.0 REQUIRED)
 
 target_link_libraries (dbpool
     PUBLIC

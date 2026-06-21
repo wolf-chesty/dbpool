@@ -1,0 +1,63 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "debug-flags",
+            "displayName": "Debug Build",
+            "binaryDir": "${sourceDir}/build/debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "DBPOOL_UNIT_TESTS": "ON"
+            }
+        },
+        {
+            "name": "release-flags",
+            "displayName": "Release Build",
+            "binaryDir": "${sourceDir}/build/release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "DBPOOL_UNIT_TESTS": "ON"
+            }
+        },
+        {
+            "name": "coverage-flags",
+            "displayName": "Code Coverage Build",
+            "binaryDir": "${sourceDir}/build/coverage",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "DBPOOL_COVERAGE": "ON",
+                "DBPOOL_UNIT_TESTS": "ON"
+            }
+        },
+        {
+            "name": "perf-flags",
+            "displayName": "perf Build",
+            "binaryDir": "${sourceDir}/build/perf",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "DBPOOL_PERF": "ON",
+                "DBPOOL_UNIT_TESTS": "ON"
+            }
+        },
+        {
+            "name": "asan-flags",
+            "displayName": "ASan Build",
+            "binaryDir": "${sourceDir}/build/asan",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "DBPOOL_ASAN": "ON",
+                "DBPOOL_UNIT_TESTS": "ON"
+            }
+        },
+        {
+            "name": "tsan-flags",
+            "displayName": "TSan Build",
+            "binaryDir": "${sourceDir}/build/tsan",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "DBPOOL_TSAN": "ON",
+                "DBPOOL_UNIT_TESTS": "ON"
+            }
+        }
+    ]
+}

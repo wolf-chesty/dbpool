@@ -343,7 +343,7 @@ std::array<std::byte, 16> PreparedStmtImpl::getUuid(int32_t const index)
         throw std::runtime_error(fmt::format("sqlite::column_blob: null value for index {}", index));
     }
 
-    std::array<std::byte, 16> blob;
+    std::array<std::byte, 16> blob{};
     if (auto const b = sqlite3_column_blob(stmt_, index)) {
         memcpy((void *)&blob[0], b, blob.size());
     }

@@ -21,7 +21,7 @@ TEST(SQLite3Test, blob_bind_test)
     int const id0{0};
 
     std::array<std::byte, 256> blob;
-    for (auto val : blob) {
+    for (auto &val : blob) {
         val = static_cast<std::byte>(std::rand());
     }
 

@@ -48,7 +48,7 @@ int exec_callback(void *data, int c_num, char **c_vals, char **c_names)
 size_t ConnectionPoolImpl::sqlite_use_count_ = 0;
 
 ConnectionPoolImpl::ConnectionPoolImpl(std::string_view filename, size_t pool_size,
-                                       optimization_period_t optimization_period, size_t analysis_limit)
+                                       [[maybe_unused]] optimization_period_t optimization_period, [[maybe_unused]] size_t analysis_limit)
     : dbpool::ConnectionPoolImpl(pool_size)
 {
     initializeSqlite();

@@ -4,6 +4,8 @@ include(GoogleTest)
 
 add_executable(dbpool_unit_tests "")
 
+target_compile_features(dbpool_unit_tests PRIVATE cxx_std_20)
+
 enable_testing()
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.30.0")
@@ -14,6 +16,8 @@ add_test(NAME DBPoolUnitTests COMMAND dbpool_unit_tests)
 
 target_link_libraries(dbpool_unit_tests
 PRIVATE
+    $<$<BOOL:${DBPOOL_COVERAGE}>:gcov>
+
     GTest::gtest_main
     dbpool
     uuid
@@ -37,18 +41,4 @@ if(DBPOOL_ENABLE_SQLITE3)
         src/sqlite/stmt_text_tests.cpp
         src/sqlite/stmt_uuid_tests.cpp
     )
-endif()
-
-if(DBPOOL_COVERAGE)
-    target_link_options(dbpool_unit_tests PRIVATE --coverage)
-    target_link_libraries(dbpool_unit_tests PRIVATE gcov)
-elseif(DBPOOL_PERF)
-    target_compile_options(dbpool_unit_tests PRIVATE -O2 -fno-omit-frame-pointer -g)
-    target_link_options(dbpool_unit_tests PRIVATE -fno-omit-frame-pointer -g)
-elseif(DBPOOL_ASAN)
-    target_compile_options(dbpool_unit_tests PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -g)
-    target_link_options(dbpool_unit_tests PRIVATE -fsanitize=address,undefined)
-elseif(DBPOOL_TSAN)
-    target_compile_options(dbpool_unit_tests PRIVATE -fsanitize=thread -fno-omit-frame-pointer -g)
-    target_link_options(dbpool_unit_tests PRIVATE -fsanitize=thread)
 endif()

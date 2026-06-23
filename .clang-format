@@ -14,7 +14,7 @@ IndentPPDirectives: AfterHash
 IndentWrappedFunctionNames: true
 Language: Cpp
 PointerAlignment: Right
-QualifierAlignment: Right
+#QualifierAlignment: Right
 #QualifierOrder: ['inline', 'static', 'constexpr', 'volatile', 'restrict', 'type', 'const' ]
 ReflowComments: true
 SortUsingDeclarations: true

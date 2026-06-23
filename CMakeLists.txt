@@ -3,24 +3,29 @@ cmake_policy(VERSION 3.21)
 
 project(dbpool VERSION 0.0.0.0 LANGUAGES C CXX)
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Options
+# ----------------------------------------------------------------------------------------------------------------------
+option(DBPOOL_ENABLE_SQLITE3 "Enable SQLite3 support" ON)
+option(DBPOOL_UNIT_TESTS "Build unit tests" OFF)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Project dependencies
+# ----------------------------------------------------------------------------------------------------------------------
+find_package(fmt 12.1.0 REQUIRED)
+find_package(date 3.0.0 REQUIRED)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Project definition
+# ----------------------------------------------------------------------------------------------------------------------
 add_library(dbpool OBJECT "")
 
 target_compile_features(dbpool PRIVATE cxx_std_20)
-
-option(DBPOOL_ENABLE_SQLITE3 "Enable SQLite3 support" ON)
-option(DBPOOL_COVERAGE "Enable GCC Coverage" OFF)
-option(DBPOOL_PERF "Set GCC perf flags" OFF)
-option(DBPOOL_ASAN "Enable GCC Address Sanitizer (ASan)" OFF)
-option(DBPOOL_TSAN "Enable GCC Thread Sanitizer (TSan)" OFF)
-option(DBPOOL_UNIT_TESTS "Build unit tests" OFF)
 
 target_include_directories(dbpool
 PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/include
 )
-
-find_package(fmt 12.1.0 REQUIRED)
-find_package(date 3.0.0 REQUIRED)
 
 target_link_libraries(dbpool
 PUBLIC

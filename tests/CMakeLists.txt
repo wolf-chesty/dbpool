@@ -16,8 +16,6 @@ add_test(NAME DBPoolUnitTests COMMAND dbpool_unit_tests)
 
 target_link_libraries(dbpool_unit_tests
 PRIVATE
-    $<$<BOOL:${DBPOOL_COVERAGE}>:gcov>
-
     GTest::gtest_main
     dbpool
     uuid

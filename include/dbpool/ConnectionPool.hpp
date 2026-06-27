@@ -4,6 +4,8 @@
 #ifndef DBPOOL_CONNECTION_POOL_HPP
 #define DBPOOL_CONNECTION_POOL_HPP
 
+#include "dbpool/ConnectionPoolBase.hpp"
+
 #include "dbpool/Connection.hpp"
 #include "dbpool/util/PooledConnection.hpp"
 #include "impl/ConnectionPoolImpl.hpp"
@@ -12,6 +14,7 @@
 #include <string_view>
 
 namespace dbpool {
+
 class ConnectionImpl;
 
 template<class T>
@@ -27,9 +30,8 @@ concept ConnectionPoolImplT = std::derived_from<T, ConnectionPoolImpl>;
 ///
 /// Classes that derive from this will need to implement the API specific code required to return a \c db_conn object
 /// that wraps a API specific database handle.
-template<ConnectionPoolImplT connection_pool_t> class ConnectionPool {
+template<ConnectionPoolImplT connection_pool_t> class ConnectionPool : public ConnectionPoolBase {
 public:
-    ConnectionPool() = delete;
     ConnectionPool(ConnectionPool const &) = delete;
     ConnectionPool(ConnectionPool &&) noexcept = default;
 
@@ -61,11 +63,10 @@ public:
         conn_pool_->setSchema(schema);
     }
 
-    /// @brief Returns a pointer to a new \c Connection object that can be used to execute statements against the
-    ///        database.
+    /// @brief Returns a new \c Connection object that can be used to execute statements against the database.
     ///
     /// @return Pointer to a new \c Connection object.
-    Connection getConnection()
+    Connection getConnection() override
     {
         assert(conn_pool_);
         return Connection(std::make_shared<PooledConnection>(conn_pool_, conn_pool_->popConnection()));
@@ -106,6 +107,7 @@ protected:
 private:
     std::shared_ptr<connection_pool_t> conn_pool_; ///< Pointer to connection pool implementation.
 };
+
 } // namespace dbpool
 
 #endif

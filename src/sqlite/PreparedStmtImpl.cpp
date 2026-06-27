@@ -160,7 +160,15 @@ void PreparedStmtImpl::bindUuid(int32_t const index, std::span<std::byte const> 
 {
     assert(stmt_);
     if (sqlite3_bind_blob(stmt_, index, &value[0], value.size(), SQLITE_TRANSIENT) != SQLITE_OK) {
-        throw std::runtime_error(fmt::format("sqlite_stmt::bindBlob: {}", sqlite3_errmsg(db_)));
+        throw std::runtime_error(fmt::format("sqlite_stmt::bindUuid: {}", sqlite3_errmsg(db_)));
+    }
+}
+
+void PreparedStmtImpl::bindUuid(int32_t const index, uuid_t const &value)
+{
+    assert(stmt_);
+    if (sqlite3_bind_blob(stmt_, index, value, sizeof(uuid_t), SQLITE_TRANSIENT) != SQLITE_OK) {
+        throw std::runtime_error(fmt::format("sqlite_stmt::bindUuid: {}", sqlite3_errmsg(db_)));
     }
 }
 

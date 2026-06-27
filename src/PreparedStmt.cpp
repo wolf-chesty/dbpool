@@ -105,6 +105,12 @@ void PreparedStmt::bindUuid(int32_t const index, std::span<std::byte const> cons
     impl_->bindUuid(index, value);
 }
 
+void PreparedStmt::bindUuid(int32_t const index, uuid_t const &value)
+{
+    assert(impl_);
+    impl_->bindUuid(index, value);
+}
+
 std::vector<std::byte> PreparedStmt::getBlob(int32_t const index)
 {
     assert(impl_);

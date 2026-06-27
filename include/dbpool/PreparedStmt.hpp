@@ -8,6 +8,7 @@
 #include <memory>
 #include <span>
 #include <string>
+#include <uuid/uuid.h>
 #include <vector>
 
 namespace dbpool {
@@ -113,6 +114,12 @@ public:
     /// @param index Index of the column to bind \c value to.
     /// @param value Data to bind to the prepared statement field.
     void bindUuid(int32_t const index, std::span<std::byte const> const &value);
+
+    /// @brief Binds a UUI value to a prepared statement field.
+    ///
+    /// @param index Index of the column to bind \c value to.
+    /// @param value Data to bind to the prepared statement field.
+    void bindUuid(int32_t const index, uuid_t const &value);
 
     /// @brief Returns binary data from a prepared statement result.
     ///
